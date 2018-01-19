@@ -1,0 +1,320 @@
+
+\documentclass[11pt]{article}
+\usepackage[a4paper, total={4in, 6in}]{geometry}
+\marginparwidth 0.5in 
+\oddsidemargin 0.25in 
+\evensidemargin 0.25in 
+\marginparsep 0.25in
+\topmargin 0.25in 
+\textwidth 6in \textheight 8 in
+% That's about enough definitions
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{upgreek}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{algpseudocode}
+
+\begin{document}
+\author{Abhishek Kumar\hspace{0.25cm}
+Madhukant\hspace{0.25cm}
+Tushar Gupta \\ 150035\hspace{1cm} 150368\hspace{1cm} 150771 \\
+abhikr@iitk.ac.in mkant@iitk.ac.in tusharg@iitk.ac.in} 
+\title{CS335 Assignment 0}
+\maketitle
+
+% \begin{center}
+%     \begin{table}[]
+%         \centering
+%         \begin{tabular}{|c|c|c|}
+%              \hline
+%              Abhishek Kumar & 150035 & abhikr@iitk.ac.in\\
+%              \hline
+%              MadhuKant & 150368 & mkant@iitk.ac.in \\
+%              \hline
+%              Tushar Gupta & 150771 & tusharg@iitk.ac.in\\
+%              \hline
+%         \end{tabular}
+%         \caption{Team Members}
+%         \label{tab:my_label}
+%     \end{table}
+% \end{center}  
+\begin{enumerate}
+    \item \textbf{T Diagram}
+    
+    
+    \includegraphics[scale=0.25]{T_DIAG.png}
+    
+    \newpage
+    \item \textbf{BNF}
+    % \begingroup
+    % \obeylines
+    % \input{bnf.tex}
+    % \endgroup
+   % -------------------------------------------------
+    
+\color{blue}
+$<program>                 ::= <imports>\,<interfaces>\,<classes>$\\
+
+$<interfaces>                 ::= interface \,\,TYPE \{<feature\_list\_op>\} <interfaces> | <empty>$\\
+
+$<imports>                 ::= import \,\,ID;\,<imports> | <empty>$\\
+\color{black}
+$<classes>                 ::= <classes> <class> ;$\\
+                          \hspace*{2.5cm}$|   <class> ;$\\
+
+$<class>                   ::= <modifier> class \,\,TYPE <inheritance> <interfaces> \{ <features\_list\_opt> \} ;$\\
+\color{blue}
+
+$<modifier>                 ::= public \,|\, abstract \,| \,<empty>$\\
+
+$<interfaces>                 ::= implements \,\,TYPE \,\,| \,\,<empty>$\\
+\color{black}
+$<inheritance>             ::= inherits \,\,TYPE \,\,|\,\, <empty>$\\
+
+$<features\_list\_opt>       ::= <features\_list> | <empty>$\\
+
+$<features\_list>           ::= <features\_list> <feature> ;$\\
+                          \hspace*{3.6cm}$|   <feature> ;$\\
+
+$<feature>                 ::= <feature\_modifier> \,ID ( <formal\_params\_list\_opt> ) : TYPE \{ <expression> \}$\\
+                          \hspace*{2.9cm}$| <formal\_modifier>\,<formal>$\\
+\color{blue}                          
+$<feature\_modifier>             ::=  abstract \,\,|\,\, public\, | \,private \,|\, <empty>$\\
+
+$<formal\_modifier>             ::= private \,\,|\,\, public \,\,|\,\, <empty>$\\
+\color{black}
+$<formal\_params\_list\_opt>  ::= <formal\_params\_list>$\\
+                          \hspace*{5.2cm}$|   <empty>$\\
+
+$<formal\_params\_list>      ::= <formal\_params\_list> , <formal\_param>$\\
+                          \hspace*{4.5cm}$|   <formal\_param>$\\
+
+$<formal\_param>            ::= ID : TYPE $\\
+\color{blue}
+                                \hspace*{3.8cm}$| ID[\,\,] : TYPE$\\
+\color{black}
+$<formal>                  ::= ID : TYPE <- <expression>\,;$\\
+                          \hspace*{2.5cm}$|   ID : TYPE\,;$\\
+            \color{blue}
+            \hspace*{2.5cm}$|   ID : TYPE\,[<experssion>]\,;$\\
+    \color{black}
+$<expression>              ::= ID <- <expression> $\\
+                    \color{blue}
+                           \hspace*{3.2cm}$| ID[<expression>] <- <expression>$\\
+                    \color{black}
+                          \hspace*{3.2cm}$|   <expression>.ID( <arguments\_list\_opt> )$\\
+                          \hspace*{3.2cm}$|   <expression><at-type>.ID( <arguments\_list\_opt> )$\\
+                          \hspace*{3.2cm}$|   <if\_then\_else>$\\
+                          \hspace*{3.2cm}$|   <while> $\\
+                          \color{blue}
+                          \hspace*{3.2cm}$|   <for>$\\
+                          \color{black}
+                          \hspace*{3.2cm}$|   <block\_expression>$\\
+                          \hspace*{3.2cm}$|   <let\_expression>$\\
+                          \hspace*{3.2cm}$|   new TYPE$\\
+                          \hspace*{3.2cm}$|   isvoid <expr>$\\
+                          \hspace*{3.2cm}$|   <expression> + <expression>$\\
+                          \hspace*{3.2cm}$|   <expression> - <expression>$\\
+                          \hspace*{3.2cm}$|   <expression> * <expression>$\\
+                          \hspace*{3.2cm}$|   <expression> / <expression>$\\
+                          \color{blue}
+                          \hspace*{3.2cm}$|   <expression> \% <expression>$\\
+                          \color{black}
+                          \hspace*{3.2cm}$|   ~ <expression>$\\
+                          \hspace*{3.2cm}$|   <expression> \, < <expression>$\\
+                          \hspace*{3.2cm}$|   <expression> \,<= <expression>$\\
+                          \hspace*{3.2cm}$|   <expression> = <expression>$\\
+                          \color{blue}
+                          \hspace*{3.2cm}$|   <expression> \,> <expression>$\\
+                          \hspace*{3.2cm}$|   <expression> \, >= <expression>$\\
+                          \hspace*{3.2cm}$|   <expression> \, or <expression>$\\
+                          \hspace*{3.2cm}$|   <expression> \, and <expression>$\\
+                          \color{black}
+                          \hspace*{3.2cm}$|   not <expression>$\\
+                          \hspace*{3.2cm}$|   ( <expression> )$\\
+                          \hspace*{3.2cm}$|   SELF$\\
+                          \hspace*{3.2cm}$|   ID$\\
+                          \color{blue}
+                          \hspace*{3.2cm}$|   ID[<expression>]$\\
+                          \color{black}
+                          \hspace*{3.2cm}$|   INTEGER$\\
+                          \hspace*{3.2cm}$|   STRING$\\
+                          \hspace*{3.2cm}$|   TRUE$\\
+                          \hspace*{3.2cm}$|   FALSE$\\
+                          \color{blue}
+                          \hspace*{3.2cm}$|   BREAK$\\
+                          \hspace*{3.2cm}$|   CONTINUE$\\
+                          \color{black}
+
+$<arguments\_list\_opt>      ::= <arguments\_list>$\\
+                          \hspace*{4.5cm}$|   <empty>$\\
+
+$<arguments\_list>          ::= <arguments\_list\_opt> , <expression>$\\
+                          \hspace*{4.1cm}$|   <expression>$\\
+
+% $<case>                    ::= case <expression> of <actions> esac$\\
+
+$<action>                  ::= ID : TYPE => <expr>$\\
+
+$<actions>                 ::= <action>$\\
+                          \hspace*{2.7cm}$|   <action> <actions>$\\
+
+$<if\_then\_else>            ::= if <expression> then <expression> else <expression> fi$\\
+
+$<while>                   ::= while <expression> loop <expression> pool$\\
+\color{blue}
+$<for>                   ::= for ( <expression> ; <expression> ; <expression> ) loop <expression> pool$\\
+\color{black}
+
+$<block\_expression>        ::= { <block\_list> }$\\
+
+$<block\_list>              ::= <block\_list> <expression> ;$\\
+                          \hspace*{3.2cm}$|   <expression> ;$\\
+
+$<let\_expression>          ::= let <formal> in <expression>$\\
+                          \hspace*{3.8cm}$|   <nested\_lets> , <formal>$\\
+
+$<nested\_lets>            ::= <formal> IN <expression>$\\
+                          \hspace*{3.2cm}$|   <nested\_lets> , <formal>$\\
+
+$<empty>                   ::=  $\\
+
+    
+    
+    %------------------------------------------------
+    \item \textbf{Syntactic rules deleted from base Language}\\
+    $<case>                    ::= case <expression> of <actions> esac$\\
+    \item \textbf{Reserved Keyword} 
+    \begin{itemize}
+        \item Int
+        \item String
+        \item Object
+        \item abstract
+        \item and
+        \item case
+        \item class
+        \item else
+        \item esac
+        \item fi
+        \item if 
+        \item implements
+        \item import
+        \item in
+        \item inherits
+        \item interface
+        \item isvoid
+        \item for
+        \item let
+        \item loop
+        \item new
+        \item not
+        \item or
+        \item of
+        \item pool
+        \item public
+        \item private
+        \item self
+        \item then
+        \item while
+
+    \end{itemize}
+    \item \textbf{Semantic description of the new constructs added}
+    \begin{itemize}
+        \item \textbf{import}\\
+        \textit{import} statement is used to bring certain classes or the entire packages, into visibility. For example if we have to create a list of integers, we can import a list package(already written COOL file) and create a list object and use functions on it
+
+    \begin{verbatim}
+    import List;
+    
+    ....
+    
+    L = new List;
+    L.append(1);
+\end{verbatim}
+This code compiles correctly if we have package named List.cl and has append function declared in it. \textit{import} declaration section is a compile-time element of the source codes, and has no presence at run-time
+        
+    
+        \item \textbf{for-loop}\\
+        A \textit{for} loop, as described in the BNF above, has the following structure: 
+        \begin{verbatim}
+            for(expr_1; expr_2; expr_3)
+            loop
+                expr_block;
+            pool
+        \end{verbatim}
+        The execution protocol is as follows:\\
+        \begin{itemize}
+            \item {expr\_1 is executed only once before the execution of the for loop}
+            \item {expr\_2 is evaluated before each iteration of the loop. If expr\_2 evaluates to \textbf{TRUE}, then the expr\_block is executed. However, if expr\_2 is evaluated to be \textbf{FALSE}, for loop is broken out of and control reaches the statement after the \textit{pool} keyword}
+            \item{expr\_3 is executed after the execution of each iteration of the loop}
+        \end{itemize}
+        
+        For example, the code below:
+        \begin{verbatim}
+            for(i<-0; i<5; i<-i+1)
+            loop{
+                out_int(i)
+            }pool
+        \end{verbatim}
+        outputs:
+        \begin{verbatim}
+            01234
+        \end{verbatim}
+        
+
+        
+        \item \textbf{Interfaces} An interface is a blueprint of a class. It has constants and abstract methods. The methods don't have body. Interfaces cannot be instantiated. A class \textit{implements} an Interface. The class which is implementing an interface must provide a body for all the functions in interface. An interface in COOL cannot extend or implement any other class/interface. It is used to achieve abstraction.
+        
+        \item \textbf{Access Modifiers} We allow three access modifiers - \textit{abstract, public, private}. By default all the classes, methods and  variables in class are public. Class variables can be made private barring direct access to these variables from outside the class(will need getter and setter functions). A method can be declared as abstract. If a class includes abstract methods, then the class itself must be declared abstract. An abstract method only contains definitions, but no implementations. The implementations are provided in the concrete class which extends abstract class, only after which the methods can be implemented. . Abstract class may have non-abstract methods.
+        
+        \item \textbf{Array} An array is a group of like-typed variables that are referred to by a common name. This language only provide static allocation of array. Array can be declared by - 
+        \begin{verbatim}
+            arr : Int[10];
+        \end{verbatim}
+        \vspace{-0.5cm}
+        Its assignment is done by 
+        \begin{verbatim}
+            arr[0] <- 5;
+            arr[1] <- 6;
+            .
+            .
+        \end{verbatim}
+        \vspace{-0.5cm}
+        
+        \item \textbf{BREAK \& CONTINUE}\\
+        
+        \textbf{BREAK} is used to exit from the current running loop.\\ When the break statement is encountered inside a loop, the loop is immediately terminated and the program control resumes at the next statement following the loop.\\
+        
+        \textbf{CONTINUE} is used to skip the current iteration in loop. \\
+        In for loop, after the continue keyword control reaches to the updation step of iterating variable
+        In while loop after the continue keyword control flow reaches to the boolean check expression
+        
+        \item \textbf{Operator}
+        Some operator are added to the original COOL language. Operators added are -
+        \begin{itemize}
+            \item \textbf{\%} - It is the modulus operator which gives the remainder of the two operands-
+            \begin{verbatim}
+            c <- a % b
+            \end{verbatim}
+            \vspace{-0.5cm}
+            variable c gets remainder of division when variable a is divided by variable b.
+            
+            \item \textbf{$>=,>$} these are the general "greater than or equal to" and "greater than" operators
+            \item \textbf{or} is used as the general 'logical or' operator on two boolean expressions.
+            \item \textbf{and} is used as the general 'logical and' operator on two boolean expressions.
+        \end{itemize}
+        
+    \end{itemize}
+    
+    
+    
+    
+    
+    
+    \item \textbf{Tool} to be used for lexing and parsing are from PLY library of python.
+    
+    
+\end{enumerate}
+\end{document}
+
