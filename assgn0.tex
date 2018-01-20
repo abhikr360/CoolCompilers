@@ -54,89 +54,83 @@ abhikr@iitk.ac.in mkant@iitk.ac.in tusharg@iitk.ac.in}
    % -------------------------------------------------
     
 \color{blue}
-$<program>                 ::= <imports>\,<interfaces>\,<classes>$\\
+$\langle program\rangle                 ::= \langle imports\rangle\,\langle classes\rangle$\\
 
-$<interfaces>                 ::= interface \,\,TYPE \{<feature\_list\_op>\} <interfaces> | <empty>$\\
-
-$<imports>                 ::= import \,\,ID;\,<imports> | <empty>$\\
+$\langle imports\rangle                 ::= import \,\,ID;\,\langle imports\rangle | \langle empty\rangle$\\
 \color{black}
-$<classes>                 ::= <classes> <class> ;$\\
-                          \hspace*{2.5cm}$|   <class> ;$\\
+$\langle classes\rangle                 ::= \langle classes\rangle \langle class\rangle ;$\\
+                          \hspace*{2.3cm}$|   \langle class\rangle ;$\\
 
-$<class>                   ::= <modifier> class \,\,TYPE <inheritance> <interfaces> \{ <features\_list\_opt> \} ;$\\
+$\langle class\rangle                   ::= class \,\,TYPE \langle inheritance\rangle \{ \langle features\_list\_opt\rangle \} ;$\\
 \color{blue}
 
-$<modifier>                 ::= public \,|\, abstract \,| \,<empty>$\\
-
-$<interfaces>                 ::= implements \,\,TYPE \,\,| \,\,<empty>$\\
 \color{black}
-$<inheritance>             ::= inherits \,\,TYPE \,\,|\,\, <empty>$\\
+$\langle inheritance\rangle             ::= inherits \,\,TYPE \,\,|\,\, \langle empty\rangle$\\
 
-$<features\_list\_opt>       ::= <features\_list> | <empty>$\\
+$\langle features\_list\_opt\rangle       ::= \langle features\_list\rangle | \langle empty\rangle$\\
 
-$<features\_list>           ::= <features\_list> <feature> ;$\\
-                          \hspace*{3.6cm}$|   <feature> ;$\\
+$\langle features\_list\rangle           ::= \langle features\_list\rangle \langle feature\rangle ;$\\
+                          \hspace*{3.3cm}$|   \langle feature\rangle ;$\\
 
-$<feature>                 ::= <feature\_modifier> \,ID ( <formal\_params\_list\_opt> ) : TYPE \{ <expression> \}$\\
-                          \hspace*{2.9cm}$| <formal\_modifier>\,<formal>$\\
+$\langle feature\rangle                 ::= \langle modifier\rangle \,ID ( \langle formal\_params\_list\_opt\rangle ) : TYPE \{ \langle expression\rangle \}$\\
+                          \hspace*{2.4cm}$| \langle modifier\rangle\,\langle formal\rangle$\\
 \color{blue}                          
-$<feature\_modifier>             ::=  abstract \,\,|\,\, public\, | \,private \,|\, <empty>$\\
+$\langle modifier\rangle             ::= \,\, public\, | \,private \,|\, \langle empty\rangle$\\
 
-$<formal\_modifier>             ::= private \,\,|\,\, public \,\,|\,\, <empty>$\\
 \color{black}
-$<formal\_params\_list\_opt>  ::= <formal\_params\_list>$\\
-                          \hspace*{5.2cm}$|   <empty>$\\
+$\langle formal\_params\_list\_opt\rangle  ::= \langle formal\_params\_list\rangle$\\
+                          \hspace*{5.2cm}$|   \langle empty\rangle$\\
 
-$<formal\_params\_list>      ::= <formal\_params\_list> , <formal\_param>$\\
-                          \hspace*{4.5cm}$|   <formal\_param>$\\
+$\langle formal\_params\_list\rangle      ::= \langle formal\_params\_list\rangle , \langle formal\_param\rangle$\\
+                          \hspace*{4.5cm}$|   \langle formal\_param\rangle$\\
 
-$<formal\_param>            ::= ID : TYPE $\\
+$\langle formal\_param\rangle            ::= ID : TYPE $\\
 \color{blue}
-                                \hspace*{3.8cm}$| ID[\,\,] : TYPE$\\
+                                \hspace*{3.45cm}$| ID[\,\,] : TYPE$\\
 \color{black}
-$<formal>                  ::= ID : TYPE <- <expression>\,;$\\
-                          \hspace*{2.5cm}$|   ID : TYPE\,;$\\
+$\langle formal\rangle                  ::= ID : TYPE <\hspace{-0.25cm}- \langle expression\rangle\,;$\\
+                          \hspace*{2.3cm}$|   ID : TYPE\,;$\\
             \color{blue}
-            \hspace*{2.5cm}$|   ID : TYPE\,[<experssion>]\,;$\\
+            \hspace*{2.3cm}$|   ID : TYPE\,[\langle experssion\rangle]\,;$\\
     \color{black}
-$<expression>              ::= ID <- <expression> $\\
+$\langle expression\rangle              ::= ID <\hspace{-0.25cm}- \langle expression\rangle $\\
                     \color{blue}
-                           \hspace*{3.2cm}$| ID[<expression>] <- <expression>$\\
+                           \hspace*{3.2cm}$| ID[\langle expression\rangle] <\hspace{-0.25cm}- \langle expression\rangle$\\
                     \color{black}
-                          \hspace*{3.2cm}$|   <expression>.ID( <arguments\_list\_opt> )$\\
-                          \hspace*{3.2cm}$|   <expression><at-type>.ID( <arguments\_list\_opt> )$\\
-                          \hspace*{3.2cm}$|   <if\_then\_else>$\\
-                          \hspace*{3.2cm}$|   <while> $\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle.ID( \langle arguments\_list\_opt\rangle )$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle @TYPE.ID( \langle arguments\_list\_opt\rangle )$\\
+                          \hspace*{3.2cm}$|   \langle if\_then\_else\rangle$\\
+                          \hspace*{3.2cm}$|   \langle while\rangle $\\
                           \color{blue}
-                          \hspace*{3.2cm}$|   <for>$\\
+                          \hspace*{3.2cm}$|   \langle for\rangle$\\
                           \color{black}
-                          \hspace*{3.2cm}$|   <block\_expression>$\\
-                          \hspace*{3.2cm}$|   <let\_expression>$\\
+                          \hspace*{3.2cm}$|   \langle block\_expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle let\_expression\rangle$\\
                           \hspace*{3.2cm}$|   new TYPE$\\
-                          \hspace*{3.2cm}$|   isvoid <expr>$\\
-                          \hspace*{3.2cm}$|   <expression> + <expression>$\\
-                          \hspace*{3.2cm}$|   <expression> - <expression>$\\
-                          \hspace*{3.2cm}$|   <expression> * <expression>$\\
-                          \hspace*{3.2cm}$|   <expression> / <expression>$\\
+                          \hspace*{3.2cm}$|   isvoid \langle expr\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle + \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle - \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle * \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle / \langle expression\rangle$\\
                           \color{blue}
-                          \hspace*{3.2cm}$|   <expression> \% <expression>$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle \% \langle expression\rangle$\\
                           \color{black}
-                          \hspace*{3.2cm}$|   ~ <expression>$\\
-                          \hspace*{3.2cm}$|   <expression> \, < <expression>$\\
-                          \hspace*{3.2cm}$|   <expression> \,<= <expression>$\\
-                          \hspace*{3.2cm}$|   <expression> = <expression>$\\
+                          \hspace*{3.2cm}$|   ~ \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle \, <  \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle \,<= \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle = \langle expression\rangle$\\
                           \color{blue}
-                          \hspace*{3.2cm}$|   <expression> \,> <expression>$\\
-                          \hspace*{3.2cm}$|   <expression> \, >= <expression>$\\
-                          \hspace*{3.2cm}$|   <expression> \, or <expression>$\\
-                          \hspace*{3.2cm}$|   <expression> \, and <expression>$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle \,> \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle \, >= \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle \, or \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle \, and \langle expression\rangle$\\
                           \color{black}
-                          \hspace*{3.2cm}$|   not <expression>$\\
-                          \hspace*{3.2cm}$|   ( <expression> )$\\
+                          \hspace*{3.2cm}$|   not \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   ( \langle expression\rangle )$\\
                           \hspace*{3.2cm}$|   SELF$\\
                           \hspace*{3.2cm}$|   ID$\\
                           \color{blue}
-                          \hspace*{3.2cm}$|   ID[<expression>]$\\
+                          \hspace*{3.2cm}$|   ID[\langle expression\rangle]$\\
                           \color{black}
                           \hspace*{3.2cm}$|   INTEGER$\\
                           \hspace*{3.2cm}$|   STRING$\\
@@ -147,50 +141,49 @@ $<expression>              ::= ID <- <expression> $\\
                           \hspace*{3.2cm}$|   CONTINUE$\\
                           \color{black}
 
-$<arguments\_list\_opt>      ::= <arguments\_list>$\\
-                          \hspace*{4.5cm}$|   <empty>$\\
+$\langle arguments\_list\_opt\rangle      ::= \langle arguments\_list\rangle$\\
+                          \hspace*{4.5cm}$|   \langle empty\rangle$\\
 
-$<arguments\_list>          ::= <arguments\_list\_opt> , <expression>$\\
-                          \hspace*{4.1cm}$|   <expression>$\\
+$\langle arguments\_list\rangle          ::= \langle arguments\_list\_opt\rangle , \langle expression\rangle$\\
+                          \hspace*{4.1cm}$|   \langle expression\rangle$\\
 
-% $<case>                    ::= case <expression> of <actions> esac$\\
+% $\langle case\rangle                    ::= case \langle expression\rangle of \langle actions\rangle esac$\\
 
-$<action>                  ::= ID : TYPE => <expr>$\\
+$\langle action\rangle                  ::= ID : TYPE => \langle expr\rangle$\\
 
-$<actions>                 ::= <action>$\\
-                          \hspace*{2.7cm}$|   <action> <actions>$\\
+$\langle actions\rangle                 ::= \langle action\rangle$\\
+                          \hspace*{2.7cm}$|   \langle action\rangle \langle actions\rangle$\\
 
-$<if\_then\_else>            ::= if <expression> then <expression> else <expression> fi$\\
+$\langle if\_then\_else\rangle            ::= if \langle expression\rangle then \langle expression\rangle else \langle expression\rangle fi$\\
 
-$<while>                   ::= while <expression> loop <expression> pool$\\
+$\langle while\rangle                   ::= while \langle expression\rangle loop \langle expression\rangle pool$\\
 \color{blue}
-$<for>                   ::= for ( <expression> ; <expression> ; <expression> ) loop <expression> pool$\\
+$\langle for\rangle                   ::= for ( \langle expression\rangle ; \langle expression\rangle ; \langle expression\rangle ) loop \langle expression\rangle pool$\\
 \color{black}
 
-$<block\_expression>        ::= { <block\_list> }$\\
+$\langle block\_expression \rangle        ::= { \langle block\_list\rangle }$\\
 
-$<block\_list>              ::= <block\_list> <expression> ;$\\
-                          \hspace*{3.2cm}$|   <expression> ;$\\
+$\langle block\_list\rangle              ::= \langle block\_list\rangle \langle expression\rangle ;$\\
+                          \hspace*{3.2cm}$|   \langle expression\rangle ;$\\
+    
+$\langle let\_expression\rangle          ::= let \langle formal\rangle in \langle expression\rangle$\\
+                          \hspace*{3.8cm}$|   \langle nested\_lets\rangle , \langle formal\rangle$\\
 
-$<let\_expression>          ::= let <formal> in <expression>$\\
-                          \hspace*{3.8cm}$|   <nested\_lets> , <formal>$\\
+$\langle nested\_lets\rangle            ::= \langle formal\rangle IN \langle expression\rangle$\\
+                          \hspace*{3.2cm}$|   \langle nested\_lets\rangle , \langle formal\rangle$\\
 
-$<nested\_lets>            ::= <formal> IN <expression>$\\
-                          \hspace*{3.2cm}$|   <nested\_lets> , <formal>$\\
-
-$<empty>                   ::=  $\\
+$\langle empty\rangle                   ::=  $\\
 
     
     
     %------------------------------------------------
     \item \textbf{Syntactic rules deleted from base Language}\\
-    $<case>                    ::= case <expression> of <actions> esac$\\
+    $\langle case\rangle                    ::= case \langle expression\rangle of \langle actions\rangle esac$\\
     \item \textbf{Reserved Keyword} 
     \begin{itemize}
         \item Int
         \item String
         \item Object
-        \item abstract
         \item and
         \item case
         \item class
@@ -198,11 +191,9 @@ $<empty>                   ::=  $\\
         \item esac
         \item fi
         \item if 
-        \item implements
         \item import
         \item in
         \item inherits
-        \item interface
         \item isvoid
         \item for
         \item let
@@ -232,7 +223,7 @@ $<empty>                   ::=  $\\
     L = new List;
     L.append(1);
 \end{verbatim}
-This code compiles correctly if we have package named List.cl and has append function declared in it. \textit{import} declaration section is a compile-time element of the source codes, and has no presence at run-time
+This code compiles correctly if we have package named List.cl and has append function defined in it. \textit{import} declaration section is a compile-time element of the source codes, and has no presence at run-time
         
     
         \item \textbf{for-loop}\\
@@ -245,9 +236,9 @@ This code compiles correctly if we have package named List.cl and has append fun
         \end{verbatim}
         The execution protocol is as follows:\\
         \begin{itemize}
-            \item {expr\_1 is executed only once before the execution of the for loop}
-            \item {expr\_2 is evaluated before each iteration of the loop. If expr\_2 evaluates to \textbf{TRUE}, then the expr\_block is executed. However, if expr\_2 is evaluated to be \textbf{FALSE}, for loop is broken out of and control reaches the statement after the \textit{pool} keyword}
-            \item{expr\_3 is executed after the execution of each iteration of the loop}
+            \item {expr\_1 is initialization, executed only once before the execution of the for loop}
+            \item {expr\_2 is condition, evaluated before each iteration of the loop. If expr\_2 evaluates to \textbf{TRUE}, then the expr\_block is executed. However, if expr\_2 is evaluated to be \textbf{FALSE}, for loop is broken out of and control reaches the statement after the \textit{pool} keyword}
+            \item{expr\_3 is updation, executed after the execution of each iteration of the loop}
         \end{itemize}
         
         For example, the code below:
@@ -262,11 +253,8 @@ This code compiles correctly if we have package named List.cl and has append fun
             01234
         \end{verbatim}
         
-
         
-        \item \textbf{Interfaces} An interface is a blueprint of a class. It has constants and abstract methods. The methods don't have body. Interfaces cannot be instantiated. A class \textit{implements} an Interface. The class which is implementing an interface must provide a body for all the functions in interface. An interface in COOL cannot extend or implement any other class/interface. It is used to achieve abstraction.
-        
-        \item \textbf{Access Modifiers} We allow three access modifiers - \textit{abstract, public, private}. By default all the classes, methods and  variables in class are public. Class variables can be made private barring direct access to these variables from outside the class(will need getter and setter functions). A method can be declared as abstract. If a class includes abstract methods, then the class itself must be declared abstract. An abstract method only contains definitions, but no implementations. The implementations are provided in the concrete class which extends abstract class, only after which the methods can be implemented. . Abstract class may have non-abstract methods.
+        \item \textbf{Access Modifiers} We allow two access modifiers - \textit{public, private}. By default all the classes, methods and  variables in class are public. Class variables can be made private barring direct access to these variables from outside the class(will need getter and setter functions). A method can be declared as private can be called from inside the class only.
         
         \item \textbf{Array} An array is a group of like-typed variables that are referred to by a common name. This language only provide static allocation of array. Array can be declared by - 
         \begin{verbatim}
@@ -317,4 +305,3 @@ This code compiles correctly if we have package named List.cl and has append fun
     
 \end{enumerate}
 \end{document}
-
