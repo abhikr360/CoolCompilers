@@ -51,7 +51,7 @@ tokens = (
    # 'THEN',
    # 'ELSE',
    # 'FI',
-   # 'WHILE',
+   'WHILE',
    # 'LOOP',
    # 'POOL',
    # 'FOR',
@@ -76,7 +76,18 @@ reserved = {
   'public' : 'PUBLIC',
   'private' : 'PRIVATE',
   'main' : 'MAIN',
-  'Object' : 'OBJECT'
+  'Object' : 'OBJECT',
+  'while' : 'WHILE',
+  # 'loop' : 'LOOP',
+  # 'pool' : 'POOL',
+  # 'for' : 'FOR',
+  # 'let' : 'LET',
+  # 'in' : 'IN',
+  # 'self' : 'SELF',
+  # 'break' : 'BREAK',
+  # 'continue' : 'CONTINUE',
+  # 'isvoid' : 'ISVOID',
+  # 'new' : 'NEW'
 
 }
 
@@ -127,6 +138,7 @@ data = '''
 import abara
 main
 [43]
+for abc in mcd
 3 + 4 * 10}
   + -20 *2
 '''
