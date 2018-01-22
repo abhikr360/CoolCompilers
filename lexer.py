@@ -22,6 +22,7 @@ tokens = (
    'RPAREN',
    'LBRACE',
    'RBRACE',
+   'PERIOD',
    'MAIN',
    'OBJECT',
 
@@ -29,7 +30,8 @@ tokens = (
    'INTEGER',
    'INTEGER_TYPE',
    'BOOL_TYPE',
-   'STRING_TYPE'
+   'STRING_TYPE',
+   'SELF_TYPE',
    'STRING',
    'TRUE',
    'FALSE',
@@ -98,6 +100,7 @@ reserved = {
   'String' : 'STRING_TYPE',
   'TRUE' : 'TRUE',
   'FALSE' : 'FALSE',
+  'SELF_TYPE' : 'SELF_TYPE'
 
 }
 
@@ -122,7 +125,7 @@ t_EQUAL = r'='
 t_LTEQ = r'<='
 t_GTEQ = r'>='
 t_GETS = r'<-'
-
+t_PERIOD = r'\.'
 
 
 
@@ -165,7 +168,8 @@ class Main inherits IO {
   x : Int;
    main(): SELF_TYPE {
   out_string("Hello World\n")
-  a<-23
+  a<-23.;
+  let a in Int:xyz;
    };
 };
 '''
