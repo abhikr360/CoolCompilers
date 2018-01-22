@@ -88,6 +88,13 @@ reserved = {
   # 'continue' : 'CONTINUE',
   # 'isvoid' : 'ISVOID',
   # 'new' : 'NEW'
+  'Int' : 'INTEGER_TYPE',
+  'Bool' : 'BOOL_TYPE',
+  'String' : 'STRING_TYPE',
+  'TRUE' : 'TRUE',
+  'FALSE' : 'FALSE',
+
+
 
 }
 
@@ -103,6 +110,8 @@ t_RBRACE  = r'\}'
 t_LSQRBRACKET = r'\['
 t_RSQRBRACKET = r'\]'
 t_SEMICOLON = r';'
+t_COLON = r':'
+
 
 
 # A regular expression rule with some action code
@@ -135,12 +144,12 @@ def t_error(t):
 lexer = lex.lex()
 
 data = '''
-import abara
-main
-[43]
-for abc in mcd
-3 + 4 * 10}
-  + -20 *2
+class Main inherits IO {
+  x : Int;
+   main(): SELF_TYPE {
+  out_string("Hello, World.\n")
+   };
+};
 '''
 
 # Give the lexer some input
