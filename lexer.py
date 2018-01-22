@@ -35,12 +35,12 @@ tokens = (
    'FALSE',
    'MOD',
    'TILDA',
-   # 'GT',
-   # 'LT',
-   # 'EQUAL',
-   # 'LTEQ',
-   # 'GTEQ',
-   # 'GETS',
+   'GT',
+   'LT',
+   'EQUAL',
+   'LTEQ',
+   'GTEQ',
+   'GETS',
    'OR',
    'AND',
    'NOT',
@@ -116,6 +116,13 @@ t_RSQRBRACKET = r'\]'
 t_SEMICOLON = r';'
 t_COLON = r':'
 t_TILDA = r'~'
+t_GT = r'>'
+t_LT = r'<'
+t_EQUAL = r'='
+t_LTEQ = r'<='
+t_GTEQ = r'>='
+t_GETS = r'<-'
+
 
 
 
@@ -158,6 +165,7 @@ class Main inherits IO {
   x : Int;
    main(): SELF_TYPE {
   out_string("Hello World\n")
+  a<-23
    };
 };
 '''
