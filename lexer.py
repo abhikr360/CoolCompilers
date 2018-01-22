@@ -91,6 +91,7 @@ t_LBRACE  = r'\{'
 t_RBRACE  = r'\}'
 t_LSQRBRACKET = r'\['
 t_RSQRBRACKET = r'\]'
+t_SEMICOLON = r';'
 
 
 # A regular expression rule with some action code
@@ -119,9 +120,9 @@ def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
-# Build the lexer
+
 lexer = lex.lex()
-# Test it out
+
 data = '''
 import abara
 main
@@ -129,7 +130,6 @@ main
 3 + 4 * 10}
   + -20 *2
 '''
-# data="( 3 + 2 )"
 
 # Give the lexer some input
 lexer.input(data)
@@ -138,5 +138,5 @@ lexer.input(data)
 while True:
     tok = lexer.token()
     if not tok: 
-        break      # No more input
+        break
     print(tok)
