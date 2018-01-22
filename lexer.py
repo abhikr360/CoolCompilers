@@ -26,8 +26,10 @@ tokens = (
 
    # # DATA TYPES
    'INTEGER',
-   # 'BOOL',
-   # 'STRING',
+   'INTEGER_TYPE',
+   'BOOL_TYPE',
+   'STRING_TYPE',
+   'STRING',
    # 'TRUE',
    # 'FALSE'
    # # OPERATORS 
@@ -126,6 +128,11 @@ def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value,'ID')    # Check for reserved words
     return t
+# regular expression for String
+def t_STRING(t):
+    r"^\"*\"$"
+    t.value = str(t.value)
+    return t
 # regular expression for integer
 def t_INTEGER(t):
     r'\d+'
@@ -152,7 +159,7 @@ data = '''
 class Main inherits IO {
   x : Int;
    main(): SELF_TYPE {
-  out_string("Hello, World.\n")
+  out_string("Hello World\n")
    };
 };
 '''
