@@ -43,25 +43,25 @@ tokens = (
    # 'LTEQ',
    # 'GTEQ',
    # 'GETS',
-   # 'OR',
-   # 'AND',
-   # 'NOT',
+   'OR',
+   'AND',
+   'NOT',
    # # LOOP AND CONDITIONAL
-   # 'IF',
-   # 'THEN',
-   # 'ELSE',
-   # 'FI',
+   'IF',
+   'THEN',
+   'ELSE',
+   'FI',
    'WHILE',
-   # 'LOOP',
-   # 'POOL',
-   # 'FOR',
-   # 'LET',
-   # 'IN',
-   # 'SELF',
-   # 'BREAK',
-   # 'CONTINUE',
-   # 'ISVOID',
-   # 'NEW'
+   'LOOP',
+   'POOL',
+   'FOR',
+   'LET',
+   'IN',
+   'SELF',
+   'BREAK',
+   'CONTINUE',
+   'ISVOID',
+   'NEW',
    'PLUS',
    'MINUS',
    'TIMES',
@@ -78,16 +78,23 @@ reserved = {
   'main' : 'MAIN',
   'Object' : 'OBJECT',
   'while' : 'WHILE',
-  # 'loop' : 'LOOP',
-  # 'pool' : 'POOL',
-  # 'for' : 'FOR',
-  # 'let' : 'LET',
-  # 'in' : 'IN',
-  # 'self' : 'SELF',
-  # 'break' : 'BREAK',
-  # 'continue' : 'CONTINUE',
-  # 'isvoid' : 'ISVOID',
-  # 'new' : 'NEW'
+  'loop' : 'LOOP',
+  'pool' : 'POOL',
+  'for' : 'FOR',
+  'let' : 'LET',
+  'in' : 'IN',
+  'self' : 'SELF',
+  'break' : 'BREAK',
+  'continue' : 'CONTINUE',
+  'isvoid' : 'ISVOID',
+  'new' : 'NEW',
+  'if' : 'IF',
+  'then' : 'THEN',
+  'else' : 'ELSE',
+  'fi' : 'FI',
+  'and' : 'AND',
+  'not' : 'NOT',
+  'or' : 'OR'
 
 }
 
@@ -141,6 +148,7 @@ main
 for abc in mcd
 3 + 4 * 10}
   + -20 *2
+  or and anda
 '''
 
 # Give the lexer some input
