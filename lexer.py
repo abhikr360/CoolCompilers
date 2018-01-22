@@ -5,6 +5,7 @@
 import ply.lex as lex
 
 # List of token names.
+######                        TRY keeping exactly same order across all
 tokens = (
   # KEYWORDS
    'IMPORT',
@@ -26,17 +27,13 @@ tokens = (
 
    # # DATA TYPES
    'INTEGER',
-   # 'BOOL',
-   # 'STRING',
-   # 'TRUE',
-   # 'FALSE'
-   # # OPERATORS 
-   # 'PLUS',
-   # 'MINUS',
-   # 'TIMES',
-   # 'DIVIDE',
-   # 'MOD',
-   # 'TILDA',
+   'BOOL_TYPE',
+   'STRING_TYPE'
+   'STRING',
+   'TRUE',
+   'FALSE'
+   'MOD',
+   'TILDA',
    # 'GT',
    # 'LT',
    # 'EQUAL',
@@ -108,6 +105,7 @@ t_PLUS    = r'\+'
 t_MINUS   = r'-'
 t_TIMES   = r'\*'
 t_DIVIDE  = r'/'
+t_MOD = r'%'
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
 t_LBRACE  = r'\{'
@@ -116,6 +114,7 @@ t_LSQRBRACKET = r'\['
 t_RSQRBRACKET = r'\]'
 t_SEMICOLON = r';'
 t_COLON = r':'
+t_TILDA = r'~'
 
 
 
