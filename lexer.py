@@ -3,6 +3,7 @@
 # 
 # ------------------------------------------------------------
 import ply.lex as lex
+from ply.lex import TOKEN
 
 # List of token names.
 ######                        TRY keeping exactly same order across all
@@ -27,6 +28,7 @@ tokens = (
    'OBJECT',
 
    # # DATA TYPES
+   'CLASS_TYPE'
    'INTEGER',
    'INTEGER_TYPE',
    'BOOL_TYPE',
@@ -131,11 +133,19 @@ t_PERIOD = r'\.'
 
 # A regular expression rule with some action code
 
+
 # REgular expression for Identifier
 def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    r'[a-z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value,'ID')    # Check for reserved words
     return t
+
+# Regex for Class Name
+def t_CLASS_TYPE(t):
+  r'[A-Z][a-zA-Z_0-9]*'
+  t.type = reserved.get(t.value, 'CLASS_TYPE')
+  return t
+
 # regular expression for String
 def t_STRING(t):
     r"^\"*\"$"
