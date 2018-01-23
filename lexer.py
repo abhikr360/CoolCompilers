@@ -1,9 +1,10 @@
-# ------------------------------------------------------------
+# -----------------------\ n-------------------------------------
 # lexer.py
 # 
 # ------------------------------------------------------------
 import ply.lex as lex
 from ply.lex import TOKEN
+import sys
 
 # List of token names.
 ######                        TRY keeping exactly same order across all
@@ -28,7 +29,7 @@ tokens = (
    'OBJECT',
 
    # # DATA TYPES
-   'CLASS_TYPE'
+   'CLASS_TYPE',
    'INTEGER',
    'INTEGER_TYPE',
    'BOOL_TYPE',
@@ -102,7 +103,8 @@ reserved = {
   'String' : 'STRING_TYPE',
   'TRUE' : 'TRUE',
   'FALSE' : 'FALSE',
-  'SELF_TYPE' : 'SELF_TYPE'
+  'SELF_TYPE' : 'SELF_TYPE',
+  'CLASS_TYPE' : 'CLASS_TYPE'
 
 }
 
@@ -166,7 +168,6 @@ def t_error(t):
     t.lexer.skip(1)
 
 states = (
-   ('COMMENT','exclusive'),
    ('STRING','exclusive'),
 )
 
@@ -174,7 +175,7 @@ def t_start_string(t): # try removing start -> begin
     r'\"'
     t.lexer.push_state("STRING")
     t.lexer.string_backslashed = False
-    t.lexer.stringbuffer=""
+    t.lexer.stringbuffer='"'
 
 
 
@@ -184,15 +185,15 @@ def t_STRING_end(t):
     t.lexer.stringbuffer += '"'
     t.lexer.string_backslashed = False
   else:
-    t.lexer.pop()
+    t.lexer.pop_state()
     t.value = t.lexer.stringbuffer
     t.type = "STRING"
     return t
 
 def t_STRING_anything(t):
     r'.'
-
     if(t=='\n'):
+
       t.lexer.lineno += 1
       if not t.lexer.string_backslashed:
         dummy=0
@@ -212,25 +213,25 @@ def t_STRING_anything(t):
           t.lexer.stringbuffer += '\f'
         else:
           t.lexer.stringbuffer += t.value
-            t.lexer.string_backslashed = False
+        t.lexer.string_backslashed = False
       else:
+
         if t.value != '\\':
-          t.lexer.stringbuffer += t.value
+            t.lexer.stringbuffer += t.value
         else:
           t.lexer.string_backslashed = True
 
+
+t_STRING_ignore = ''
+
+def t_STRING_error(t):
+    print("Illegal character in line no. {0}, character {1}".format(t.lineno,t.value[0]))
+
 lexer = lex.lex()
 
-data = '''
-class Main inherits IO {
-  x : Int;
-   main(): SELF_TYPE {
-  out_string("Hello World\n")
-  a<-23.;
-  let a in Int:xyz;
-   };
-};
-'''
+input_file = sys.argv[1]
+with open(input_file) as file:
+    data = file.read()
 
 # Give the lexer some input
 lexer.input(data)
