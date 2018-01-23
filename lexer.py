@@ -68,7 +68,8 @@ tokens = (
    'PLUS',
    'MINUS',
    'TIMES',
-   'DIVIDE'
+   'DIVIDE',
+   'COMMA'
 
    )
 # reserved Keyword
@@ -130,7 +131,7 @@ t_LTEQ = r'<='
 t_GTEQ = r'>='
 t_GETS = r'<-'
 t_PERIOD = r'\.'
-
+t_COMMA = r','
 
 
 # A regular expression rule with some action code
@@ -169,6 +170,7 @@ def t_error(t):
 
 states = (
    ('STRING','exclusive'),
+   ('COMMENT','exclusive'),
 )
 
 def t_start_string(t): # try removing start -> begin
@@ -177,6 +179,25 @@ def t_start_string(t): # try removing start -> begin
     t.lexer.string_backslashed = False
     t.lexer.stringbuffer='"'
 
+def t_start_comment(t):
+    r'\(\*'
+    t.lexer.push_state("COMMENT")
+    # t.lexer.no_comment = t.lexer.no_comment + 1
+
+def t_COMMENT_end(t):
+    r'\*\)'
+    t.lexer.pop_state()
+
+def t_COMMENT_anything(t):
+    r'.|\n'
+    # r'[^(\*\))]'
+
+
+t_COMMENT_ignore=""
+
+def t_COMMENT_error(t):
+    print("Illegal COMMENT in line no. {0}, character {1}".format(t.lineno,t.value[0]))
+    
 
 
 def t_STRING_end(t):
