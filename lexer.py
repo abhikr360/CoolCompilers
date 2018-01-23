@@ -146,12 +146,7 @@ def t_CLASS_TYPE(t):
   t.type = reserved.get(t.value, 'CLASS_TYPE')
   return t
 
-# regular expression for String
-def t_STRING(t):
-    r"^\"*\"$"
-    t.value = str(t.value)
-    return t
-# regular expression for integer
+#ssion for integer
 def t_INTEGER(t):
     r'\d+'
     t.value = int(t.value)    
@@ -170,6 +165,59 @@ def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
+states = (
+   ('COMMENT','exclusive'),
+   ('STRING','exclusive'),
+)
+
+def t_start_string(t): # try removing start -> begin
+    r'\"'
+    t.lexer.push_state("STRING")
+    t.lexer.string_backslashed = False
+    t.lexer.stringbuffer=""
+
+
+
+def t_STRING_end(t):
+  r'\"'
+  if t.lexer.string_backslashed :
+    t.lexer.stringbuffer += '"'
+    t.lexer.string_backslashed = False
+  else:
+    t.lexer.pop()
+    t.value = t.lexer.stringbuffer
+    t.type = "STRING"
+    return t
+
+def t_STRING_anything(t):
+    r'.'
+
+    if(t=='\n'):
+      t.lexer.lineno += 1
+      if not t.lexer.string_backslashed:
+        dummy=0
+      else:
+        t.lexer.string_backslashed = False
+    else:
+      if t.lexer.string_backslashed:
+        if t.value == 'b':
+          t.lexer.stringbuffer += '\b'
+        elif t.value == 'n':
+          t.lexer.stringbuffer += '\n'
+        elif t.value == 't':
+          t.lexer.stringbuffer += '\t'
+        elif t.value == '\\':
+          t.lexer.stringbuffer += '\\'
+        elif t.value == 'f':
+          t.lexer.stringbuffer += '\f'
+        else:
+          t.lexer.stringbuffer += t.value
+            t.lexer.string_backslashed = False
+      else:
+        if t.value != '\\':
+          t.lexer.stringbuffer += t.value
+        else:
+          t.lexer.string_backslashed = True
 
 lexer = lex.lex()
 
