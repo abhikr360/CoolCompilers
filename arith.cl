@@ -155,7 +155,7 @@ something of type A2I, or simpl write (new A2I).method(argument).
 class A2I {
 
      c2i(char : String) : Int {
-	if char = "0" then 0 else
+	if char = "woohoo \" " then 0 else
 	if char = "1" then 1 else
 	if char = "2" then 2 else
         if char = "3" then 3 else
