@@ -177,7 +177,7 @@ def t_start_string(t): # try removing start -> begin
     r'\"'
     t.lexer.push_state("STRING")
     t.lexer.string_backslashed = False
-    t.lexer.stringbuffer='"'
+    t.lexer.stringbuffer=''
 
 def t_start_comment(t):
     r'\(\*'
@@ -207,7 +207,7 @@ def t_STRING_end(t):
     t.lexer.string_backslashed = False
   else:
     t.lexer.pop_state()
-    t.lexer.stringbuffer += '"'
+    t.lexer.stringbuffer += ''
     t.value = t.lexer.stringbuffer
     t.type = "STRING"
     return t
@@ -269,7 +269,7 @@ while True:
 #TOKEN HAS TYPE AND VALUE
 
     collect.append(tok)
-print(collect)
+#print(collect)
 for single_token in tokens:
 	token_list = []
 	token_count = 0
@@ -278,6 +278,8 @@ for single_token in tokens:
 			token_count = token_count + 1
 			if(lex_tokens.value not in token_list):
 				token_list.append(lex_tokens.value)
+	if(token_count == 0):
+		continue
 	print(single_token + ':' + str(token_count))
 	print(str(token_list))
 	print("--------------------------------------------")
