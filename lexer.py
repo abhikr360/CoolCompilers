@@ -273,7 +273,7 @@ while True:
 #TOKEN HAS TYPE AND VALUE
 
     collect.append(tok)
-#print(collect)
+# print(collect)
 for single_token in tokens:
 	token_list = []
 	token_count = 0
@@ -282,9 +282,8 @@ for single_token in tokens:
 			token_count = token_count + 1
 			if(lex_tokens.value not in token_list):
 				token_list.append(lex_tokens.value)
-	if(token_count == 0):
-		continue
-	print(single_token + ':' + str(token_count))
-	print(str(token_list))
-	print("--------------------------------------------")
-
+	if(token_count!=0):
+		print(single_token + ':' + str(token_count))
+		for item in token_list :
+			print(item)
+    collect.append(tok)
