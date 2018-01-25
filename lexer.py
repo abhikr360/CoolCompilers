@@ -69,7 +69,10 @@ tokens = (
    'MINUS',
    'TIMES',
    'DIVIDE',
-   'COMMA'
+   'COMMA',
+
+   # At
+   'AT'
 
    )
 # reserved Keyword
@@ -132,6 +135,7 @@ t_GTEQ = r'>='
 t_GETS = r'<-'
 t_PERIOD = r'\.'
 t_COMMA = r','
+t_AT = r'@'
 
 
 # A regular expression rule with some action code
