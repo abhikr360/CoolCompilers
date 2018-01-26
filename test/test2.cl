@@ -48,7 +48,6 @@
 
 class A {
 
-   -- Let's assume that we don't want A to not inherit from IO.
 
    io : IO <- new IO;
 
@@ -59,7 +58,6 @@ class A {
 
 class B inherits A {
 
-   -- B does not have to an extra attribute, since it inherits io from A.
 
    out_b() : Object { io.out_string("B: Hello world\n") };
 
@@ -68,18 +66,15 @@ class B inherits A {
 
 class C inherits IO {
 
-   -- Now the IO methods are part of C.
 
    out_c() : Object { out_string("C: Hello world\n") };
 
-   -- Note that out_string(...) is just a shorthand for self.out_string(...)
 
 };
 
 
 class D inherits C {
 
-   -- Inherits IO methods from C.
 
    out_d() : Object { out_string("D: Hello world\n") };
 
@@ -88,7 +83,6 @@ class D inherits C {
 
 class Main inherits IO {
 
-   -- Same case as class C.
 
    main() : Object {
       {
