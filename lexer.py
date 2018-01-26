@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # -----------------------\ n-------------------------------------
 # lexer.py
 # 
@@ -264,12 +266,12 @@ while True:
     tok = lexer.token()
     if not tok: 
         break
-    #print(tok)
+    print(tok)
 
 #TOKEN HAS TYPE AND VALUE
 
     collect.append(tok)
-print(collect)
+# print(collect)
 for single_token in tokens:
 	token_list = []
 	token_count = 0

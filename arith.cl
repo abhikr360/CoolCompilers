@@ -6,8 +6,16 @@
 
 class A {
 
+   
+   
+   
+   
+   
+   
    var : Int <- 0;
-
+   break;
+   continue;
+   b=a++;
    value() : Int { var };
 
    set_var(num : Int) : SELF_TYPE {
