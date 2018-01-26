@@ -172,8 +172,10 @@ t_ignore  = ' \t'
 
 # Error handling rule
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    print("Illegal character '%s' at line %d" % (t.value[0],t.lineno))
     t.lexer.skip(1)
+    print("Exiting due to lexing error.....Abort!")
+    exit()
 
 states = (
    ('STRING','exclusive'),
@@ -271,7 +273,7 @@ while True:
     tok = lexer.token()
     if not tok: 
         break
-    print(tok)
+    # print(tok)
 
 #TOKEN HAS TYPE AND VALUE
 
