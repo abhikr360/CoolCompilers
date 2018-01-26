@@ -5,6 +5,7 @@
 import ply.lex as lex
 from ply.lex import TOKEN
 import sys
+from table import Table
 
 # List of token names.
 ######                        TRY keeping exactly same order across all
@@ -273,17 +274,39 @@ while True:
 #TOKEN HAS TYPE AND VALUE
 
     collect.append(tok)
-# print(collect)
+#print(collect)
+
+print_list = []
+
 for single_token in tokens:
+	print_list_element = []
 	token_list = []
+	token_str = ""
 	token_count = 0
 	for lex_tokens in collect:
 		if(single_token == lex_tokens.type):
 			token_count = token_count + 1
 			if(lex_tokens.value not in token_list):
 				token_list.append(lex_tokens.value)
-	if(token_count!=0):
-		print(single_token + ':' + str(token_count))
-		for item in token_list :
-			print(item)
-    collect.append(tok)
+				if(token_count > 1):
+					token_str = token_str + '                        '
+				token_str = token_str + str(lex_tokens.value)
+				#print(token_str)
+	if(token_count == 0):
+		continue
+	print_list.append([single_token, str(token_count), token_str])
+	# print(single_token + ':' + str(token_count))
+	# print(str(token_list))
+	# print("--------------------------------------------")
+
+#print(print_list)
+print("------------------------------------------------------")
+
+header = Table([["Tokens", "Occurences", "Lexemes"]],20,True)
+print(header)
+print("------------------------------------------------------")
+
+table = Table(print_list, 20, True)
+
+print(table)
+
