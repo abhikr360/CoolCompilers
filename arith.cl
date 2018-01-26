@@ -25,11 +25,11 @@ class A {
       }
    };
 
-   method1(num : Int) : SELF_TYPE {  -- same
+   method1(num : Int) : SELF_TYPE {  
       self
    };
 
-   method2(num1 : Int, num2 : Int) : B {  -- plus
+   method2(num1 : Int, num2 : Int) : B {  
       (let x : Int in
 	 {
             x <- num1 + num2;
@@ -38,7 +38,7 @@ class A {
       )
    };
 
-   method3(num : Int) : C {  -- negate
+   method3(num : Int) : C {  
       (let x : Int in
 	 {
             x <- ~num;
@@ -47,7 +47,7 @@ class A {
       )
    };
 
-   method4(num1 : Int, num2 : Int) : D {  -- diff
+   method4(num1 : Int, num2 : Int) : D {  
             if num2 < num1 then
                (let x : Int in
 		  {
@@ -65,7 +65,7 @@ class A {
             fi
    };
 
-   method5(num : Int) : E {  -- factorial
+   method5(num : Int) : E {  
       (let x : Int <- 1 in
 	 {
 	    (let y : Int <- 1 in
@@ -83,9 +83,9 @@ class A {
 
 };
 
-class B inherits A {  -- B is a number squared
+class B inherits A {  
 
-   method5(num : Int) : E { -- square
+   method5(num : Int) : E { 
       (let x : Int in
 	 {
             x <- num * num;
@@ -98,7 +98,7 @@ class B inherits A {  -- B is a number squared
 
 class C inherits B {
 
-   method6(num : Int) : A { -- negate
+   method6(num : Int) : A { 
       (let x : Int in
          {
             x <- ~num;
@@ -107,7 +107,7 @@ class C inherits B {
       )
    };
 
-   method5(num : Int) : E {  -- cube
+   method5(num : Int) : E {  
       (let x : Int in
 	 {
             x <- num * num * num;
@@ -120,7 +120,7 @@ class C inherits B {
 
 class D inherits B {  
 		
-   method7(num : Int) : Bool {  -- divisible by 3
+   method7(num : Int) : Bool {  3
       (let x : Int <- num in
             if x < 0 then method7(~x) else
             if 0 = x then true else
@@ -135,7 +135,7 @@ class D inherits B {
 
 class E inherits D {
 
-   method6(num : Int) : A {  -- division
+   method6(num : Int) : A {  
       (let x : Int in
          {
             x <- num / 8;
@@ -192,7 +192,7 @@ class A2I {
 	if i = 7 then "7" else
 	if i = 8 then "8" else
 	if i = 9 then "9" else
-	{ abort(); ""; }  -- the "" is needed to satisfy the typchecker
+	{ abort(); ""; }  "" is needed to satisfy the typchecker
         fi fi fi fi fi fi fi fi fi fi
      };
 
@@ -349,7 +349,7 @@ class Main inherits IO {
          avar <- (new A);
          while flag loop
             {
-	       -- avar <- (new A).set_var(get_int());
+	       <- (new A).set_var(get_int());
 	       out_string("number ");
 	       print(avar);
 	       if is_even(avar.value()) then
@@ -357,15 +357,15 @@ class Main inherits IO {
 	       else
 	          out_string("is odd!\n")
 	       fi;
-	       -- print(avar); -- prints out answer
+	       (avar); 
 	       class_type(avar);
 	       char <- menu();
-                  if char = "a" then -- add
+                  if char = "a" then 
                      {
                         a_var <- (new A).set_var(get_int());
 	                avar <- (new B).method2(avar.value(), a_var.value());
 	             } else
-                  if char = "b" then -- negate
+                  if char = "b" then 
                      case avar of
 	                   c : C => avar <- c.method6(c.value());
 	                   a : A => avar <- a.method3(a.value());
@@ -374,26 +374,26 @@ class Main inherits IO {
 		                  abort(); 0;
 		               };
                      esac else
-                  if char = "c" then -- diff
+                  if char = "c" then 
                      {
                         a_var <- (new A).set_var(get_int());
 	                avar <- (new D).method4(avar.value(), a_var.value());
 	             } else
                   if char = "d" then avar <- (new C)@A.method5(avar.value()) else
-		          -- factorial
+		          
                   if char = "e" then avar <- (new C)@B.method5(avar.value()) else
-			  -- square
+			  
                   if char = "f" then avar <- (new C)@C.method5(avar.value()) else
-			  -- cube
-                  if char = "g" then -- multiple of 3?
+			  
+                  if char = "g" then 3
 		      if ((new D).method7(avar.value()))
-		                       then -- avar <- (new A).method1(avar.value())
+		                       then <- (new A).method1(avar.value())
 			 {
 	                    out_string("number ");
 	                    print(avar);
 	                    out_string("is divisible by 3.\n");
 			 }
-			 else  -- avar <- (new A).set_var(0)
+			 else  <- (new A).set_var(0)
 			 {
 	                    out_string("number ");
 	                    print(avar);
@@ -416,18 +416,18 @@ class Main inherits IO {
 			                out_string(a.i2a(r));
 			                out_string("\n");
 				     }
-				  ); -- end let a:
+				  ); :
 			       }
-                            ); -- end let r:
+                            ); :
 			    avar <- x;
 		         } 
-		      )  -- end let x:
+		      )  :
 		      else
                   if char = "j" then avar <- (new A)
 		      else
                   if char = "q" then flag <- false
 		      else
-                      avar <- (new A).method1(avar.value()) -- divide/8
+                      avar <- (new A).method1(avar.value()) /8
                   fi fi fi fi fi fi fi fi fi fi;
             }
          pool;

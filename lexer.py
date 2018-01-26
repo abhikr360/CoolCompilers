@@ -7,6 +7,7 @@
 import ply.lex as lex
 from ply.lex import TOKEN
 import sys
+from table import Table
 
 # List of token names.
 ######                        TRY keeping exactly same order across all
@@ -71,7 +72,10 @@ tokens = (
    'MINUS',
    'TIMES',
    'DIVIDE',
-   'COMMA'
+   'COMMA',
+
+   # At
+   'AT'
 
    )
 # reserved Keyword
@@ -134,6 +138,7 @@ t_GTEQ = r'>='
 t_GETS = r'<-'
 t_PERIOD = r'\.'
 t_COMMA = r','
+t_AT = r'@'
 
 
 # A regular expression rule with some action code
@@ -179,7 +184,7 @@ def t_start_string(t): # try removing start -> begin
     r'\"'
     t.lexer.push_state("STRING")
     t.lexer.string_backslashed = False
-    t.lexer.stringbuffer='"'
+    t.lexer.stringbuffer=''
 
 def t_start_comment(t):
     r'\(\*'
@@ -209,7 +214,7 @@ def t_STRING_end(t):
     t.lexer.string_backslashed = False
   else:
     t.lexer.pop_state()
-    t.lexer.stringbuffer += '"'
+    t.lexer.stringbuffer += ''
     t.value = t.lexer.stringbuffer
     t.type = "STRING"
     return t
@@ -271,16 +276,38 @@ while True:
 #TOKEN HAS TYPE AND VALUE
 
     collect.append(tok)
-# print(collect)
+
+print_list = []
+
 for single_token in tokens:
+	print_list_element = []
 	token_list = []
+	token_str = ""
 	token_count = 0
 	for lex_tokens in collect:
 		if(single_token == lex_tokens.type):
 			token_count = token_count + 1
 			if(lex_tokens.value not in token_list):
 				token_list.append(lex_tokens.value)
-	print(single_token + ':' + str(token_count))
-	print(str(token_list))
-	print("--------------------------------------------")
+				if(token_count > 1):
+					token_str = token_str + '                        '
+				token_str = token_str + str(lex_tokens.value)
+				#print(token_str)
+	if(token_count == 0):
+		continue
+	print_list.append([single_token, str(token_count), token_str])
+	# print(single_token + ':' + str(token_count))
+	# print(str(token_list))
+	# print("--------------------------------------------")
+
+#print(print_list)
+print("------------------------------------------------------")
+
+header = Table([["Tokens", "Occurences", "Lexemes"]],20,True)
+print(header)
+print("------------------------------------------------------")
+
+table = Table(print_list, 20, True)
+
+print(table)
 
