@@ -1,0 +1,7 @@
+Usage :
+	bin/lexer test/test1.cl
+
+Package Required : 
+	sys
+	textwrap
+	PLY 
