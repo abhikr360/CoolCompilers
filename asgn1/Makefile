@@ -1,4 +1,4 @@
-bin/lexer.py:
+src/lexer.py:
 	mkdir bin
 	cp src/table.py bin/
 	cp src/lexer.py bin/
