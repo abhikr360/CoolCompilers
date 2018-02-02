@@ -3,3 +3,4 @@ class Main inherits IO {
 	out_string("Hello, World.\n")
    };
 };
+if admi
