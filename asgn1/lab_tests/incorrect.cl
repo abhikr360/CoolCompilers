@@ -1,7 +1,7 @@
 class Main inherits IO{
    	i : Int;
 	 36a : Int;
-	 `$#@name : Int;
+	 @name : Int;
    main(): Int {
 	{
    	i <- 6;

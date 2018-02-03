@@ -297,9 +297,9 @@ for single_token in tokens:
 	if(token_count == 0):
 		continue
 	print_list.append([single_token, str(token_count), token_str])
-	# print(single_token + ':' + str(token_count))
-	# print(str(token_list))
-	# print("--------------------------------------------")
+	#print(single_token + ':' + str(token_count))
+	#print(str(token_list))
+	#print("--------------------------------------------")
 
 #print(print_list)
 print("------------------------------------------------------")
