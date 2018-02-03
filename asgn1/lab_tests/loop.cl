@@ -4,9 +4,9 @@ class Main inherits IO{
 	k : Int;
 	res : Int;
 
-	main() : SELF_TYPE{
+	main() : Int{
 	{
-		for({res <- 0; i <- 0 }; i < 10; i <- i+1)loop
+		for({res <- 0; i <- 0; }; i < 10; i <- i+1)loop
 			for(j <- 0; j < 10; j <- j+1)loop
 				for(k <- 0; k < 10; k <- k+1)loop
 					res <- res+1;
@@ -16,6 +16,7 @@ class Main inherits IO{
 		out_string("res = ");
 		out_int(res);
 		out_string("\n");
+		0;
 	}
 
 

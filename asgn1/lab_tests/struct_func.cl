@@ -7,7 +7,7 @@ class T{
 	name : String;
 	f : String;
 	
-	init() : SELF_TYPE {
+	init() : String {
 	{
 		a <- "a";
 		b <- 47114711;
@@ -23,9 +23,12 @@ class T{
 
 class Main{
 	k : T;
-	main(): SELF_TYPE{
+	main():Int{
+	{
 		k <- new T;
 		k.init();
+		0;
+	}
 	};
 };
 
