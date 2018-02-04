@@ -1,6 +1,7 @@
 class Main inherits IO{
+   	i : Int
    main(): Int {
-   	i : Int;
+	{
    	i <- 6;
    	for(;i<= 8 and i>= 6 and not(i== 7); i<-i+1)
    	loop{
@@ -11,5 +12,6 @@ class Main inherits IO{
    	}
    	pool;
    	0;
+	}
    };
 };
