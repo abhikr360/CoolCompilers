@@ -10,9 +10,10 @@ class InstrType(Enum):
 	func_call = 7
 	func_return = 8
 
-class SymtabEntry(Enum):
+class SymtabEntryType(Enum):
 	integer = 1
-	address = 2
+	variable = 2
+	string = 3
 
 class Operator(Enum):
 	less_than = 1
@@ -25,17 +26,24 @@ class Operator(Enum):
 	div = 8
 
 class statement:
-	def __init__(self, instr_typ, in1, in2, out, jump_tagret):
+	def __init__(self, instr_typ, in1, in1_type, in2, in2_type, out, out_type, jump_tagret):
 		self.instr_typ = instr_typ
 		self.in1 = in1
+		self.in1_type = in1_type
 		self.in2 = in2
+		self.in2_type = in2_type
 		self.out = out
+		self.out_type = out_type
 		self.jump_tagret = jump_tagret
 
 
 def main():
-	for i in Operator:
-		print(i)
+	code = []
+	s1 = statement(InstrType.assign, 1, SymtabEntryType.integer, 2, SymtabEntryType.integer, 3, SymtabEntryType.variable, 4)
+	
+	code.append(s1)
+
+	print (code)
 
 if __name__ == '__main__':
 	main()
