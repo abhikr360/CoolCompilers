@@ -48,6 +48,9 @@ class statement:
 		self.jump_tagret = None
 		self.label = None
 
+	def print_stmt(self):
+		print(self.linenum,self.instr_typ,self.operator,self.in1,self.in1_type,self.in2,self.in2_type,self.out,self.jump_tagret,self.label)
+
 def set_inputs(row, curr_statement):
 	curr_statement.linenum = row[0]
 	#------------------------------------------------
@@ -118,7 +121,7 @@ def set_inputs(row, curr_statement):
 			curr_statement.in2_type = EntryType.VARIABLE
 
 	#-------------------row 2 end -------------------
-	print(curr_statement.linenum, curr_statement.instr_typ, curr_statement.operator,curr_statement.out,curr_statement.in1,curr_statement.in2)
+	#print(curr_statement.linenum, curr_statement.instr_typ, curr_statement.operator,curr_statement.out,curr_statement.in1,curr_statement.in2)
 
 
 def main():
@@ -128,15 +131,18 @@ def main():
 		line_reader = csv.reader(codefile, delimiter = ',')
 		for row in line_reader:
 			curr_statement = statement()
-			print(row[1])
+			#print(row[1])
 			set_inputs(row, curr_statement)
+			code.append(curr_statement)
 			#------------------------------------------------
 			
 
 	#code = []
 	# s1 = statement(0,InstrType.assign, 1, SymtabEntryType.integer, 2, SymtabEntryType.integer, 3, SymtabEntryType.variable, 4)
 	# s2 = statement(0,InstrType.assign, 1, SymtabEntryType.integer, 2, SymtabEntryType.integer, 3, SymtabEntryType.variable, 4)
-	print (code)
+	
+	for x in code:
+		x.print_stmt()
 
 if __name__ == '__main__':
 	main()
