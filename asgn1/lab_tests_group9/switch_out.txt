@@ -1,0 +1,57 @@
+Tokens              Occurences          Lexemes             
+
+
+------------------------------------------------------
+Keyword_CLASS       1                   class               
+
+SEMICOLON           9                   ;                   
+
+COLON               5                   :                   
+
+ID                  12                  wflg                
+                                        dflg                
+                                        tflg                
+                                        c                   
+
+LPAREN              1                   (                   
+
+RPAREN              1                   )                   
+
+LBRACE              2                   {                   
+
+RBRACE              2                   }                   
+
+Keyword_MAIN        1                   main                
+
+Keyword_OBJECT      1                   Object              
+
+Keyword_CLASS_TYPE  1                   Main                
+
+INTEGER             7                   0                   
+                                        1                   
+
+Keyword_INTEGER_TYPE3                   Int                 
+
+Keyword_STRING_TYPE 1                   String              
+
+STRING              5                   w                   
+                                        W                   
+                                        t                   
+                                        T                   
+                                        d                   
+
+EQUAL               5                   =                   
+
+GETS                6                   <-                  
+
+Keyword_OR          2                   or                  
+
+Keyword_IF          3                   if                  
+
+Keyword_THEN        3                   then                
+
+Keyword_ELSE        3                   else                
+
+Keyword_FI          3                   fi                  
+
+

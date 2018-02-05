@@ -1,0 +1,54 @@
+Tokens              Occurences          Lexemes             
+
+
+------------------------------------------------------
+Keyword_CLASS       2                   class               
+
+SEMICOLON           22                  ;                   
+
+COLON               10                  :                   
+
+ID                  19                  a                   
+                                        b                   
+                                        c                   
+                                        d                   
+                                        e                   
+                                        name                
+                                        f                   
+                                        init                
+                                        k                   
+
+LPAREN              3                   (                   
+
+RPAREN              3                   )                   
+
+LBRACE              6                   {                   
+
+RBRACE              6                   }                   
+
+PERIOD              1                   .                   
+
+Keyword_MAIN        1                   main                
+
+Keyword_CLASS_TYPE  4                   T                   
+                                        Main                
+
+INTEGER             4                   47114711            
+                                        1234                
+                                        3                   
+                                        0                   
+
+Keyword_INTEGER_TYPE4                   Int                 
+
+Keyword_STRING_TYPE 5                   String              
+
+STRING              4                   a                   
+                                        c                   
+                                        *                   
+                                        abc                 
+
+GETS                8                   <-                  
+
+Keyword_NEW         1                   new                 
+
+

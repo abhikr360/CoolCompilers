@@ -1,4 +1,4 @@
 1,=,a,1
-2,=,b,arr,0,lw
+2,lw,b,arr,0
 3,+,b,b,a
-4,=,b,arr,0,sw
+4,sw,b,arr,0

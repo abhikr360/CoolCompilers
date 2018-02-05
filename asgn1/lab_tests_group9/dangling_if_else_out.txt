@@ -1,0 +1,58 @@
+Tokens              Occurences          Lexemes             
+
+
+------------------------------------------------------
+Keyword_CLASS       1                   class               
+
+Keyword_INHERITS    1                   inherits            
+
+SEMICOLON           10                  ;                   
+
+COLON               3                   :                   
+
+ID                  18                  i                   
+                                        a                   
+
+LSQRBRACKET         9                   [                   
+
+RSQRBRACKET         9                   ]                   
+
+LPAREN              1                   (                   
+
+RPAREN              1                   )                   
+
+LBRACE              3                   {                   
+
+RBRACE              3                   }                   
+
+Keyword_MAIN        1                   main                
+
+Keyword_CLASS_TYPE  2                   Main                
+                                        IO                  
+
+INTEGER             13                  3                   
+                                        0                   
+                                        1                   
+                                        2                   
+
+Keyword_INTEGER_TYPE3                   Int                 
+
+LTEQ                1                   <=                  
+
+GTEQ                1                   >=                  
+
+GETS                7                   <-                  
+
+Keyword_IF          2                   if                  
+
+Keyword_THEN        2                   then                
+
+Keyword_ELSE        2                   else                
+
+Keyword_FI          2                   fi                  
+
+PLUS                1                   +                   
+
+MINUS               1                   -                   
+
+

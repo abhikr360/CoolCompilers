@@ -296,13 +296,17 @@ for single_token in tokens:
 				#print(token_str)
 	if(token_count == 0):
 		continue
-	print_list.append([single_token, str(token_count), token_str])
-	#print(single_token + ':' + str(token_count))
-	#print(str(token_list))
-	#print("--------------------------------------------")
+	if(single_token in reserved.values()):
+		print_list.append(["Keyword_"+single_token, str(token_count), token_str])
+	else:
+		print_list.append([single_token, str(token_count), token_str])
+	# print(single_token + ':' + str(token_count))
+	# print(str(token_list))
+	# print (single_token in reserved.values())
+	# print("--------------------------------------------")
 
 #print(print_list)
-print("------------------------------------------------------")
+# print("------------------------------------------------------")
 
 header = Table([["Tokens", "Occurences", "Lexemes"]],20,True)
 print(header)

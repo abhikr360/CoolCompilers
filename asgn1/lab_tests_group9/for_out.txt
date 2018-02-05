@@ -1,0 +1,68 @@
+Tokens              Occurences          Lexemes             
+
+
+------------------------------------------------------
+Keyword_CLASS       1                   class               
+
+Keyword_INHERITS    1                   inherits            
+
+SEMICOLON           8                   ;                   
+
+COLON               2                   :                   
+
+ID                  10                  i                   
+                                        out_string          
+
+LPAREN              6                   (                   
+
+RPAREN              6                   )                   
+
+LBRACE              4                   {                   
+
+RBRACE              4                   }                   
+
+Keyword_MAIN        1                   main                
+
+Keyword_CLASS_TYPE  2                   Main                
+                                        IO                  
+
+INTEGER             7                   6                   
+                                        8                   
+                                        7                   
+                                        1                   
+                                        0                   
+
+Keyword_INTEGER_TYPE2                   Int                 
+
+STRING              2                   yes                 
+                                        no                  
+
+EQUAL               2                   =                   
+
+LTEQ                1                   <=                  
+
+GTEQ                2                   >=                  
+
+GETS                2                   <-                  
+
+Keyword_AND         2                   and                 
+
+Keyword_NOT         1                   not                 
+
+Keyword_IF          1                   if                  
+
+Keyword_THEN        1                   then                
+
+Keyword_ELSE        1                   else                
+
+Keyword_FI          1                   fi                  
+
+Keyword_LOOP        1                   loop                
+
+Keyword_POOL        1                   pool                
+
+Keyword_FOR         1                   for                 
+
+PLUS                1                   +                   
+
+

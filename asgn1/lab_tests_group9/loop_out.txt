@@ -1,0 +1,53 @@
+Tokens              Occurences          Lexemes             
+
+
+------------------------------------------------------
+Keyword_CLASS       1                   class               
+
+Keyword_INHERITS    1                   inherits            
+
+SEMICOLON           22                  ;                   
+
+COLON               5                   :                   
+
+ID                  23                  i                   
+                                        j                   
+                                        k                   
+                                        res                 
+                                        out_string          
+                                        out_int             
+
+LPAREN              7                   (                   
+
+RPAREN              7                   )                   
+
+LBRACE              4                   {                   
+
+RBRACE              4                   }                   
+
+Keyword_MAIN        1                   main                
+
+Keyword_CLASS_TYPE  2                   Main                
+                                        IO                  
+
+INTEGER             12                  0                   
+                                        10                  
+                                        1                   
+
+Keyword_INTEGER_TYPE5                   Int                 
+
+STRING              2                   res =               
+
+LT                  3                   <                   
+
+GETS                8                   <-                  
+
+Keyword_LOOP        3                   loop                
+
+Keyword_POOL        3                   pool                
+
+Keyword_FOR         3                   for                 
+
+PLUS                4                   +                   
+
+
