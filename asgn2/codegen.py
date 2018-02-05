@@ -119,9 +119,6 @@ def set_inputs(row, curr_statement):
 
 	#-------------------row 2 end -------------------
 	print(curr_statement.linenum, curr_statement.instr_typ, curr_statement.operator,curr_statement.out,curr_statement.in1,curr_statement.in2)
-class Operator(Enum):
-	less_than = 1
-
 
 
 def main():
@@ -139,7 +136,6 @@ def main():
 	#code = []
 	# s1 = statement(0,InstrType.assign, 1, SymtabEntryType.integer, 2, SymtabEntryType.integer, 3, SymtabEntryType.variable, 4)
 	# s2 = statement(0,InstrType.assign, 1, SymtabEntryType.integer, 2, SymtabEntryType.integer, 3, SymtabEntryType.variable, 4)
-
 	print (code)
 
 if __name__ == '__main__':
