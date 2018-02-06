@@ -134,6 +134,13 @@ def main():
 			#print(row[1])
 			set_inputs(row, curr_statement)
 			code.append(curr_statement)
+
+			#------------------------------------------------
+			if(curr_statement.instr_typ == InstrType.GOTO or curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.FUNC_RETURN or curr_statement.instr_typ == InstrType.LABEL or curr_statement.instr_typ == InstrType.FUNC_CALL):
+				leaders.append(int(curr_statement.linenum))
+				if(curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.GOTO):
+					leaders.append(int(curr_statement.jump_tagret))
+
 			#------------------------------------------------
 			
 
