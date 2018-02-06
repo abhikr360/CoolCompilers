@@ -126,7 +126,7 @@ def set_inputs(row, curr_statement):
 
 def main():
 	code = []
-	leaders = []
+	leaders = [1]
 	with open(str(sys.argv[1]), 'rb') as codefile:
 		line_reader = csv.reader(codefile, delimiter = ',')
 		for row in line_reader:
@@ -136,20 +136,34 @@ def main():
 			code.append(curr_statement)
 
 			#------------------------------------------------
-			if(curr_statement.instr_typ == InstrType.GOTO or curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.FUNC_RETURN or curr_statement.instr_typ == InstrType.LABEL or curr_statement.instr_typ == InstrType.FUNC_CALL):
-				leaders.append(int(curr_statement.linenum))
+			if(curr_statement.instr_typ == InstrType.GOTO or curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.FUNC_RETURN or curr_statement.instr_typ == InstrType.FUNC_CALL):
+				leaders.append(int(curr_statement.linenum)+1)
 				if(curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.GOTO):
 					leaders.append(int(curr_statement.jump_tagret))
+			if(curr_statement.instr_typ == InstrType.LABEL):
+				leaders.append(int(curr_statement.linenum))
 
 			#------------------------------------------------
-			
 
 	#code = []
 	# s1 = statement(0,InstrType.assign, 1, SymtabEntryType.integer, 2, SymtabEntryType.integer, 3, SymtabEntryType.variable, 4)
 	# s2 = statement(0,InstrType.assign, 1, SymtabEntryType.integer, 2, SymtabEntryType.integer, 3, SymtabEntryType.variable, 4)
-	
+
 	for x in code:
 		x.print_stmt()
+	leaders=set(leaders)
+	leaders=list(leaders)
+	leaders.sort()
+
+	basic_block_list = []
+
+	for i in range(len(leaders)-1):
+		print(leaders[i]-1,leaders[i+1]-1)
+		basic_block = code[leaders[i]-1:leaders[i+1]-1]
+		basic_block_list.append(basic_block)
+	
+	for x in basic_block_list:
+		print(x[0].instr_typ)
 
 if __name__ == '__main__':
 	main()
