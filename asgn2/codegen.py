@@ -2,6 +2,13 @@ from enum import Enum
 import csv
 import sys
 
+def is_int(row):
+	try:
+		temp = int(row)
+		return True
+	except Exception as e:
+		return False
+
 class InstrType(Enum):
 	ASSIGN = 1
 	GOTO = 2
@@ -45,6 +52,7 @@ class statement:
 		self.in2 = None
 		self.in2_type = None
 		self.out = None
+		self.out_type = None
 		self.jump_tagret = None
 		self.label = None
 
@@ -67,6 +75,8 @@ def set_inputs(row, curr_statement):
 	if(curr_statement.instr_typ == InstrType.ASSIGN):
 		if(curr_statement.operator <> None):					#for statements of type a = b + 2
 			curr_statement.out = row[2]
+			curr_statement.out_type = EntryType.VARIABLE
+
 			try:
 				temp = int(row[3])
 				curr_statement.in1 = temp
@@ -86,6 +96,7 @@ def set_inputs(row, curr_statement):
 				curr_statement.in2_type = EntryType.VARIABLE
 		else:
 			curr_statement.out = row[2]
+			curr_statement.out_type = EntryType.VARIABLE
 			try:
 				temp = int(row[3])
 				curr_statement.in1 = temp
@@ -94,10 +105,6 @@ def set_inputs(row, curr_statement):
 				temp = row[3]
 				curr_statement.in1 = temp
 				curr_statement.in1_type = EntryType.VARIABLE
-			
-
-
-
 
 	elif(curr_statement.instr_typ == InstrType.IFGOTO):
 		exec("curr_statement.operator = Operator.%s" %(row[2]))
@@ -119,6 +126,42 @@ def set_inputs(row, curr_statement):
 			temp = row[4]
 			curr_statement.in2 = temp
 			curr_statement.in2_type = EntryType.VARIABLE
+
+	elif(curr_statement.instr_typ == InstrType.INDEX_ASSIGN_L):			# OUT[IN1] = IN2
+		curr_statement.out = row[2]
+		curr_statement.out_type = EntryType.VARIABLE
+		
+		if(is_int(row[3])):
+			curr_statement.in1 = int(row[3])
+			curr_statement.in1_type = EntryType.INTEGER
+		else:
+			curr_statement.in1 = row[3]
+			curr_statement.in1_type = EntryType.VARIABLE
+
+		if(is_int(row[4])):
+			curr_statement.in1 = int(row[4])
+			curr_statement.in1_type = EntryType.INTEGER
+		else:
+			curr_statement.in1 = row[4]
+			curr_statement.in1_type = EntryType.VARIABLE
+
+	elif(curr_statement.instr_typ == InstrType.INDEX_ASSIGN_R):			# OUT = IN1[IN2]
+		curr_statement.out = row[2]
+		curr_statement.out_type = EntryType.VARIABLE
+		
+		curr_statement.in1 = row[3]
+		curr_statement.in1_type = EntryType.VARIABLE
+
+		if(is_int(row[4])):
+			curr_statement.in1 = int(row[4])
+			curr_statement.in1_type = EntryType.INTEGER
+		else:
+			curr_statement.in1 = row[4]
+			curr_statement.in1_type = EntryType.VARIABLE
+
+
+
+
 
 	#-------------------row 2 end -------------------
 	#print(curr_statement.linenum, curr_statement.instr_typ, curr_statement.operator,curr_statement.out,curr_statement.in1,curr_statement.in2)
@@ -161,6 +204,8 @@ def main():
 		print(leaders[i]-1,leaders[i+1]-1)
 		basic_block = code[leaders[i]-1:leaders[i+1]-1]
 		basic_block_list.append(basic_block)
+
+
 	
 	for x in basic_block_list:
 		print(x[0].instr_typ)
