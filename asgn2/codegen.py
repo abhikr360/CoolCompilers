@@ -82,9 +82,9 @@ class statement:
 		self.jump_tagret = None
 		self.label = None
 
-	def #print_stmt(self):
+	def print_stmt(self):
 		'''Print an instruction'''
-		#print(self.linenum,self.instr_typ,self.operator,self.in1,self.in1_type,self.in2,self.in2_type,self.out,self.jump_tagret,self.label)
+		print(self.linenum,self.instr_typ,self.operator,self.in1,self.in1_type,self.in2,self.in2_type,self.out,self.jump_tagret,self.label)
 
 def set_inputs(row, curr_statement):
 	'''Reads input stores it in a list of classes'''
@@ -216,7 +216,7 @@ def insert_LocalSymbolTable(s, symbolTableEntry):
 
 class LocalSymTabEntry:
 	'''One entry of symbol table'''
-	def __init__(self, size=10, dataType="Int", scope=Scope.GLOBAL, isLive=False, nextUse=np.inf):
+	def __init__(self, size=1, dataType="Int", scope=Scope.GLOBAL, isLive=False, nextUse=np.inf):
 		self.isLive=isLive
 		self.nextUse=nextUse
 		self.dataType=dataType
@@ -272,7 +272,7 @@ def construct_NextUse():
 					steo.isLive=False
 					LocalSymbolTable[out]=steo
 				else:
-					print("No entry for this variable in LocalSymbolTable")
+					print("No entry for this variable in LocalSymbolTable" + str(out))
 					# s=LocalSymTabEntry()
 					# insert_LocalSymbolTable(out,s)
 			if(in1):
@@ -285,7 +285,7 @@ def construct_NextUse():
 				else:
 					# s=LocalSymTabEntry(True, stmt.linenum)
 					# insert_LocalSymbolTable(in1,s)
-					print("No entry for this variable in LocalSymbolTable")
+					print("No entry for this variable in LocalSymbolTable" + str(in1))
 			if(in2):
 				if(ste2):
 					in2nextuse=ste2.nextUse
@@ -296,7 +296,7 @@ def construct_NextUse():
 				else:
 					# s=LocalSymTabEntry(True, stmt.linenum)
 					# insert_LocalSymbolTable(in2,s)
-					print("No entry for this variable in LocalSymbolTable")
+					print("No entry for this variable in LocalSymbolTable" + str(in2))
 			
 
 			nue = NextUseEntry(in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive)
@@ -322,8 +322,13 @@ def FindEmptyReg():
 		if (UsableRegisters[reg] == 0):
 			return reg
 
-def GetReg():
-	if 0 in UsableRegisters.values():
+def GetReg(linenum):
+	nue = NextUse[linenum]
+	if(!nue.in1islive):
+		VariableData[nue.in1][1]
+	elif(!nue.in2islive):
+		VariableData[nue.in2][1]
+	elif 0 in UsableRegisters.values():
 		return FindEmptyReg()
 
 def UpdateVariableData(statement):
@@ -490,10 +495,10 @@ def main():
 		#print(UsableRegisters)
 		#print("-------------------------------------------------------------------")
 
-	for basic_block in basic_block_list:
-		#print("-------")
-		for stmt in basic_block:
-			#print(stmt.linenum)
+	# for basic_block in basic_block_list:
+	# 	#print("-------")
+	# 	for stmt in basic_block:
+	# 		#print(stmt.linenum)
 
 	construct_NextUse()
 	#constructEvictionCandidate()
@@ -505,7 +510,7 @@ def main():
 	#NextUse = temp
 	
 	for x in NextUse:
-		#print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
+		print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
 
 	
 	temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
