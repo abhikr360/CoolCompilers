@@ -11,10 +11,13 @@ RegisterDescriptor={'HI': 0, 'LO' : 0, 'r0' : 0, 'at' : 0, 'v0' : 0, 'v1' : 0, '
 addressDescriptor={}
 NextUse={}
 
-UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 't7' : 0, 't8' : 0, 't9' : 0}
+UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0}
 UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 't7' : 0, 't8' : 0, 't9' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+
+TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
+
 VariableData = {}
 
 memory_used = [0]
@@ -79,9 +82,9 @@ class statement:
 		self.jump_tagret = None
 		self.label = None
 
-	def print_stmt(self):
+	def #print_stmt(self):
 		'''Print an instruction'''
-		print(self.linenum,self.instr_typ,self.operator,self.in1,self.in1_type,self.in2,self.in2_type,self.out,self.jump_tagret,self.label)
+		#print(self.linenum,self.instr_typ,self.operator,self.in1,self.in1_type,self.in2,self.in2_type,self.out,self.jump_tagret,self.label)
 
 def set_inputs(row, curr_statement):
 	'''Reads input stores it in a list of classes'''
@@ -189,7 +192,7 @@ def set_inputs(row, curr_statement):
 
 
 	#-------------------row 2 end -------------------
-	#print(curr_statement.linenum, curr_statement.instr_typ, curr_statement.operator,curr_statement.out,curr_statement.in1,curr_statement.in2)
+	##print(curr_statement.linenum, curr_statement.instr_typ, curr_statement.operator,curr_statement.out,curr_statement.in1,curr_statement.in2)
 
 class Scope(Enum):
 	''' Scope of a variable'''
@@ -206,7 +209,7 @@ def lookup_SymbolTable(s):
 def insert_SymbolTable(s, symbolTableEntry):
 	'''Insert into symbol table'''
 	if(s==""):
-		print("symbolName Cannot be empty.....Aborting !!")
+		#print("symbolName Cannot be empty.....Aborting !!")
 		exit()
 	else:
 		SymbolTable[s]=symbolTableEntry
@@ -233,7 +236,7 @@ class NextUseEntry:
 		self.outislive = outislive
 
 def construct_NextUse():
-	# print(len(basic_block_list))
+	# #print(len(basic_block_list))
 	for basic_block in basic_block_list:
 		#Flush Symbol table's nextuse islive information
 		for x in SymbolTable:
@@ -244,7 +247,7 @@ def construct_NextUse():
 		for stmt in reversed(basic_block):
 			in1=""
 			in2=""
-			# stmt.print_stmt()
+			# stmt.#print_stmt()
 			if(stmt.in1_type == EntryType.VARIABLE):
 				in1=stmt.in1
 			if(stmt.in2_type == EntryType.VARIABLE):
@@ -262,7 +265,7 @@ def construct_NextUse():
 			ste1 = lookup_SymbolTable(in1)
 			ste2 = lookup_SymbolTable(in2)
 			steo = lookup_SymbolTable(out)
-			print("1",in1, in2, out)
+			#print("1",in1, in2, out)
 			if(out):
 				if(steo):
 					outnextuse=steo.nextUse
@@ -305,7 +308,7 @@ def constructEvictionCandidate(cur_line, basic_block):
 			return EvictionCandidates
 		in1=""
 		in2=""
-		# stmt.print_stmt()
+		# stmt.#print_stmt()
 		if(stmt.in1_type == EntryType.VARIABLE):
 			in1=stmt.in1
 			EvictionCandidates[stmt.in1] = stmt.linenum
@@ -358,16 +361,16 @@ def main():
 
 			#------------------------------------------------
 	# for x in code:
-	# 	x.print_stmt()
+	# 	x.#print_stmt()
 	leaders.append(numberoflinesinfile+1)
 	leaders=set(leaders)
 	leaders=list(leaders)
 	leaders.sort()
 
-	# print(leaders)
+	# #print(leaders)
 
 	for i in range(len(leaders)-1):
-		# print(leaders[i]-1,leaders[i+1]-1)
+		# #print(leaders[i]-1,leaders[i+1]-1)
 		basic_block = code[leaders[i]-1:leaders[i+1]-1]
 		basic_block_list.append(basic_block)
 
@@ -391,15 +394,73 @@ def main():
 					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
 						machine_code = machine_code + "addi $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
-						machine_code = machine_code + "add $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+						machine_code = machine_code + "addi $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
 						machine_code = machine_code + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 + st.in2)
 
+				elif(st.operator == Operator.SUB):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "sub $t7, $zero, $%s\n"%(VariableData[st.in2][1])
+						machine_code = machine_code + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in1)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 - st.in2)
 
-			print(constructEvictionCandidate(st,x))
-		print("-------------------------------------------------------------------")
-		print(VariableData)
-		print(UsableRegisters)
+				elif(st.operator == Operator.MUL):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "mult $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in2][1])
+						machine_code = machine_code + "mflo $%s\n"%(VariableData[st.out][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "li $t7, %d\n"%(st.in2)
+						machine_code = machine_code + "mult $%s, $t7\n"%(VariableData[st.in1][1])
+						machine_code = machine_code + "mflo $%s\n"%(VariableData[st.out][1])
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "li $t7, %d\n"%(st.in1)
+						machine_code = machine_code + "mult $%s, $t7\n"%(VariableData[st.in2][1])
+						machine_code = machine_code + "mflo $%s\n"%(VariableData[st.out][1])
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 * st.in2)
+
+				elif(st.operator == Operator.DIV):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "div $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in2][1])
+						machine_code = machine_code + "mflo $%s\n"%(VariableData[st.out][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "li $t7, %d\n"%(st.in2)
+						machine_code = machine_code + "div $%s, $t7\n"%(VariableData[st.in1][1])
+						machine_code = machine_code + "mflo $%s\n"%(VariableData[st.out][1])
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "li $t7, %d\n"%(st.in1)
+						machine_code = machine_code + "div $%s, $t7\n"%(VariableData[st.in2][1])
+						machine_code = machine_code + "mflo $%s\n"%(VariableData[st.out][1])
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 / st.in2)
+
+				elif(st.operator == Operator.MOD):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "div $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in2][1])
+						machine_code = machine_code + "mfhi $%s\n"%(VariableData[st.out][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "li $t7, %d\n"%(st.in2)
+						machine_code = machine_code + "div $%s, $t7\n"%(VariableData[st.in1][1])
+						machine_code = machine_code + "mfhi $%s\n"%(VariableData[st.out][1])
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "li $t7, %d\n"%(st.in1)
+						machine_code = machine_code + "div $%s, $t7\n"%(VariableData[st.in2][1])
+						machine_code = machine_code + "mfhi $%s"%(VariableData[st.out][1])
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 % st.in2)
+
+
+
+
+			#print(constructEvictionCandidate(st,x))
+		#print("-------------------------------------------------------------------")
+		#print(VariableData)
+		#print(UsableRegisters)
 
 		for var in VariableData:
 			if(VariableData[var][1] <> 0):
@@ -407,33 +468,33 @@ def main():
 				UsableRegisters[VariableData[var][1]] = 0
 				VariableData[var][1] = 0
 
-		print(VariableData)
-		print(UsableRegisters)
-		print("-------------------------------------------------------------------")
+		#print(VariableData)
+		#print(UsableRegisters)
+		#print("-------------------------------------------------------------------")
 
 	for basic_block in basic_block_list:
-		print("-------")
+		#print("-------")
 		for stmt in basic_block:
-			print(stmt.linenum)
+			#print(stmt.linenum)
 
 	construct_NextUse()
 	#constructEvictionCandidate()
-	# print(NextUse.keys())
+	# #print(NextUse.keys())
 	#NextUse.sort()
-	print("HERE")
-	#print(NextUse)
+	#print("HERE")
+	##print(NextUse)
 	#temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
 	#NextUse = temp
 	
 	for x in NextUse:
-		print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
+		#print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
 
 	
 	temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
-	print(temp)
+	#print(temp)
 	#NextUse = temp
 
-	print(machine_code)
+	#print(machine_code)
 
 if __name__ == '__main__':
 	main()

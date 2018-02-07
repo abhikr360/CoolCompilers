@@ -3,3 +3,6 @@
 3,ADD,a,a,4
 4,ADD,c,a,b
 5,ADD,d,1,2
+6,MUL,d,d,c
+7,DIV,d,a,2
+8,MOD,e,5,3
