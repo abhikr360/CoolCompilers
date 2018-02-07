@@ -343,8 +343,8 @@ def main():
 	machine_code = ""
 	machine_code = machine_code + "lw $s7, $sp\n"
 
-	with open(str(sys.argv[1]), 'rb') as symbolfile:
-		line_reader = csv.reader(codefile, delimiter = ',')
+	with open(str(sys.argv[2]), 'rb') as symbolfile:
+		line_reader = csv.reader(symbolfile, delimiter = ',')
 		for row in line_reader:
 			varname = row[0]
 			size=row[1]
