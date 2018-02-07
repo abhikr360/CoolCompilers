@@ -6,7 +6,7 @@ import numpy as np
 
 # Global DS #
 basic_block_list = []
-SymbolTable={}
+LocalSymbolTable={}
 RegisterDescriptor={'HI': 0, 'LO' : 0, 'r0' : 0, 'at' : 0, 'v0' : 0, 'v1' : 0, 'a0' : 0, 'a1' : 0, 'a2' : 0, 'a3' : 0, 't0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 't7' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0, 's7' : 0, 't8' : 0, 't9' : 0, 'k0' : 0, 'k1' : 0, 's8' : 0, 'ra' : 0}
 addressDescriptor={}
 NextUse={}
@@ -196,31 +196,32 @@ class Scope(Enum):
 	GLOBAL = 1
 	LOCAL = 2
 
-def lookup_SymbolTable(s):
+def lookup_LocalSymbolTable(s):
 	''' Search in symbol table'''
-	if(s in SymbolTable.keys() and s !=''):
-		return SymbolTable[s]
+	if(s in LocalSymbolTable.keys() and s !=''):
+		return LocalSymbolTable[s]
 	else:
 		return None
 
-def insert_SymbolTable(s, symbolTableEntry):
+def insert_LocalSymbolTable(s, symbolTableEntry):
 	'''Insert into symbol table'''
 	if(s==""):
 		print("symbolName Cannot be empty.....Aborting !!")
 		exit()
 	else:
-		SymbolTable[s]=symbolTableEntry
+		LocalSymbolTable[s]=symbolTableEntry
 
-class SymTabEntry:
+class LocalSymTabEntry:
 	'''One entry of symbol table'''
-	def __init__(self, isLive=False, nextUse=np.inf, dataType=EntryType.INTEGER, scope=Scope.GLOBAL):
+	def __init__(self, size=10, dataType="Int", scope=Scope.GLOBAL, isLive=False, nextUse=np.inf):
 		self.isLive=isLive
 		self.nextUse=nextUse
 		self.dataType=dataType
 		self.scope=scope
+		self.size=size
 
 class NextUseEntry:
-	"""for each line : for all three variables involved their next use and is lib=ve information"""
+	"""for each line : for all three variables involved their next use and is live information"""
 	def __init__(self, in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive):
 		self.in1 = in1
 		self.in2 = in2
@@ -236,9 +237,9 @@ def construct_NextUse():
 	# print(len(basic_block_list))
 	for basic_block in basic_block_list:
 		#Flush Symbol table's nextuse islive information
-		for x in SymbolTable:
-			SymbolTable[x].isLive = False
-			SymbolTable[x].nextUse = np.inf
+		for x in LocalSymbolTable:
+			LocalSymbolTable[x].isLive = False
+			LocalSymbolTable[x].nextUse = np.inf
 
 
 		for stmt in reversed(basic_block):
@@ -259,9 +260,9 @@ def construct_NextUse():
 
 
 
-			ste1 = lookup_SymbolTable(in1)
-			ste2 = lookup_SymbolTable(in2)
-			steo = lookup_SymbolTable(out)
+			ste1 = lookup_LocalSymbolTable(in1)
+			ste2 = lookup_LocalSymbolTable(in2)
+			steo = lookup_LocalSymbolTable(out)
 			print("1",in1, in2, out)
 			if(out):
 				if(steo):
@@ -269,30 +270,33 @@ def construct_NextUse():
 					outislive=steo.isLive
 					steo.nextUse=np.inf
 					steo.isLive=False
-					SymbolTable[out]=steo
+					LocalSymbolTable[out]=steo
 				else:
-					s=SymTabEntry()
-					insert_SymbolTable(out,s)
+					print("No entry for this variable in LocalSymbolTable")
+					# s=LocalSymTabEntry()
+					# insert_LocalSymbolTable(out,s)
 			if(in1):
 				if(ste1):
 					in1nextuse=ste1.nextUse
 					in1islive=ste1.isLive
 					ste1.nextUse=stmt.linenum
 					ste1.isLive=True
-					SymbolTable[in1]=ste1
+					LocalSymbolTable[in1]=ste1
 				else:
-					s=SymTabEntry(True, stmt.linenum)
-					insert_SymbolTable(in1,s)
+					# s=LocalSymTabEntry(True, stmt.linenum)
+					# insert_LocalSymbolTable(in1,s)
+					print("No entry for this variable in LocalSymbolTable")
 			if(in2):
 				if(ste2):
 					in2nextuse=ste2.nextUse
 					in2islive=ste2.isLive
 					ste2.nextUse=stmt.linenum
 					ste2.isLive=True
-					SymbolTable[in2]=ste2
+					LocalSymbolTable[in2]=ste2
 				else:
-					s=SymTabEntry(True, stmt.linenum)
-					insert_SymbolTable(in2,s)
+					# s=LocalSymTabEntry(True, stmt.linenum)
+					# insert_LocalSymbolTable(in2,s)
+					print("No entry for this variable in LocalSymbolTable")
 			
 
 			nue = NextUseEntry(in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive)
@@ -338,6 +342,23 @@ def main():
 
 	machine_code = ""
 	machine_code = machine_code + "lw $s7, $sp\n"
+
+	with open(str(sys.argv[1]), 'rb') as symbolfile:
+		line_reader = csv.reader(codefile, delimiter = ',')
+		for row in line_reader:
+			varname = row[0]
+			size=row[1]
+			datatype=row[2]
+			if(row[3]=="GLOBAL"):
+				scope=Scope.GLOBAL
+			else:
+				scope=Scope.LOCAL
+
+			s=LocalSymTabEntry(size, datatype, scope)
+			insert_LocalSymbolTable(varname, s)
+
+
+
 
 	with open(str(sys.argv[1]), 'rb') as codefile:
 		line_reader = csv.reader(codefile, delimiter = ',')
@@ -430,10 +451,10 @@ def main():
 
 	
 	temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
-	print(temp)
-	#NextUse = temp
+	# print(temp)
+	# #NextUse = temp
 
-	print(machine_code)
+	# print(machine_code)
 
 if __name__ == '__main__':
 	main()
