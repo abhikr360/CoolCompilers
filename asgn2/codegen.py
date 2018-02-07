@@ -82,7 +82,7 @@ class statement:
 		self.jump_tagret = None
 		self.label = None
 
-	def #print_stmt(self):
+	#def print_stmt(self):
 		'''Print an instruction'''
 		#print(self.linenum,self.instr_typ,self.operator,self.in1,self.in1_type,self.in2,self.in2_type,self.out,self.jump_tagret,self.label)
 
@@ -216,7 +216,7 @@ def insert_LocalSymbolTable(s, symbolTableEntry):
 
 class LocalSymTabEntry:
 	'''One entry of symbol table'''
-	def __init__(self, size=10, dataType="Int", scope=Scope.GLOBAL, isLive=False, nextUse=np.inf):
+	def __init__(self, size=1, dataType="Int", scope=Scope.GLOBAL, isLive=False, nextUse=np.inf):
 		self.isLive=isLive
 		self.nextUse=nextUse
 		self.dataType=dataType
@@ -340,8 +340,8 @@ def main():
 	leaders = [1]
 	numberoflinesinfile=0
 
+	data_code = ".data\n"
 	machine_code = ""
-	machine_code = machine_code + "lw $s7, $sp\n"
 
 	with open(str(sys.argv[2]), 'rb') as symbolfile:
 		line_reader = csv.reader(symbolfile, delimiter = ',')
@@ -357,7 +357,16 @@ def main():
 			s=LocalSymTabEntry(size, datatype, scope)
 			insert_LocalSymbolTable(varname, s)
 
+			if(datatype == 'Int'):
+				data_code = data_code + "%s : .word 0\n"%(varname)
+			elif(datatype == "Array"):
+				data_code = data_code + "%s : .space \"%d\"\n"%(varname, 4*size)
 
+	print data_code
+
+	for s in LocalSymbolTable:
+		print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
+	quit()
 
 
 	with open(str(sys.argv[1]), 'rb') as codefile:
@@ -393,8 +402,6 @@ def main():
 		basic_block_list.append(basic_block)
 
 	# Basic block prepared----------------------------------------
-
-
 	
 	for x in basic_block_list:
 		for st in x:
@@ -490,9 +497,9 @@ def main():
 		#print(UsableRegisters)
 		#print("-------------------------------------------------------------------")
 
-	for basic_block in basic_block_list:
+	# for basic_block in basic_block_list:
 		#print("-------")
-		for stmt in basic_block:
+		# for stmt in basic_block:
 			#print(stmt.linenum)
 
 	construct_NextUse()
@@ -504,11 +511,12 @@ def main():
 	#temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
 	#NextUse = temp
 	
-	for x in NextUse:
+	#for x in NextUse:
 		#print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
 
 	
 	temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
+	print machine_code
 
 
 if __name__ == '__main__':
