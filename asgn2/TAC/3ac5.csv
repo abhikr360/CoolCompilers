@@ -1,0 +1,5 @@
+1,ASSIGN,a,2
+2,ASSIGN,b,3
+3,ADD,a,a,4
+4,ADD,c,a,b
+5,ADD,d,1,2

@@ -1,7 +1,7 @@
 from enum import Enum
 import csv
 import sys
-
+import numpy as np
 
 
 # Global DS #
@@ -11,13 +11,20 @@ RegisterDescriptor={'HI': 0, 'LO' : 0, 'r0' : 0, 'at' : 0, 'v0' : 0, 'v1' : 0, '
 addressDescriptor={}
 NextUse={}
 
+UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 't7' : 0, 't8' : 0, 't9' : 0}
+UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 't7' : 0, 't8' : 0, 't9' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+VariableData = {}
+
+memory_used = [0]
+
 def is_int(row):
 	try:
 		temp = int(row)
 		return True
 	except Exception as e:
 		return False
-
 
 class InstrType(Enum):
 	'''Any Instruction in three Address code can be of one of these types'''
@@ -75,8 +82,6 @@ class statement:
 	def print_stmt(self):
 		'''Print an instruction'''
 		print(self.linenum,self.instr_typ,self.operator,self.in1,self.in1_type,self.in2,self.in2_type,self.out,self.jump_tagret,self.label)
-
-
 
 def set_inputs(row, curr_statement):
 	'''Reads input stores it in a list of classes'''
@@ -191,7 +196,6 @@ class Scope(Enum):
 	GLOBAL = 1
 	LOCAL = 2
 
-
 def lookup_SymbolTable(s):
 	''' Search in symbol table'''
 	if(s in SymbolTable.keys() and s !=''):
@@ -207,16 +211,13 @@ def insert_SymbolTable(s, symbolTableEntry):
 	else:
 		SymbolTable[s]=symbolTableEntry
 
-
 class SymTabEntry:
 	'''One entry of symbol table'''
-	def __init__(self, isLive=False, nextUse=0, dataType=EntryType.INTEGER, scope=Scope.GLOBAL):
+	def __init__(self, isLive=False, nextUse=np.inf, dataType=EntryType.INTEGER, scope=Scope.GLOBAL):
 		self.isLive=isLive
 		self.nextUse=nextUse
 		self.dataType=dataType
 		self.scope=scope
-
-
 
 class NextUseEntry:
 	"""for each line : for all three variables involved their next use and is lib=ve information"""
@@ -231,21 +232,15 @@ class NextUseEntry:
 		self.in2islive = in2islive
 		self.outislive = outislive
 
-
 def construct_NextUse():
 	# print(len(basic_block_list))
-	i=-1
 	for basic_block in basic_block_list:
 		#Flush Symbol table's nextuse islive information
-		i=i+1
 		for x in SymbolTable:
 			SymbolTable[x].isLive = False
-			SymbolTable[x].nextUse = 0
+			SymbolTable[x].nextUse = np.inf
 
-		# if i==1:
-		# 	print(SymbolTable['a'].isLive)
-		# 	print(SymbolTable['a'].nextUse)
-		# 	break
+
 		for stmt in reversed(basic_block):
 			in1=""
 			in2=""
@@ -255,9 +250,9 @@ def construct_NextUse():
 			if(stmt.in2_type == EntryType.VARIABLE):
 				in2=stmt.in2
 			out = stmt.out
-			in1nextuse=0
-			in2nextuse=0
-			outnextuse=0
+			in1nextuse=np.inf
+			in2nextuse=np.inf
+			outnextuse=np.inf
 			in1islive=False
 			in2islive=False
 			outislive=False
@@ -267,12 +262,12 @@ def construct_NextUse():
 			ste1 = lookup_SymbolTable(in1)
 			ste2 = lookup_SymbolTable(in2)
 			steo = lookup_SymbolTable(out)
-			print(in1, in2, out)
+			print("1",in1, in2, out)
 			if(out):
 				if(steo):
 					outnextuse=steo.nextUse
 					outislive=steo.isLive
-					steo.nextUse=0
+					steo.nextUse=np.inf
 					steo.isLive=False
 					SymbolTable[out]=steo
 				else:
@@ -303,12 +298,47 @@ def construct_NextUse():
 			nue = NextUseEntry(in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive)
 			NextUse[stmt.linenum]=nue
 
+def constructEvictionCandidate(cur_line, basic_block):
+	EvictionCandidates={}
+	for stmt in reversed(basic_block):
+		if(stmt == cur_line):
+			return EvictionCandidates
+		in1=""
+		in2=""
+		# stmt.print_stmt()
+		if(stmt.in1_type == EntryType.VARIABLE):
+			in1=stmt.in1
+			EvictionCandidates[stmt.in1] = stmt.linenum
+		if(stmt.in2_type == EntryType.VARIABLE):
+			in2=stmt.in2
+			EvictionCandidates[stmt.in2] = stmt.linenum
 
+def FindEmptyReg():
+	for reg in UsableRegisters:
+		if (UsableRegisters[reg] == 0):
+			return reg
+
+def GetReg():
+	if 0 in UsableRegisters.values():
+		return FindEmptyReg()
+
+def UpdateVariableData(statement):
+	if(statement.out_type == EntryType.VARIABLE):
+		if(statement.out not in VariableData):
+			register = GetReg()
+			VariableData[statement.out] = [memory_used[0],register]
+			memory_used[0] = memory_used[0] + 4
+			UsableRegisters[register] = statement.out
 
 def main():
+
 	code = []
 	leaders = [1]
 	numberoflinesinfile=0
+
+	machine_code = ""
+	machine_code = machine_code + "lw $s7, $sp\n"
+
 	with open(str(sys.argv[1]), 'rb') as codefile:
 		line_reader = csv.reader(codefile, delimiter = ',')
 		
@@ -346,7 +376,40 @@ def main():
 
 	
 	for x in basic_block_list:
-		print(x[0].instr_typ)
+		for st in x:
+			UpdateVariableData(st)
+			if(st.instr_typ == InstrType.ASSIGN and st.operator == None):
+				if(st.in1_type == EntryType.VARIABLE):
+					machine_code = machine_code + "move $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1])
+				elif(st.in1_type == EntryType.INTEGER):
+					machine_code = machine_code + "li $%s, %d\n"%(VariableData[st.out][1], st.in1)
+
+			elif(st.instr_typ == InstrType.ASSIGN):
+				if(st.operator == Operator.ADD):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "add $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "addi $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						machine_code = machine_code + "add $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						machine_code = machine_code + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 + st.in2)
+
+
+			print(constructEvictionCandidate(st,x))
+		print("-------------------------------------------------------------------")
+		print(VariableData)
+		print(UsableRegisters)
+
+		for var in VariableData:
+			if(VariableData[var][1] <> 0):
+				machine_code = machine_code + "sw %d($s7), $%s\n"%(VariableData[var][0], VariableData[var][1])
+				UsableRegisters[VariableData[var][1]] = 0
+				VariableData[var][1] = 0
+
+		print(VariableData)
+		print(UsableRegisters)
+		print("-------------------------------------------------------------------")
 
 	for basic_block in basic_block_list:
 		print("-------")
@@ -354,10 +417,23 @@ def main():
 			print(stmt.linenum)
 
 	construct_NextUse()
-
+	#constructEvictionCandidate()
 	# print(NextUse.keys())
+	#NextUse.sort()
+	print("HERE")
+	#print(NextUse)
+	#temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
+	#NextUse = temp
+	
 	for x in NextUse:
 		print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
+
+	
+	temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
+	print(temp)
+	#NextUse = temp
+
+	print(machine_code)
 
 if __name__ == '__main__':
 	main()
