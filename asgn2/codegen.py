@@ -190,6 +190,12 @@ def set_inputs(row, curr_statement):
 			curr_statement.in1 = row[4]
 			curr_statement.in1_type = EntryType.VARIABLE
 
+	elif(curr_statement.instr_typ == InstrType.LABEL):
+		curr_statement.jump_tagret = row[2]
+
+	elif(curr_statement.instr_typ == InstrType.FUNC_CALL):
+		curr_statement.jump_tagret = row[2]
+
 
 
 
@@ -371,7 +377,10 @@ def UpdateVariableData(statement,block):
 			register = GetReg(statement,block)
 			VariableData[statement.in1] = [memory_used[0],register]
 			UsableRegisters[register] = statement.in1
-			statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
+			if(statement.instr_typ==InstrType.INDEX_ASSIGN_R):
+				statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
+			else:
+				statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
 
 	if(statement.in2_type == EntryType.VARIABLE):
 		if(statement.in2 not in VariableData or VariableData[statement.in2][1] == 0):
@@ -385,7 +394,8 @@ def UpdateVariableData(statement,block):
 			register = GetReg(statement,block)
 			VariableData[statement.out] = [memory_used[0],register]
 			UsableRegisters[register] = statement.out
-			#statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.out][1], statement.out)
+			if(statement.instr_typ==InstrType.INDEX_ASSIGN_L):
+				statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.out][1], statement.out)
 
 def main():
 
@@ -459,6 +469,7 @@ def main():
 	
 	for x in basic_block_list:
 		for st in x:
+			infunction=['main']
 			UpdateVariableData(st,x)
 			if(st.instr_typ == InstrType.ASSIGN and st.operator == None):
 				if(st.in1_type == EntryType.VARIABLE):
@@ -532,6 +543,42 @@ def main():
 						st.code_statement = st.code_statement + "mfhi $%s"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 % st.in2)
+
+			elif(st.instr_typ == InstrType.LABEL):
+				st.code_statement = st.code_statement + "%s:\n"%(st.jump_tagret)
+			elif(st.instr_typ == InstrType.FUNC_CALL):
+				st.code_statement = st.code_statement + "j %s\n"%(st.jump_tagret) # handle return register
+				
+			elif(st.instr_typ == InstrType.FUNC_RETURN):
+				f = 0# Handle jumping back
+			elif(st.instr_typ == InstrType.INDEX_ASSIGN_L):
+				if(st.in1_type==EntryType.VARIABLE):
+					st.code_statement = st.code_statement+ "add $%s, $%s, $%s\nadd $%s, $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1])
+					st.code_statement = st.code_statement + "add $%s, $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.out][1])
+					if(st.in2_type==EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sw $%s, 0($%s)"%(VariableData[st.in2][1], VariableData[st.in1][1])
+					else:
+						st.code_statement = st.code_statement + "sw $%d, 0($%s)"%(st.in2, VariableData[st.in1][1])
+				else:
+					st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in1)
+					st.code_statement = st.code_statement + "add $t9, $t9, $t9\nadd $t9, $t9, $t9\n"
+					st.code_statement = st.code_statement + "add $t9, $%s,$t9"%(VariableData[st.out][1])
+					if(st.in2_type==EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sw $%s, 0($t9)"%(VariableData[st.in2][1])
+					else:
+						st.code_statement = st.code_statement + "sw $%d, 0($t9)"%(st.in2)
+
+
+			elif(st.instr_typ == InstrType.INDEX_ASSIGN_R):
+				if(st.in2_type==EntryType.VARIABLE):
+					st.code_statement = st.code_statement+ "add $%s, $%s, $%s\nadd $%s, $%s, $%s\n"%(VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in2][1])
+					st.code_statement = st.code_statement + "add $%s, $%s, $%s\n"%(VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in1][1])
+					st.code_statement = st.code_statement + "lw $%s, 0($%s)"%(VariableData[st.out][1], VariableData[st.in2][1])
+				else:
+					st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in2)
+					st.code_statement = st.code_statement + "add $t9, $t9, $t9\nadd $t9, $t9, $t9\n"
+					st.code_statement = st.code_statement + "add $t9, $%s,$t9"%(VariableData[st.in1][1])
+					st.code_statement = st.code_statement + "lw $%s, 0($t9)"%(st.out)
 
 
 
