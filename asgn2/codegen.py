@@ -20,6 +20,8 @@ TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
 
 VariableData = {}
 
+block_codes = {}
+
 memory_used = [0]
 
 def is_int(row):
@@ -341,17 +343,25 @@ def GetReg(stmt, block):
 	empty_reg = None
 	if(nue.in1 != "" and nue.in1nextuse == np.inf):
 		useless_var = nue.in1
+		empty_reg = VariableData[useless_var][1]
+		stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
+		UsableRegisters[empty_reg] = 0
 	elif(nue.in2 != "" and nue.in2nextuse == np.inf):
 		useless_var = nue.in2
+		empty_reg = VariableData[useless_var][1]
+		stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
+		UsableRegisters[empty_reg] = 0
 	elif 0 in UsableRegisters.values():
 		return FindEmptyReg()
 	else:
 		useless_var = constructEvictionCandidate(stmt,block)
-	empty_reg = VariableData[useless_var][1]
+		empty_reg = VariableData[useless_var][1]
+		stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
+		UsableRegisters[empty_reg] = 0
+		VariableData[useless_var][1] = 0
+	
 	# print("------------------------1234--%s"%empty_reg)
-	stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
-	UsableRegisters[empty_reg] = 0
-	# VariableData[useless_var][1] = 0
+	
 	return empty_reg
 
 
@@ -536,11 +546,14 @@ def main():
 		#print(VariableData)
 		#print(UsableRegisters)
 
+		
+		block_code = ""
 		for var in VariableData:
 			if(VariableData[var][1] <> 0):
-				machine_code = machine_code + "sw %d($s7), $%s\n"%(VariableData[var][0], VariableData[var][1])
+				block_code = block_code + "sw %s, $%s\n"%(var, VariableData[var][1])
 				UsableRegisters[VariableData[var][1]] = 0
 				VariableData[var][1] = 0
+		block_codes[id(x)] = block_code
 
 		#print(VariableData)
 		#print(UsableRegisters)
@@ -550,6 +563,7 @@ def main():
 
 		for stmt in basic_block:
 			print(stmt.code_statement)
+		print(block_codes[id(basic_block)])
 
 	#constructEvictionCandidate()
 	# #print(NextUse.keys())
