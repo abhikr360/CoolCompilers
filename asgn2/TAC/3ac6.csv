@@ -1,0 +1,15 @@
+1,ASSIGN,aalo,2
+2,ASSIGN,bhalu,3
+3,FUNC_CALL,print_hello
+4,IFGOTO,LESS_THAN,aalo,bhalu,L1
+5,FUNC_CALL,print_false
+6,LABEL,L1
+7,ADD,kachalu,aalo,bhalu
+8,SUB,aalo,aalo,aalo
+9,FUNC_RETURN
+10,LABEL,print_hello
+11,ADD,C,2,68
+12,FUNC_RETURN
+13,LABEL,print_false
+14,SUB,chor,5,1
+15,FUNC_RETURN

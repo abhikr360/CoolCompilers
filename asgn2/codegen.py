@@ -14,7 +14,7 @@ NextUse={}
 UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0}
 UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0}#, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
 TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
 
@@ -361,7 +361,7 @@ def GetReg(stmt, block):
 	# 	stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
 	# 	UsableRegisters[empty_reg] = 0
 	if 0 in UsableRegisters.values():
-		return FindEmptyReg()
+		empty_reg = FindEmptyReg()
 	else:
 		useless_var = constructEvictionCandidate(stmt,block)
 		empty_reg = VariableData[useless_var][1]
@@ -370,7 +370,6 @@ def GetReg(stmt, block):
 		VariableData[useless_var][1] = 0
 	
 	# print("------------------------1234--%s"%empty_reg)
-	stmt.code_statement = stmt.code_statement + "lw $%s,%s\n" % (empty_reg, UsableRegisters[empty_reg])
 	return empty_reg
 
 
@@ -378,11 +377,14 @@ def UpdateVariableData(statement,block):
 	if(statement.in1_type == EntryType.VARIABLE):
 		if(statement.in1 not in VariableData or VariableData[statement.in1][1] == 0):
 			register = GetReg(statement,block)
+			# print("#*******************givenrehister for ",statement.in1)
 			VariableData[statement.in1] = [memory_used[0],register]
 			UsableRegisters[register] = statement.in1
+			# statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
 			if(statement.instr_typ==InstrType.INDEX_ASSIGN_R):
 				statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
 			else:
+				# print("HERE")
 				statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
 
 	if(statement.in2_type == EntryType.VARIABLE):
@@ -390,6 +392,7 @@ def UpdateVariableData(statement,block):
 			register = GetReg(statement,block)
 			VariableData[statement.in2] = [memory_used[0],register]
 			UsableRegisters[register] = statement.in2
+			# statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
 			statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in2][1], statement.in2)
 
 	if(statement.out_type == EntryType.VARIABLE):
@@ -399,6 +402,8 @@ def UpdateVariableData(statement,block):
 			UsableRegisters[register] = statement.out
 			if(statement.instr_typ==InstrType.INDEX_ASSIGN_L):
 				statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.out][1], statement.out)
+			else:
+				statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
 
 def main():
 
@@ -634,7 +639,7 @@ def main():
 					branch_instr = temp_instr + branch_instr + " $t7,$t8,%s\n" % (st.jump_tagret)
 
 
-				st.code_statement = branch_instr
+				st.code_statement = st.code_statement + branch_instr
 			elif(st.instr_typ == InstrType.GOTO):
 				st.code_statement = st.code_statement + "j %s\n" % (st.jump_tagret)
 			#print(constructEvictionCandidate(st,x))
@@ -645,7 +650,7 @@ def main():
 		
 		block_code = ""
 		for var in VariableData:
-			if(VariableData[var][1] <> 0):
+			if(VariableData[var][1] <> 0 and LocalSymbolTable[var].dataType <> "Array" ) :
 				block_code = block_code + "sw $%s, %s\n"%(VariableData[var][1], var)
 				UsableRegisters[VariableData[var][1]] = 0
 				VariableData[var][1] = 0
@@ -653,7 +658,7 @@ def main():
 
 		# print("block %d ended")%(id(x))
 		# print (UsableRegisters)
-		block_codes[id(x)] = block_code + "#---------------------------------------------block id: %d"%(id(x))
+		block_codes[id(x)] = block_code
 
 		#print(VariableData)
 		#print(UsableRegisters)
@@ -666,11 +671,19 @@ def main():
 				print(stmt.code_statement)
 			else:
 				if(stmt.instr_typ in [InstrType.GOTO, InstrType.IFGOTO, InstrType.FUNC_CALL, InstrType.FUNC_RETURN]):
-					print(block_codes[id(basic_block)])
+					temp = stmt.code_statement.split('\n')
+					ne = temp[:len(temp)-2] + [block_codes[id(basic_block)]] + temp[len(temp)-2:]
+					res = ""
+					for line in ne:
+						res = res+line+'\n'
+					stmt.code_statement = res[:len(res)-1]
+					# print(block_codes[id(basic_block)])
 					print(stmt.code_statement)
+					print("#-----------------------------------block id: %d"%(id(basic_block)))
 				else:
 					print(stmt.code_statement)
 					print(block_codes[id(basic_block)])
+					print("#-----------------------------------block id: %d"%(id(basic_block)))
 
 
 	#constructEvictionCandidate()
