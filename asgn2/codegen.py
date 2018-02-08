@@ -370,7 +370,7 @@ def GetReg(stmt, block):
 		VariableData[useless_var][1] = 0
 	
 	# print("------------------------1234--%s"%empty_reg)
-	
+	stmt.code_statement = stmt.code_statement + "lw $%s,%s\n" % (empty_reg, UsableRegisters[empty_reg])
 	return empty_reg
 
 
@@ -474,6 +474,14 @@ def main():
 		for st in x:
 			infunction=['main']
 			UpdateVariableData(st,x)
+			# print("variable data updated :  %s" % st.linenum)
+			# print VariableData
+			print("variable data updated :  %s" % st.linenum)
+			print (VariableData)
+			print UsableRegisters
+			# for x in UsableRegisters:
+			# 	if(UsableRegisters[x] != 0):
+			# 		print (x,UsableRegisters[x])
 			if(st.instr_typ == InstrType.ASSIGN and st.operator == None):
 				if(st.in1_type == EntryType.VARIABLE):
 					st.code_statement = st.code_statement + "move $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1])
@@ -555,34 +563,36 @@ def main():
 			elif(st.instr_typ == InstrType.FUNC_RETURN):
 				st.code_statement = st.code_statement + "jr $ra\n"
 			elif(st.instr_typ == InstrType.INDEX_ASSIGN_L):
-				st.print_stmt()
+				# st.print_stmt()
 				if(st.in1_type==EntryType.VARIABLE):
-					st.code_statement = st.code_statement+ "add $%s, $%s, $%s\nadd $%s, $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1])
-					st.code_statement = st.code_statement + "add $%s, $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.out][1])
+					st.code_statement = st.code_statement+ "sll $t7, $%s, 2\n"%(VariableData[st.in1][1])
+					st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.out][1])
 					if(st.in2_type==EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sw $%s, 0($%s)"%(VariableData[st.in2][1], VariableData[st.in1][1])
+						st.code_statement = st.code_statement + "sw $%s, 0($t8)"%(VariableData[st.in2][1])
 					else:
-						st.code_statement = st.code_statement + "sw $%d, 0($%s)"%(st.in2, VariableData[st.in1][1])
+						st.code_statement = st.code_statement + "li $t9, %d"%(st.in2)
+						st.code_statement = st.code_statement + "sw $t9, 0($t8)"
 				else:
-					st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in1)
-					st.code_statement = st.code_statement + "add $t9, $t9, $t9\nadd $t9, $t9, $t9\n"
-					st.code_statement = st.code_statement + "add $t9, $%s,$t9"%(VariableData[st.out][1])
+					st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in1)
+					st.code_statement = st.code_statement + "sll $t7, $t7, 2\n"
+					st.code_statement = st.code_statement + "add $t8, $%s,$t7"%(VariableData[st.out][1])
 					if(st.in2_type==EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sw $%s, 0($t9)"%(VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "sw $%s, 0($t8)"%(VariableData[st.in2][1])
 					else:
-						st.code_statement = st.code_statement + "sw $%d, 0($t9)"%(st.in2)
+						st.code_statement = st.code_statement + "li $t9, %d"%(st.in2)
+						st.code_statement = st.code_statement + "sw $t9, 0($t8)"
 
 
 			elif(st.instr_typ == InstrType.INDEX_ASSIGN_R):
 				if(st.in2_type==EntryType.VARIABLE):
-					st.code_statement = st.code_statement+ "add $%s, $%s, $%s\nadd $%s, $%s, $%s\n"%(VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in2][1])
-					st.code_statement = st.code_statement + "add $%s, $%s, $%s\n"%(VariableData[st.in2][1], VariableData[st.in2][1], VariableData[st.in1][1])
-					st.code_statement = st.code_statement + "lw $%s, 0($%s)"%(VariableData[st.out][1], VariableData[st.in2][1])
+					st.code_statement = st.code_statement+ "sll $t7, $%s, 2\n"%(VariableData[st.in2][1])
+					st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
+					st.code_statement = st.code_statement + "lw $%s, 0($t8)"%(VariableData[st.out][1])
 				else:
-					st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in2)
-					st.code_statement = st.code_statement + "add $t9, $t9, $t9\nadd $t9, $t9, $t9\n"
-					st.code_statement = st.code_statement + "add $t9, $%s,$t9"%(VariableData[st.in1][1])
-					st.code_statement = st.code_statement + "lw $%s, 0($t9)"%(st.out)
+					st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
+					st.code_statement = st.code_statement + "sll $t8, $t7, 2\n"
+					st.code_statement = st.code_statement + "add $t8, $%s,$t8"%(VariableData[st.in1][1])
+					st.code_statement = st.code_statement + "lw $%s, 0($t8)"%(VariableData[st.out][1])
 
 
 
@@ -639,7 +649,11 @@ def main():
 				block_code = block_code + "sw $%s, %s\n"%(VariableData[var][1], var)
 				UsableRegisters[VariableData[var][1]] = 0
 				VariableData[var][1] = 0
-		block_codes[id(x)] = block_code + "#------------new block started---------------------"
+
+
+		# print("block %d ended")%(id(x))
+		# print (UsableRegisters)
+		block_codes[id(x)] = block_code + "#---------------------------------------------block id: %d"%(id(x))
 
 		#print(VariableData)
 		#print(UsableRegisters)

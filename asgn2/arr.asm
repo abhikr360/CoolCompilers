@@ -8,7 +8,7 @@ temp : .word 0
 .text
 
 main:
-
+li $t5, 0
 sw $t5, i
 #------------new block started---------------------
 LOOP:
