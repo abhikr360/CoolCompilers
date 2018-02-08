@@ -1,0 +1,4 @@
+i,1,Int,GLOBAL
+arr,10,Array,GLOBAL
+sum,1,Int,GLOBAL
+temp,1,Int,GLOBAL

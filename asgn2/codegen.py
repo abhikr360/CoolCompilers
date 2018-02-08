@@ -139,7 +139,7 @@ def set_inputs(row, curr_statement):
 
 	elif(curr_statement.instr_typ == InstrType.IFGOTO):
 		exec("curr_statement.operator = Operator.%s" %(row[2]))
-		curr_statement.jump_tagret = int(row[5])
+		curr_statement.jump_tagret = row[5]
 		try:
 			temp = int(row[3])
 			curr_statement.in1 = temp
@@ -170,11 +170,11 @@ def set_inputs(row, curr_statement):
 			curr_statement.in1_type = EntryType.VARIABLE
 
 		if(is_int(row[4])):
-			curr_statement.in1 = int(row[4])
-			curr_statement.in1_type = EntryType.INTEGER
+			curr_statement.in2 = int(row[4])
+			curr_statement.in2_type = EntryType.INTEGER
 		else:
-			curr_statement.in1 = row[4]
-			curr_statement.in1_type = EntryType.VARIABLE
+			curr_statement.in2 = row[4]
+			curr_statement.in2_type = EntryType.VARIABLE
 
 	elif(curr_statement.instr_typ == InstrType.INDEX_ASSIGN_R):			# OUT = IN1[IN2]
 		curr_statement.out = row[2]
@@ -184,11 +184,11 @@ def set_inputs(row, curr_statement):
 		curr_statement.in1_type = EntryType.VARIABLE
 
 		if(is_int(row[4])):
-			curr_statement.in1 = int(row[4])
-			curr_statement.in1_type = EntryType.INTEGER
+			curr_statement.in2 = int(row[4])
+			curr_statement.in2_type = EntryType.INTEGER
 		else:
-			curr_statement.in1 = row[4]
-			curr_statement.in1_type = EntryType.VARIABLE
+			curr_statement.in2 = row[4]
+			curr_statement.in2_type = EntryType.VARIABLE
 
 	elif(curr_statement.instr_typ == InstrType.LABEL):
 		curr_statement.label = row[2]
@@ -365,7 +365,7 @@ def GetReg(stmt, block):
 	else:
 		useless_var = constructEvictionCandidate(stmt,block)
 		empty_reg = VariableData[useless_var][1]
-		stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
+		stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1],useless_var)
 		UsableRegisters[empty_reg] = 0
 		VariableData[useless_var][1] = 0
 	
@@ -426,7 +426,7 @@ def main():
 			if(datatype == 'Int'):
 				data_code = data_code + "%s : .word 0\n"%(varname)
 			elif(datatype == "Array"):
-				data_code = data_code + "%s : .space \"%d\"\n"%(varname, 4*size)
+				data_code = data_code + "%s : .space %d\n"%(varname, 4*int(size))
 
 	print data_code
 
@@ -555,6 +555,7 @@ def main():
 			elif(st.instr_typ == InstrType.FUNC_RETURN):
 				st.code_statement = st.code_statement + "jr $ra\n"
 			elif(st.instr_typ == InstrType.INDEX_ASSIGN_L):
+				st.print_stmt()
 				if(st.in1_type==EntryType.VARIABLE):
 					st.code_statement = st.code_statement+ "add $%s, $%s, $%s\nadd $%s, $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1])
 					st.code_statement = st.code_statement + "add $%s, $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.out][1])
@@ -593,7 +594,7 @@ def main():
 					VariableData[st.in2][1] = 0
 
 			elif(st.instr_typ==InstrType.IFGOTO):
-				st.print_stmt()
+				# st.print_stmt()
 
 				branch_instr = ""
 				if(st.operator == Operator.GREATER_THAN):
@@ -635,7 +636,7 @@ def main():
 		block_code = ""
 		for var in VariableData:
 			if(VariableData[var][1] <> 0):
-				block_code = block_code + "sw %s, $%s\n"%(var, VariableData[var][1])
+				block_code = block_code + "sw $%s, %s\n"%(VariableData[var][1], var)
 				UsableRegisters[VariableData[var][1]] = 0
 				VariableData[var][1] = 0
 		block_codes[id(x)] = block_code + "#------------new block started---------------------"
@@ -656,7 +657,7 @@ def main():
 				else:
 					print(stmt.code_statement)
 					print(block_codes[id(basic_block)])
-					
+
 
 	#constructEvictionCandidate()
 	# #print(NextUse.keys())
