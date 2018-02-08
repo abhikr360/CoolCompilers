@@ -238,8 +238,8 @@ class NextUseEntry:
 		self.outislive = outislive
 
 def construct_NextUse():
-	print("here")
-	print(len(basic_block_list))
+	# print("here")
+	# print(len(basic_block_list))
 	for basic_block in basic_block_list:
 		#Flush Symbol table's nextuse islive information
 		for x in LocalSymbolTable:
@@ -335,25 +335,47 @@ def FindEmptyReg():
 			return reg
 
 def GetReg(stmt, block):
-	print(NextUse)
+	# print(NextUse)
 	nue = NextUse[stmt.linenum]
+	useless_var = None
+	empty_reg = None
 	if(nue.in1 != "" and nue.in1nextuse == np.inf):
-		return VariableData[nue.in1][1]
+		useless_var = nue.in1
 	elif(nue.in2 != "" and nue.in2nextuse == np.inf):
-		return VariableData[nue.in2][1]
+		useless_var = nue.in2
 	elif 0 in UsableRegisters.values():
 		return FindEmptyReg()
 	else:
-		useless_reg = constructEvictionCandidate(stmt,block)
+		useless_var = constructEvictionCandidate(stmt,block)
+	empty_reg = VariableData[useless_var][1]
+	# print("------------------------1234--%s"%empty_reg)
+	stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
+	UsableRegisters[empty_reg] = 0
+	# VariableData[useless_var][1] = 0
+	return empty_reg
+
 
 def UpdateVariableData(statement,block):
+	if(statement.in1_type == EntryType.VARIABLE):
+		if(statement.in1 not in VariableData or VariableData[statement.in1][1] == 0):
+			register = GetReg(statement,block)
+			VariableData[statement.in1] = [memory_used[0],register]
+			UsableRegisters[register] = statement.in1
+			statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
+
+	if(statement.in2_type == EntryType.VARIABLE):
+		if(statement.in2 not in VariableData or VariableData[statement.in2][1] == 0):
+			register = GetReg(statement,block)
+			VariableData[statement.in2] = [memory_used[0],register]
+			UsableRegisters[register] = statement.in2
+			statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in2][1], statement.in2)
+
 	if(statement.out_type == EntryType.VARIABLE):
-		if(statement.out not in VariableData):
+		if(statement.out not in VariableData or VariableData[statement.out][1] == 0):
 			register = GetReg(statement,block)
 			VariableData[statement.out] = [memory_used[0],register]
-			memory_used[0] = memory_used[0] + 4
 			UsableRegisters[register] = statement.out
-
+			#statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.out][1], statement.out)
 
 def main():
 
@@ -430,80 +452,85 @@ def main():
 			UpdateVariableData(st,x)
 			if(st.instr_typ == InstrType.ASSIGN and st.operator == None):
 				if(st.in1_type == EntryType.VARIABLE):
-					st.code_statement = "move $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1])
+					st.code_statement = st.code_statement + "move $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1])
 				elif(st.in1_type == EntryType.INTEGER):
-					st.code_statement = "li $%s, %d\n"%(VariableData[st.out][1], st.in1)
+					st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1)
 
 			elif(st.instr_typ == InstrType.ASSIGN):
 				if(st.operator == Operator.ADD):
 					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "add $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "add $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "addi $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+						st.code_statement = st.code_statement + "addi $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "addi $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+						st.code_statement = st.code_statement + "addi $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "li $%s, %d\n"%(VariableData[st.out][1], st.in1 + st.in2)
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 + st.in2)
 
 				elif(st.operator == Operator.SUB):
 					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "sub $t7, $zero, $%s\n"%(VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in2][1])
 						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in1)
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "li $%s, %d\n"%(VariableData[st.out][1], st.in1 - st.in2)
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 - st.in2)
 
 				elif(st.operator == Operator.MUL):
 					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "mult $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "mult $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in2][1])
 						st.code_statement = st.code_statement + "mflo $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "li $t7, %d\n"%(st.in2)
+						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
 						st.code_statement = st.code_statement + "mult $%s, $t7\n"%(VariableData[st.in1][1])
 						machine_code = machine_code + "mflo $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "li $t7, %d\n"%(st.in1)
+						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in1)
 						st.code_statement = st.code_statement + "mult $%s, $t7\n"%(VariableData[st.in2][1])
 						st.code_statement = st.code_statement + "mflo $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "li $%s, %d\n"%(VariableData[st.out][1], st.in1 * st.in2)
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 * st.in2)
 
 				elif(st.operator == Operator.DIV):
 					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "div $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "div $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in2][1])
 						st.code_statement = st.code_statement + "mflo $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "li $t7, %d\n"%(st.in2)
+						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
 						st.code_statement = st.code_statement + "div $%s, $t7\n"%(VariableData[st.in1][1])
 						st.code_statement = st.code_statement + "mflo $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "li $t7, %d\n"%(st.in1)
+						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in1)
 						st.code_statement = st.code_statement + "div $%s, $t7\n"%(VariableData[st.in2][1])
 						st.code_statement = st.code_statement + "mflo $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "li $%s, %d\n"%(VariableData[st.out][1], st.in1 / st.in2)
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 / st.in2)
 
 				elif(st.operator == Operator.MOD):
 					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "div $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "div $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in2][1])
 						st.code_statement = st.code_statement + "mfhi $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "li $t7, %d\n"%(st.in2)
+						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
 						st.code_statement = st.code_statement + "div $%s, $t7\n"%(VariableData[st.in1][1])
 						st.code_statement = st.code_statement + "mfhi $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = "li $t7, %d\n"%(st.in1)
+						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in1)
 						st.code_statement = st.code_statement + "div $%s, $t7\n"%(VariableData[st.in2][1])
 						st.code_statement = st.code_statement + "mfhi $%s"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
-						st.code_statement = "li $%s, %d\n"%(VariableData[st.out][1], st.in1 % st.in2)
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 % st.in2)
 
 
 
-
+				if(st.out_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE and VariableData[st.out][1] == VariableData[st.in1][1] and st.out <> st.in1):
+					print(VariableData[st.in1][1],VariableData[st.out][1],st.in1,st.out)
+					VariableData[st.in1][1] = 0
+				if(st.out_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE and VariableData[st.out][1] == VariableData[st.in2][1] and st.in2 <> st.out):
+					print(VariableData[st.in2][1],VariableData[st.out][1],st.in1,st.out)
+					VariableData[st.in2][1] = 0
 			#print(constructEvictionCandidate(st,x))
 		#print("-------------------------------------------------------------------")
 		#print(VariableData)
@@ -532,8 +559,8 @@ def main():
 	#temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
 	#NextUse = temp
 	
-	for x in NextUse:
-		print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
+	# for x in NextUse:
+	# 	print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
 
 
 	
