@@ -191,9 +191,12 @@ def set_inputs(row, curr_statement):
 			curr_statement.in1_type = EntryType.VARIABLE
 
 	elif(curr_statement.instr_typ == InstrType.LABEL):
-		curr_statement.jump_tagret = row[2]
+		curr_statement.label = row[2]
 
 	elif(curr_statement.instr_typ == InstrType.FUNC_CALL):
+		curr_statement.jump_tagret = row[2]
+
+	elif(curr_statement.instr_typ == InstrType.GOTO):
 		curr_statement.jump_tagret = row[2]
 
 
@@ -347,17 +350,17 @@ def GetReg(stmt, block):
 	nue = NextUse[stmt.linenum]
 	useless_var = None
 	empty_reg = None
-	if(nue.in1 != "" and nue.in1nextuse == np.inf):
-		useless_var = nue.in1
-		empty_reg = VariableData[useless_var][1]
-		stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
-		UsableRegisters[empty_reg] = 0
-	elif(nue.in2 != "" and nue.in2nextuse == np.inf):
-		useless_var = nue.in2
-		empty_reg = VariableData[useless_var][1]
-		stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
-		UsableRegisters[empty_reg] = 0
-	elif 0 in UsableRegisters.values():
+	# if(nue.in1 != "" and nue.in1nextuse == np.inf):
+	# 	useless_var = nue.in1
+	# 	empty_reg = VariableData[useless_var][1]
+	# 	stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
+	# 	UsableRegisters[empty_reg] = 0
+	# elif(nue.in2 != "" and nue.in2nextuse == np.inf):
+	# 	useless_var = nue.in2
+	# 	empty_reg = VariableData[useless_var][1]
+	# 	stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
+	# 	UsableRegisters[empty_reg] = 0
+	if 0 in UsableRegisters.values():
 		return FindEmptyReg()
 	else:
 		useless_var = constructEvictionCandidate(stmt,block)
@@ -444,8 +447,8 @@ def main():
 			#------------------------------------------------
 			if(curr_statement.instr_typ == InstrType.GOTO or curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.FUNC_RETURN or curr_statement.instr_typ == InstrType.FUNC_CALL):
 				leaders.append(int(curr_statement.linenum)+1)
-				if(curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.GOTO):
-					leaders.append(int(curr_statement.jump_tagret))
+				# if(curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.GOTO):
+				# 	leaders.append(int(curr_statement.jump_tagret))
 			if(curr_statement.instr_typ == InstrType.LABEL):
 				leaders.append(int(curr_statement.linenum))
 
@@ -545,12 +548,12 @@ def main():
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 % st.in2)
 
 			elif(st.instr_typ == InstrType.LABEL):
-				st.code_statement = st.code_statement + "%s:\n"%(st.jump_tagret)
+				st.code_statement = st.code_statement + "%s:\n"%(st.label)
 			elif(st.instr_typ == InstrType.FUNC_CALL):
-				st.code_statement = st.code_statement + "j %s\n"%(st.jump_tagret) # handle return register
+				st.code_statement = st.code_statement + "jal %s\n"%(st.jump_tagret) # handle return register
 				
 			elif(st.instr_typ == InstrType.FUNC_RETURN):
-				f = 0# Handle jumping back
+				st.code_statement = st.code_statement + "jr $ra\n"
 			elif(st.instr_typ == InstrType.INDEX_ASSIGN_L):
 				if(st.in1_type==EntryType.VARIABLE):
 					st.code_statement = st.code_statement+ "add $%s, $%s, $%s\nadd $%s, $%s, $%s\n"%(VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1], VariableData[st.in1][1])
@@ -621,6 +624,8 @@ def main():
 
 
 				st.code_statement = branch_instr
+			elif(st.instr_typ == InstrType.GOTO):
+				st.code_statement = st.code_statement + "j %s\n" % (st.jump_tagret)
 			#print(constructEvictionCandidate(st,x))
 		#print("-------------------------------------------------------------------")
 		#print(VariableData)
@@ -633,7 +638,7 @@ def main():
 				block_code = block_code + "sw %s, $%s\n"%(var, VariableData[var][1])
 				UsableRegisters[VariableData[var][1]] = 0
 				VariableData[var][1] = 0
-		block_codes[id(x)] = block_code
+		block_codes[id(x)] = block_code + "#------------new block started---------------------"
 
 		#print(VariableData)
 		#print(UsableRegisters)
@@ -642,8 +647,16 @@ def main():
 	for basic_block in basic_block_list:
 
 		for stmt in basic_block:
-			print(stmt.code_statement)
-		print(block_codes[id(basic_block)])
+			if(stmt <> basic_block[len(basic_block) - 1]):
+				print(stmt.code_statement)
+			else:
+				if(stmt.instr_typ in [InstrType.GOTO, InstrType.IFGOTO, InstrType.FUNC_CALL, InstrType.FUNC_RETURN]):
+					print(block_codes[id(basic_block)])
+					print(stmt.code_statement)
+				else:
+					print(stmt.code_statement)
+					print(block_codes[id(basic_block)])
+					
 
 	#constructEvictionCandidate()
 	# #print(NextUse.keys())
