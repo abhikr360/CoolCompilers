@@ -588,6 +588,39 @@ def main():
 				if(st.out_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE and VariableData[st.out][1] == VariableData[st.in2][1] and st.in2 <> st.out):
 					print(VariableData[st.in2][1],VariableData[st.out][1],st.in1,st.out)
 					VariableData[st.in2][1] = 0
+
+			elif(st.instr_typ==InstrType.IFGOTO):
+				st.print_stmt()
+
+				branch_instr = ""
+				if(st.operator == Operator.GREATER_THAN):
+					branch_instr = "bgt"
+				elif(st.operator == Operator.GREATER_THAN_EQUALS):
+					branch_instr = "bge"
+				elif(st.operator == Operator.LESS_THAN):
+					branch_instr = "blt"
+				elif(st.operator == Operator.LESS_THAN_EQUALS):
+					branch_instr = "ble"
+				elif(st.operator == Operator.EQUALS):
+					branch_instr = "beq"
+				elif(st.operator == Operator.NOT_EQUALS):
+					branch_instr = "bne"
+
+				if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+					branch_instr = branch_instr + " $%s,$%s,%s\n" % (VariableData[st.in1][1],VariableData[st.in2][1],st.jump_tagret)
+				if(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+					temp_instr = "li $t7,%d\n"% st.in1
+					branch_instr = temp_instr + branch_instr + " $t7,$%s,%s\n" % (VariableData[st.in2][1],st.jump_tagret)
+				if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+					temp_instr = "li $t7,%d\n" % st.in2
+					branch_instr = temp_instr + branch_instr + " $%s,$t7,%s\n" % (VariableData[st.in1][1],st.jump_tagret)
+				if(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+					temp_instr = "li $t7,%d\n" % st.in1
+					temp_instr = temp_instr + "li $t8,%d\n" % st.in2
+					branch_instr = temp_instr + branch_instr + " $t7,$t8,%s\n" % (st.jump_tagret)
+
+
+				st.code_statement = branch_instr
 			#print(constructEvictionCandidate(st,x))
 		#print("-------------------------------------------------------------------")
 		#print(VariableData)
