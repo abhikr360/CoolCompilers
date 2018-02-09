@@ -1,0 +1,4 @@
+i,1,Int,GLOBAL
+j,1,Int,GLOBAL
+array,7,Int,GLOBAL
+rev_array,7,Int,GLOBAL
