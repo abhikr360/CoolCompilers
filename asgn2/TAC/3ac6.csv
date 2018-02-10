@@ -8,8 +8,9 @@
 8,SUB,aalo,aalo,aalo
 9,FUNC_RETURN
 10,LABEL,print_hello
-11,ADD,C,2,68
-12,FUNC_RETURN
-13,LABEL,print_false
-14,SUB,chor,5,1
-15,FUNC_RETURN
+11,PRINT_INT,aalo
+12,ADD,C,2,68
+13,FUNC_RETURN
+14,LABEL,print_false
+15,SUB,chor,5,1
+16,FUNC_RETURN

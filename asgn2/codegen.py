@@ -14,7 +14,7 @@ NextUse={}
 UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0}
 UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0}#, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
 TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
 
@@ -100,6 +100,7 @@ def set_inputs(row, curr_statement):
 			exec("curr_statement.operator = Operator.%s" %(row[1]))
 	else:
 		exec("curr_statement.instr_typ = InstrType.%s" %(row[1]))
+
 
 	#         --------------- For row 2 ----------------------
 
@@ -198,6 +199,24 @@ def set_inputs(row, curr_statement):
 
 	elif(curr_statement.instr_typ == InstrType.GOTO):
 		curr_statement.jump_tagret = row[2]
+	elif(curr_statement.instr_typ == InstrType.SCAN_INT or curr_statement.instr_typ == InstrType.PRINT_INT):
+		try:
+			temp = int(row[2])
+			curr_statement.in1 = temp
+			curr_statement.in1_type = EntryType.INTEGER
+		except Exception as e:
+			temp = row[2]
+			curr_statement.in1 = temp
+			curr_statement.in1_type = EntryType.VARIABLE
+		if(len(row)==4):
+			try:
+				temp = int(row[3])
+				curr_statement.in2 = temp
+				curr_statement.in2_type = EntryType.INTEGER
+			except Exception as e:
+				temp = row[3]
+				curr_statement.in2 = temp
+				curr_statement.in2_type = EntryType.VARIABLE
 
 
 
@@ -350,12 +369,12 @@ def GetReg(stmt, block):
 	nue = NextUse[stmt.linenum]
 	useless_var = None
 	empty_reg = None
-	# if(nue.in1 != "" and nue.in1nextuse == np.inf):
+	# if(nue.in1 != "" and nue.in1nextuse == np.inf and nue.in1 != nue.out):
 	# 	useless_var = nue.in1
 	# 	empty_reg = VariableData[useless_var][1]
 	# 	stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
 	# 	UsableRegisters[empty_reg] = 0
-	# elif(nue.in2 != "" and nue.in2nextuse == np.inf):
+	# elif(nue.in2 != "" and nue.in2nextuse == np.inf and nue.in2 != nue.out):
 	# 	useless_var = nue.in2
 	# 	empty_reg = VariableData[useless_var][1]
 	# 	stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
@@ -380,11 +399,11 @@ def UpdateVariableData(statement,block):
 			# print("#*******************givenrehister for ",statement.in1)
 			VariableData[statement.in1] = [memory_used[0],register]
 			UsableRegisters[register] = statement.in1
-			# statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
-			if(statement.instr_typ==InstrType.INDEX_ASSIGN_R):
+			l = lookup_LocalSymbolTable(statement.in1)
+			# if(statement.instr_typ==InstrType.INDEX_ASSIGN_R or (l.dataType=="Array" and (statement.instr_typ==InstrType.SCAN_INT or statement.instr_typ==InstrType.PRINT_INT))):
+			if(l.dataType=="Array"):
 				statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
 			else:
-				# print("HERE")
 				statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
 
 	if(statement.in2_type == EntryType.VARIABLE):
@@ -400,7 +419,9 @@ def UpdateVariableData(statement,block):
 			register = GetReg(statement,block)
 			VariableData[statement.out] = [memory_used[0],register]
 			UsableRegisters[register] = statement.out
-			if(statement.instr_typ==InstrType.INDEX_ASSIGN_L):
+			l=lookup_LocalSymbolTable(statement.out)
+			# if(statement.instr_typ==InstrType.INDEX_ASSIGN_L):
+			if(l.dataType=="Array"):
 				statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.out][1], statement.out)
 			else:
 				statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
@@ -434,6 +455,8 @@ def main():
 				data_code = data_code + "%s : .space %d\n"%(varname, 4*int(size))
 
 	print data_code
+	print ".text"
+	print "main:"
 
 	# for s in LocalSymbolTable:
 	# 	print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
@@ -481,9 +504,9 @@ def main():
 			UpdateVariableData(st,x)
 			# print("variable data updated :  %s" % st.linenum)
 			# print VariableData
-			print("variable data updated :  %s" % st.linenum)
-			print (VariableData)
-			print UsableRegisters
+			# print("variable data updated :  %s" % st.linenum)
+			# print (VariableData)
+			# print UsableRegisters
 			# for x in UsableRegisters:
 			# 	if(UsableRegisters[x] != 0):
 			# 		print (x,UsableRegisters[x])
@@ -642,6 +665,55 @@ def main():
 				st.code_statement = st.code_statement + branch_instr
 			elif(st.instr_typ == InstrType.GOTO):
 				st.code_statement = st.code_statement + "j %s\n" % (st.jump_tagret)
+			elif(st.instr_typ == InstrType.PRINT_INT):
+				if(st.in2 == None):	
+					if(st.in1_type ==EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "move $a0,$%s\n" % (VariableData[st.in1][1])
+						st.code_statement = st.code_statement + "jal print_int\n"
+					else:
+						st.code_statement = st.code_statement + "li $a0,%d\n" % st.in1
+						st.code_statement = st.code_statement + "jal print_int\n"
+				else:
+					if(st.in1_type == EntryType.INTEGER):
+						print("Array address is an INTEGER \n")
+						quit()
+					else:
+						if(st.in2_type == EntryType.VARIABLE):
+							st.code_statement = st.code_statement + "sll $t7, $%s, 2\n"%(VariableData[st.in2][1])
+							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
+							# st.code_statement = st.code_statement + "lw "
+							st.code_statement = st.code_statement + "lw $a0,0($t8)\n"
+							st.code_statement = st.code_statement + "jal print_int\n"
+						else:
+							st.code_statement = st.code_statement + "sll $t7, $%d, 2\n"%(st.in2)
+							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
+							# st.code_statement = st.code_statement + "lw "
+							st.code_statement = st.code_statement + "lw $a0,0($t8)\n" 
+							st.code_statement = st.code_statement + "jal print_int\n"
+			elif(st.instr_typ == InstrType.SCAN_INT):
+				if(st.in2 == None):	
+					if(st.in1_type ==EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "jal scan_int\n"
+						st.code_statement = st.code_statement + "move $%s,$v0\n" % (VariableData[st.in1][1])
+				else:
+					if(st.in1_type == EntryType.INTEGER):
+						print("Array address is an INTEGER \n")
+						quit()
+					else:
+						if(st.in2_type == EntryType.VARIABLE):
+							st.code_statement = st.code_statement + "jal scan_int\n"
+							st.code_statement = st.code_statement + "sll $t7, $%s, 2\n"%(VariableData[st.in2][1])
+							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
+							# st.code_statement = st.code_statement + "lw "
+							st.code_statement = st.code_statement + "sw $v0,0($t8)\n"
+						else:
+							st.code_statement = st.code_statement + "jal scan_int\n"
+							st.code_statement = st.code_statement + "sll $t7, $%d, 2\n"%(st.in2)
+							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
+							# st.code_statement = st.code_statement + "lw "
+							st.code_statement = st.code_statement + "sw $v0,0($t8)\n" 
+	
+
 			#print(constructEvictionCandidate(st,x))
 		#print("-------------------------------------------------------------------")
 		#print(VariableData)
@@ -684,7 +756,12 @@ def main():
 					print(stmt.code_statement)
 					print(block_codes[id(basic_block)])
 					print("#-----------------------------------block id: %d"%(id(basic_block)))
-
+	#-----print utility  functions..----
+	print_int_func = "print_int:\nli $v0,1\nsyscall\njr $ra\n"
+	scan_int_func = "scan_int:\nli $v0,5\nsyscall\njr $ra\n"
+	print "li $v0,10\nsyscall\n"
+	print print_int_func 
+	print scan_int_func
 
 	#constructEvictionCandidate()
 	# #print(NextUse.keys())

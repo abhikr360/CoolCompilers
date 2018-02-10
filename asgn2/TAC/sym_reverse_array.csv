@@ -1,4 +1,5 @@
 i,1,Int,GLOBAL
-j,1,Int,GLOBAL
-array,7,Int,GLOBAL
-rev_array,7,Int,GLOBAL
+jaj,1,Int,GLOBAL
+array,7,Array,GLOBAL
+rev_array,7,Array,GLOBAL
+t,1,Int,GLOBAL

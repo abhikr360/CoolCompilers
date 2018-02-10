@@ -1,81 +1,83 @@
 .data
-aalo : .word 0
-bhalu : .word 0
-C : .word 0
-chor : .word 0
-kachalu : .word 0
-str : .asciiz "\nHello\n"
+i : .word 0
+n : .word 0
+f : .word 0
+s : .word 0
+cur : .word 0
 
 .text
 main:
-lw $t2,aalo
-li $t2, 2
+lw $t5,i
+li $t5, 2
 
-lw $t0,bhalu
-li $t0, 3
+lw $s6, n
+jal scan_int
+move $s6,$v0
 
-sw $t2, aalo
-sw $t0, bhalu
+lw $s5,f
+li $s5, 1
 
-jal print_hello
+lw $s4,s
+li $s4, 1
 
-#-----------------------------------block id: 140637126959400
-lw $t2, aalo
-lw $t0, bhalu
-sw $t2, aalo
-sw $t0, bhalu
+lw $s3,cur
+li $s3, 1
 
-blt $t2,$t0,L1
+li $t7,2
+sw $t5, i
+sw $s4, s
+sw $s5, f
+sw $s3, cur
+sw $s6, n
 
-#-----------------------------------block id: 140637126959688
+ble $s6,$t7,out
 
-jal print_false
+#-----------------------------------block id: 140141874082232
+rep:
 
-#-----------------------------------block id: 140637126959760
-L1:
+lw $t5, f
+lw $s6,s
+move $s6, $t5
 
-lw $t2, aalo
-lw $t0, bhalu
-lw $t1,kachalu
-add $t1, $t2, $t0
+lw $s5, cur
+move $t5, $s5
 
-sub $t2, $t2, $t2
+add $s5, $t5, $s6
 
-sw $t1, kachalu
-sw $t2, aalo
-sw $t0, bhalu
+lw $s4, i
+addi $s4, $s4, 1
 
-jr $ra
+lw $s3, n
+sw $s4, i
+sw $s6, s
+sw $t5, f
+sw $s5, cur
+sw $s3, n
 
-#-----------------------------------block id: 140637126959832
-print_hello:
+blt $s4,$s3,rep
 
-lw $t2,C
-li $t2, 70
+#-----------------------------------block id: 140141874082448
+out:
 
-la $a0,str
-li $v0,4
-syscall
+lw $t5, cur
+move $a0,$t5
+jal print_int
 
-sw $t2, C
-
-jr $ra
-
-#-----------------------------------block id: 140637126959904
-print_false:
-
-lw $t2,chor
-li $t2, 4
-
-sw $t2, chor
+sw $t5, cur
 
 jr $ra
 
-#-----------------------------------block id: 139640244974440
-
+#-----------------------------------block id: 140141874082520
 li $v0,10
 syscall
 
-la $a0,str
-li $v0,4
+print_int:
+li $v0,1
 syscall
+jr $ra
+
+scan_int:
+li $v0,5
+syscall
+jr $ra
+

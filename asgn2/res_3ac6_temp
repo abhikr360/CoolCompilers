@@ -1,0 +1,63 @@
+.data
+aalo : .word 0
+bhalu : .word 0
+C : .word 0
+chor : .word 0
+kachalu : .word 0
+
+lw $t2,aalo
+li $t2, 2
+
+lw $t0,bhalu
+li $t0, 3
+
+sw $t2, aalo
+sw $t0, bhalu
+
+jal print_hello
+
+sw $0, aalo
+lw $0, aalo
+sw $0, aalo
+lw $0, bhalu
+
+blt $0,$0,L1
+
+
+jal print_false
+
+L1:
+
+sw $0, bhalu
+lw $0, aalo
+sw $0, bhalu
+lw $0, bhalu
+sw $0, bhalu
+lw $0,kachalu
+add $0, $0, $0
+
+lw $t2, aalo
+sub $t2, $t2, $t2
+
+sw $t2, aalo
+
+jr $ra
+
+print_hello:
+
+lw $t2,C
+li $t2, 70
+
+sw $t2, C
+
+jr $ra
+
+print_false:
+
+lw $t2,chor
+li $t2, 4
+
+sw $t2, chor
+
+jr $ra
+
