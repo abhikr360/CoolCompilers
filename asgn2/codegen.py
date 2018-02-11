@@ -16,7 +16,7 @@ UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' 
 
 # UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0}
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 's0' : 0}
 TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
 
 VariableData = {}
@@ -440,7 +440,7 @@ def main():
 	leaders = [1]
 	numberoflinesinfile=0
 
-	data_code = ".data\n\n"
+	data_code = ".data\n"
 	machine_code = ".text\n"
 	# data_code = data_code + 'space: .asciiz " "\n':
 
@@ -710,7 +710,7 @@ def main():
 						st.code_statement = st.code_statement + "move $a0,$%s\n" % (VariableData[st.in1][1])
 						st.code_statement = st.code_statement + "jal print_int\n"
 					else:
-						st.code_statement = st.code_statement + "li $a0,%d\n" % st.in1
+						st.code_statement = st.code_statement + "li $a0,%d\n" % (st.in1)
 						st.code_statement = st.code_statement + "jal print_int\n"
 				else:
 					if(st.in1_type == EntryType.INTEGER):
@@ -724,8 +724,8 @@ def main():
 							st.code_statement = st.code_statement + "lw $a0,0($t8)\n"
 							st.code_statement = st.code_statement + "jal print_int\n"
 						else:
-							st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in2)
-							st.code_statement = st.code_statement + "sll $t7, $t9, 2\n"
+							st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
+							st.code_statement = st.code_statement + "sll $t7, $t7, 2\n"
 							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
 							# st.code_statement = st.code_statement + "lw "
 							st.code_statement = st.code_statement + "lw $a0,0($t8)\n" 
@@ -748,8 +748,8 @@ def main():
 							st.code_statement = st.code_statement + "sw $v0,0($t8)\n"
 						else:
 							st.code_statement = st.code_statement + "jal scan_int\n"
-							st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in2)
-							st.code_statement = st.code_statement + "sll $t7, $t9, 2\n"
+							st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
+							st.code_statement = st.code_statement + "sll $t7, $t7, 2\n"
 							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
 							# st.code_statement = st.code_statement + "lw "
 							st.code_statement = st.code_statement + "sw $v0,0($t8)\n" 

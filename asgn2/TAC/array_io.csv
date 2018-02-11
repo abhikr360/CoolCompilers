@@ -9,4 +9,3 @@
 9,PRINT_INT,arr,i
 10,ADD,i,i,1
 11,IFGOTO,LESS_THAN,i,n,print
-12,FUNC_RETURN
