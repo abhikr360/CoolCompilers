@@ -14,9 +14,9 @@ NextUse={}
 UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0}
 UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+# UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-# UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 's0' : 0, 's1' : 0}
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 's0' : 0}
 TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
 
 VariableData = {}
@@ -47,6 +47,7 @@ class InstrType(Enum):
 	PRINT_INT = 12
 	PRINT_STRING = 13
 	EXIT=14
+	SPACE=15
 
 class EntryType(Enum):
 	'''Data Type of variable in three address code'''
@@ -390,12 +391,20 @@ def GetReg(stmt, block):
 		empty_reg = FindEmptyReg()
 	else:
 		useless_var = constructEvictionCandidate(stmt,block)
+
 		empty_reg = VariableData[useless_var][1]
-		stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1],useless_var)
+		l = lookup_LocalSymbolTable(useless_var)
+
+		if(l.dataType != 'Array'):
+			stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1],useless_var)
 		UsableRegisters[empty_reg] = 0
 		VariableData[useless_var][1] = 0
 	
 	# print("------------------------1234--%s"%empty_reg)
+	# print(UsableRegisters.keys())
+	if(not (empty_reg in UsableRegisters.keys())):
+		print("Invalid register" + str(empty_reg))
+		exit()
 	return empty_reg
 
 
@@ -403,7 +412,7 @@ def UpdateVariableData(statement,block):
 	if(statement.in1_type == EntryType.VARIABLE):
 		if(statement.in1 not in VariableData or VariableData[statement.in1][1] == 0):
 			register = GetReg(statement,block)
-			# print("#*******************givenrehister for ",statement.in1)
+			# print("#*******************givenrehister for %s %s "%(statement.in1, register))
 			VariableData[statement.in1] = [0,register]
 			UsableRegisters[register] = statement.in1
 			l = lookup_LocalSymbolTable(statement.in1)
@@ -442,12 +451,10 @@ def main():
 
 	data_code = ".data\n"
 	machine_code = ".text\n"
-	# data_code = data_code + 'space: .asciiz " "\n':
+	data_code = data_code + 'space: .asciiz " "\n'
 
 
-	# la $a0, space
-	# li $v0, 4
-	# syscall
+
 #-------------------------------------------- Local Symbol Table-------------------------
 	with open(str(sys.argv[2]), 'rb') as symbolfile:
 		line_reader = csv.reader(symbolfile, delimiter = ',')
@@ -470,8 +477,8 @@ def main():
 
 
 
-	os.system('rm -f temp1.asm')
-	assemblyfile=open('temp1.asm','w')
+	os.system('rm -f temp.asm')
+	assemblyfile=open('temp.asm','w')
 	assemblyfile.write(data_code)
 	assemblyfile.write(machine_code)
 	assemblyfile.write("main:\n")
@@ -536,13 +543,13 @@ def main():
 	print_int_func = "print_int:\nli $v0,1\nsyscall\njr $ra\n"
 	scan_int_func = "scan_int:\nli $v0,5\nsyscall\njr $ra\n"
 	exit_func="exit_func:\nli $v0,10\nsyscall\n"
+	space_func="space_func:\nla $a0, space\nli $v0, 4\nsyscall\njr $ra\n"
 
 	# ---------------------------------------------------------------Translation -----------------------------
 	for x in basic_block_list:
 		for st in x:
 			# infunction=['main']
 			# print("%s translating" %(st.linenum))
-
 			UpdateVariableData(st,x)
 
 			# print("variable data updated :  %s" % st.linenum)
@@ -756,20 +763,23 @@ def main():
 	
 			elif(st.instr_typ == InstrType.EXIT):
 				st.code_statement = st.code_statement + "jal exit_func\n"
+			elif(st.instr_typ == InstrType.SPACE):
+				st.code_statement = st.code_statement + "jal space_func\n"
 
 			# print("%s translated" %(st.linenum))
 		#print("-------------------------------------------------------------------")
 		#print(VariableData)
-		#print(UsableRegisters)
 
 		
 		block_code = ""
 		for var in VariableData:
 			if(VariableData[var][1] <> 0 and LocalSymbolTable[var].dataType <> "Array" ) :
 				block_code = block_code + "sw $%s, %s\n"%(VariableData[var][1], var)
+			if(VariableData[var][1] <> 0):
 				UsableRegisters[VariableData[var][1]] = 0
 				VariableData[var][1] = 0
 
+		# print(UsableRegisters)
 
 		# print("block %d ended")%(id(x))
 		# print (UsableRegisters)
@@ -808,6 +818,7 @@ def main():
 	assemblyfile.write(exit_func)
 	assemblyfile.write(print_int_func)
 	assemblyfile.write(scan_int_func)
+	assemblyfile.write(space_func)
 
 	#constructEvictionCandidate()
 	# #print(NextUse.keys())
@@ -821,8 +832,6 @@ def main():
 	# 	print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
 
 
-	
-	temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
 	# print machine_code
 
 	assemblyfile.close()

@@ -7,5 +7,6 @@
 7,ASSIGN,i,0
 8,LABEL,print
 9,PRINT_INT,arr,i
-10,ADD,i,i,1
-11,IFGOTO,LESS_THAN,i,n,print
+10,SPACE
+11,ADD,i,i,1
+12,IFGOTO,LESS_THAN,i,n,print

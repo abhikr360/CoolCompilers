@@ -1,4 +1,5 @@
 .data
+space: .asciiz " "
 i : .word 0
 jaj : .word 0
 array : .space 12
@@ -11,7 +12,7 @@ li $s0, 0
 
 sw $s0, i
 
-#-----------------------------------block id: 139956143753768
+#-----------------------------------block id: 140197921004144
 scan:
 
 la $s0, array
@@ -28,17 +29,17 @@ sw $t2, i
 
 blt $t2,$t7,scan
 
-#-----------------------------------block id: 139956143753984
-lw $t2,i
-li $t2, 0
+#-----------------------------------block id: 140197921004360
+lw $s0,i
+li $s0, 0
 
-lw $t0,jaj
-li $t0, 2
+lw $t2,jaj
+li $t2, 2
 
-sw $t2, i
-sw $t0, jaj
+sw $s0, i
+sw $t2, jaj
 
-#-----------------------------------block id: 139956143754056
+#-----------------------------------block id: 140197921004432
 rev:
 
 la $s0, array
@@ -64,20 +65,23 @@ sw $t0, t
 
 blt $t2,$t7,rev
 
-#-----------------------------------block id: 139956143754200
-lw $t2,i
-li $t2, 0
+#-----------------------------------block id: 140197921004504
+lw $s0,i
+li $s0, 0
 
-sw $t2, i
+sw $s0, i
 
-#-----------------------------------block id: 139956143754128
+#-----------------------------------block id: 140197921004576
 print:
 
+la $s0, rev_array
 lw $t2, i
 sll $t7, $t2, 2
 add $t8, $s0, $t7
 lw $a0,0($t8)
 jal print_int
+
+jal space_func
 
 addi $t2, $t2, 1
 
@@ -86,7 +90,7 @@ sw $t2, i
 
 blt $t2,$t7,print
 
-#-----------------------------------block id: 139956143754272
+#-----------------------------------block id: 140197921004648
 exit_func:
 li $v0,10
 syscall
@@ -96,5 +100,10 @@ syscall
 jr $ra
 scan_int:
 li $v0,5
+syscall
+jr $ra
+space_func:
+la $a0, space
+li $v0, 4
 syscall
 jr $ra

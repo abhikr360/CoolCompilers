@@ -14,5 +14,6 @@
 14,ASSIGN,i,0
 15,LABEL,print
 16,PRINT_INT,rev_array,i
-17,ADD,i,i,1
-18,IFGOTO,LESS_THAN,i,3,print
+17,SPACE
+18,ADD,i,i,1
+19,IFGOTO,LESS_THAN,i,3,print

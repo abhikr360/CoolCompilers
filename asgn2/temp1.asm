@@ -1,45 +1,92 @@
 .data
-t1 : .word 0
-t2 : .word 0
-t3 : .word 0
-t4 : .word 0
-t5 : .word 0
-t6 : .word 0
-X : .word 0
+i : .word 0
+jaj : .word 0
+array : .space 12
+rev_array : .space 12
+t : .word 0
 .text
 main:
-lw $t5,t1
-li $t5, 1
+lw $s0,i
+li $s0, 0
 
-lw $s6,t2
-li $s6, 1
+sw $s0, i
 
-lw $s5,t3
-li $t7, 2
-mult $s6, $t7
-mflo $s5
+#-----------------------------------block id: 139969071733288
+scan:
 
-lw $s4,t4
-add $s4, $t5, $s5
+la $s0, array
+lw $t2, i
+jal scan_int
+sll $t7, $t2, 2
+add $t8, $s0, $t7
+sw $v0,0($t8)
 
-lw $s3,t5
-li $s3, 4
+addi $t2, $t2, 1
 
-lw $s2,t6
-add $s2, $s4, $s3
+li $t7,3
+sw $t2, i
 
-lw $s1,X
-move $s1, $s2
+blt $t2,$t7,scan
 
-sw $s2, t6
-sw $s4, t4
-sw $s3, t5
-sw $s6, t2
-sw $s5, t3
-sw $t5, t1
-sw $s1, X
+#-----------------------------------block id: 139969071733504
+lw $t2,i
+li $t2, 0
 
-#-----------------------------------block id: 139661853219512
+lw $t0,jaj
+li $t0, 2
+
+sw $t2, i
+sw $t0, jaj
+
+#-----------------------------------block id: 139969071733576
+rev:
+
+lw $t2, i
+lw $t0,t
+sll $t7, $t2, 2
+add $t8, $s0, $t7
+lw $t0, 0($t8)
+
+lw $t1, jaj
+sw $s0, array
+la $s0, rev_array
+sll $t7, $t1, 2
+add $t8, $s0, $t7
+sw $t0, 0($t8)
+addi $t2, $t2, 1
+
+addi $t1, $t1, -1
+
+li $t7,3
+sw $t2, i
+sw $t1, jaj
+sw $t0, t
+
+blt $t2,$t7,rev
+
+#-----------------------------------block id: 139969071733720
+lw $t2,i
+li $t2, 0
+
+sw $t2, i
+
+#-----------------------------------block id: 139969071733648
+print:
+
+lw $t2, i
+sll $t7, $t2, 2
+add $t8, $s0, $t7
+lw $a0,0($t8)
+jal print_int
+
+addi $t2, $t2, 1
+
+li $t7,3
+sw $t2, i
+
+blt $t2,$t7,print
+
+#-----------------------------------block id: 139969071733792
 exit_func:
 li $v0,10
 syscall
