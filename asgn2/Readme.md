@@ -19,4 +19,10 @@ SCAN_INT can scan into an integer variable, array[i]
 EXIT for exiting
 SPACE for printing space
 
+### EFFORT SHEET ###
 
+All of us consent to the following effort distribution for our group for asgn2:
+
+Abhishek Kumar 150035 34%
+Madhukant      150368 33%
+Tushar Gupta   150771 33%
