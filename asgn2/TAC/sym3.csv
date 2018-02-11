@@ -1,4 +1,5 @@
 a,1,Int,GLOBAL
-array,3,Int,GLOBAL
-b,1,Int,GLOBAL
+array,4,Array,GLOBAL
+baba,1,Int,GLOBAL
 c,1,Int,GLOBAL
+d,1,Int,GLOBAL

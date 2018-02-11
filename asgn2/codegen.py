@@ -2,7 +2,7 @@ from enum import Enum
 import csv
 import sys
 import numpy as np
-
+import os
 
 # Global DS #
 basic_block_list = []
@@ -14,15 +14,15 @@ NextUse={}
 UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0}
 UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+# UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0}
 TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
 
 VariableData = {}
 
 block_codes = {}
 
-memory_used = [0]
 
 def is_int(row):
 	try:
@@ -46,6 +46,7 @@ class InstrType(Enum):
 	SCAN_STRING = 11
 	PRINT_INT = 12
 	PRINT_STRING = 13
+	EXIT=14
 
 class EntryType(Enum):
 	'''Data Type of variable in three address code'''
@@ -91,7 +92,7 @@ class statement:
 
 def set_inputs(row, curr_statement):
 	'''Reads input stores it in a list of classes'''
-	curr_statement.linenum = row[0]
+	curr_statement.linenum = int(row[0])
 	#------------------------------------------------
 	assign_list = ["LESS_THAN", "GREATER_THAN", "LESS_THAN_EQUALS", "GREATER_THAN_EQUALS", "EQUALS", "NOT_EQUALS", "ADD", "SUB", "MUL", "DIV", "MOD"]
 	if(row[1] == "ASSIGN" or row[1] in assign_list):
@@ -334,30 +335,35 @@ def construct_NextUse():
 			nue = NextUseEntry(in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive)
 			NextUse[stmt.linenum]=nue
 
+
+# farthest and in variable data and usableregister   what about equality
 def constructEvictionCandidate(cur_line, basic_block):
 	EvictionCandidates={}
+
+
+
 	for stmt in reversed(basic_block):
-		in1=""
-		in2=""
-		# stmt.#print_stmt()
+		# print(int(stmt.linenum), int(cur_line.linenum), int(stmt.linenum) > int(cur_line.linenum))
 		if(stmt.linenum > cur_line.linenum):
-			if(stmt.in1_type == EntryType.VARIABLE):
-				in1=stmt.in1
+			if(stmt.in1_type == EntryType.VARIABLE and VariableData[stmt.in1][1] != 0 and (stmt.in1 != cur_line.in1 and stmt.in1 !=cur_line.in2 and stmt.in1 != cur_line.out)) :
 				EvictionCandidates[stmt.in1] = stmt.linenum
-			if(stmt.in2_type == EntryType.VARIABLE):
-				in2=stmt.in2
+			if(stmt.in2_type == EntryType.VARIABLE and VariableData[stmt.in2][1] != 0 and (stmt.in2 != cur_line.in1 and stmt.in2 !=cur_line.in2 and stmt.in2 != cur_line.out)) :
 				EvictionCandidates[stmt.in2] = stmt.linenum
-		else:
-			if(stmt.in1 <> None and stmt.in1_type == EntryType.VARIABLE and stmt.in1 not in EvictionCandidates and VariableData[stmt.in1][1] <> 0):
+			# if(VariableData[stmt.out][1] != 0 and (stmt.out != cur_line.in1 and stmt.out != cur_line.in2 and stmt.out != cur_line.out)) :
+			# 	EvictionCandidates[stmt.out] = np.inf
+
+		elif(stmt.linenum < cur_line.linenum):
+			# print(stmt.linenum)
+			if(stmt.in1 <> None and stmt.in1_type == EntryType.VARIABLE and stmt.in1 not in EvictionCandidates and stmt.in1 in VariableData and  VariableData[stmt.in1][1] <> 0 and (stmt.in1 != cur_line.in1 and stmt.in1 !=cur_line.in2 and stmt.in1 != cur_line.out)):
 				return stmt.in1
-			elif(stmt.in2 <> None and stmt.in2_type == EntryType.VARIABLE and stmt.in2 not in EvictionCandidates and VariableData[stmt.in2][1] <> 0):
+			elif(stmt.in2 <> None and stmt.in2_type == EntryType.VARIABLE and stmt.in2 not in EvictionCandidates and stmt.in2 in VariableData and VariableData[stmt.in2][1] <> 0 and (stmt.in2 != cur_line.in1 and stmt.in2 !=cur_line.in2 and stmt.in2 != cur_line.out)):
 				return stmt.in2
-			elif(stmt.out <> None and stmt.out_type == EntryType.VARIABLE and stmt.out not in EvictionCandidates and VariableData[stmt.out][1] <> 0):
+			elif(stmt.out <> None and stmt.out_type == EntryType.VARIABLE and stmt.out not in EvictionCandidates and stmt.out in VariableData and VariableData[stmt.out][1] <> 0 and (stmt.out != cur_line.in1 and stmt.out !=cur_line.in2 and stmt.out != cur_line.out)):
 				return stmt.out
 
 
-
-		return max (EvictionCandidates, key=EvictionCandidates.get)
+	# print("HERE")
+	return max (EvictionCandidates, key=EvictionCandidates.get)
 
 def FindEmptyReg():
 	for reg in UsableRegisters:
@@ -379,6 +385,7 @@ def GetReg(stmt, block):
 	# 	empty_reg = VariableData[useless_var][1]
 	# 	stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
 	# 	UsableRegisters[empty_reg] = 0
+	print(UsableRegisters.values())
 	if 0 in UsableRegisters.values():
 		empty_reg = FindEmptyReg()
 	else:
@@ -397,7 +404,7 @@ def UpdateVariableData(statement,block):
 		if(statement.in1 not in VariableData or VariableData[statement.in1][1] == 0):
 			register = GetReg(statement,block)
 			# print("#*******************givenrehister for ",statement.in1)
-			VariableData[statement.in1] = [memory_used[0],register]
+			VariableData[statement.in1] = [0,register]
 			UsableRegisters[register] = statement.in1
 			l = lookup_LocalSymbolTable(statement.in1)
 			# if(statement.instr_typ==InstrType.INDEX_ASSIGN_R or (l.dataType=="Array" and (statement.instr_typ==InstrType.SCAN_INT or statement.instr_typ==InstrType.PRINT_INT))):
@@ -409,15 +416,16 @@ def UpdateVariableData(statement,block):
 	if(statement.in2_type == EntryType.VARIABLE):
 		if(statement.in2 not in VariableData or VariableData[statement.in2][1] == 0):
 			register = GetReg(statement,block)
-			VariableData[statement.in2] = [memory_used[0],register]
+			VariableData[statement.in2] = [0,register]
 			UsableRegisters[register] = statement.in2
 			# statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
 			statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in2][1], statement.in2)
 
 	if(statement.out_type == EntryType.VARIABLE):
 		if(statement.out not in VariableData or VariableData[statement.out][1] == 0):
+			# print(statement.out)
 			register = GetReg(statement,block)
-			VariableData[statement.out] = [memory_used[0],register]
+			VariableData[statement.out] = [0,register]
 			UsableRegisters[register] = statement.out
 			l=lookup_LocalSymbolTable(statement.out)
 			# if(statement.instr_typ==InstrType.INDEX_ASSIGN_L):
@@ -432,9 +440,15 @@ def main():
 	leaders = [1]
 	numberoflinesinfile=0
 
-	data_code = ".data\n"
+	data_code = ".data\n\n"
 	machine_code = ".text\n"
+	# data_code = data_code + 'space: .asciiz " "\n':
 
+
+	# la $a0, m1
+	# li $v0, 4
+	# syscall
+#-------------------------------------------- Local Symbol Table-------------------------
 	with open(str(sys.argv[2]), 'rb') as symbolfile:
 		line_reader = csv.reader(symbolfile, delimiter = ',')
 		for row in line_reader:
@@ -454,15 +468,20 @@ def main():
 			elif(datatype == "Array"):
 				data_code = data_code + "%s : .space %d\n"%(varname, 4*int(size))
 
-	print data_code
-	print ".text"
-	print "main:"
+
+
+	os.system('rm -f temp.asm')
+	assemblyfile=open('temp.asm','w')
+	assemblyfile.write(data_code)
+	assemblyfile.write(machine_code)
+	assemblyfile.write("main:\n")
 
 	# for s in LocalSymbolTable:
 	# 	print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
 	# quit()
+#----------------------------------------Local Symbol Table Loaded----------------------------------
 
-
+#------------------------------------- Reading Code----------------------------------------
 	with open(str(sys.argv[1]), 'rb') as codefile:
 		line_reader = csv.reader(codefile, delimiter = ',')
 		
@@ -482,34 +501,54 @@ def main():
 
 			#------------------------------------------------
 	# for x in code:
-	# 	x.#print_stmt()
+	# 	x.print_stmt()
+	#-------------------------------------------- Code Read--------------------------------
+
+
+
+
+	#---------------------------------------------Basic block------------------------------
 	leaders.append(numberoflinesinfile+1)
 	leaders=set(leaders)
 	leaders=list(leaders)
 	leaders.sort()
 
-	# #print(leaders)
+	# print(leaders)
 
 	for i in range(len(leaders)-1):
 		# #print(leaders[i]-1,leaders[i+1]-1)
 		basic_block = code[leaders[i]-1:leaders[i+1]-1]
 		basic_block_list.append(basic_block)
 
-	# Basic block prepared----------------------------------------
+	# for x in basic_block_list:
+	# 	for st in x:
+	# 		st.print_stmt()
+	# 	print("----------------------")
+
+	# ----------------------------------------Basic block prepared----------------------------------------
+
+
 	construct_NextUse()
-	
+	for s in LocalSymbolTable:
+		VariableData[s]=[0,0]
+
+
+	print_int_func = "print_int:\nli $v0,1\nsyscall\njr $ra\n"
+	scan_int_func = "scan_int:\nli $v0,5\nsyscall\njr $ra\n"
+	exit_func="exit_func:\nli $v0,10\nsyscall\n"
+
+	# ---------------------------------------------------------------Translation -----------------------------
 	for x in basic_block_list:
 		for st in x:
-			infunction=['main']
+			# infunction=['main']
+			print("%s translating" %(st.linenum))
+
 			UpdateVariableData(st,x)
-			# print("variable data updated :  %s" % st.linenum)
-			# print VariableData
-			# print("variable data updated :  %s" % st.linenum)
-			# print (VariableData)
-			# print UsableRegisters
-			# for x in UsableRegisters:
-			# 	if(UsableRegisters[x] != 0):
-			# 		print (x,UsableRegisters[x])
+
+			print("variable data updated :  %s" % st.linenum)
+			print (VariableData)
+			print UsableRegisters
+
 			if(st.instr_typ == InstrType.ASSIGN and st.operator == None):
 				if(st.in1_type == EntryType.VARIABLE):
 					st.code_statement = st.code_statement + "move $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1])
@@ -615,20 +654,20 @@ def main():
 				if(st.in2_type==EntryType.VARIABLE):
 					st.code_statement = st.code_statement+ "sll $t7, $%s, 2\n"%(VariableData[st.in2][1])
 					st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
-					st.code_statement = st.code_statement + "lw $%s, 0($t8)"%(VariableData[st.out][1])
+					st.code_statement = st.code_statement + "lw $%s, 0($t8)\n"%(VariableData[st.out][1])
 				else:
 					st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
 					st.code_statement = st.code_statement + "sll $t8, $t7, 2\n"
-					st.code_statement = st.code_statement + "add $t8, $%s,$t8"%(VariableData[st.in1][1])
-					st.code_statement = st.code_statement + "lw $%s, 0($t8)"%(VariableData[st.out][1])
+					st.code_statement = st.code_statement + "add $t8, $%s,$t8\n"%(VariableData[st.in1][1])
+					st.code_statement = st.code_statement + "lw $%s, 0($t8)\n"%(VariableData[st.out][1])
 
 
 
 				if(st.out_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE and VariableData[st.out][1] == VariableData[st.in1][1] and st.out <> st.in1):
-					print(VariableData[st.in1][1],VariableData[st.out][1],st.in1,st.out)
+					# print(VariableData[st.in1][1],VariableData[st.out][1],st.in1,st.out)
 					VariableData[st.in1][1] = 0
 				if(st.out_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE and VariableData[st.out][1] == VariableData[st.in2][1] and st.in2 <> st.out):
-					print(VariableData[st.in2][1],VariableData[st.out][1],st.in1,st.out)
+					# print(VariableData[st.in2][1],VariableData[st.out][1],st.in1,st.out)
 					VariableData[st.in2][1] = 0
 
 			elif(st.instr_typ==InstrType.IFGOTO):
@@ -685,7 +724,8 @@ def main():
 							st.code_statement = st.code_statement + "lw $a0,0($t8)\n"
 							st.code_statement = st.code_statement + "jal print_int\n"
 						else:
-							st.code_statement = st.code_statement + "sll $t7, $%d, 2\n"%(st.in2)
+							st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in2)
+							st.code_statement = st.code_statement + "sll $t7, $t9, 2\n"
 							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
 							# st.code_statement = st.code_statement + "lw "
 							st.code_statement = st.code_statement + "lw $a0,0($t8)\n" 
@@ -708,13 +748,16 @@ def main():
 							st.code_statement = st.code_statement + "sw $v0,0($t8)\n"
 						else:
 							st.code_statement = st.code_statement + "jal scan_int\n"
-							st.code_statement = st.code_statement + "sll $t7, $%d, 2\n"%(st.in2)
+							st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in2)
+							st.code_statement = st.code_statement + "sll $t7, $t9, 2\n"
 							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
 							# st.code_statement = st.code_statement + "lw "
 							st.code_statement = st.code_statement + "sw $v0,0($t8)\n" 
 	
+			elif(st.instr_typ == InstrType.EXIT):
+				st.code_statement = st.code_statement + "jal exit_func\n"
 
-			#print(constructEvictionCandidate(st,x))
+			print("%s translated" %(st.linenum))
 		#print("-------------------------------------------------------------------")
 		#print(VariableData)
 		#print(UsableRegisters)
@@ -740,9 +783,10 @@ def main():
 
 		for stmt in basic_block:
 			if(stmt <> basic_block[len(basic_block) - 1]):
-				print(stmt.code_statement)
+				assemblyfile.write(stmt.code_statement)
+				assemblyfile.write('\n')
 			else:
-				if(stmt.instr_typ in [InstrType.GOTO, InstrType.IFGOTO, InstrType.FUNC_CALL, InstrType.FUNC_RETURN]):
+				if(stmt.instr_typ in [InstrType.GOTO, InstrType.IFGOTO, InstrType.FUNC_CALL, InstrType.FUNC_RETURN, InstrType.EXIT]):
 					temp = stmt.code_statement.split('\n')
 					ne = temp[:len(temp)-2] + [block_codes[id(basic_block)]] + temp[len(temp)-2:]
 					res = ""
@@ -750,18 +794,20 @@ def main():
 						res = res+line+'\n'
 					stmt.code_statement = res[:len(res)-1]
 					# print(block_codes[id(basic_block)])
-					print(stmt.code_statement)
-					print("#-----------------------------------block id: %d"%(id(basic_block)))
+					assemblyfile.write(stmt.code_statement)
+					assemblyfile.write('\n')
+					assemblyfile.write("#-----------------------------------block id: %d\n"%(id(basic_block)))
 				else:
-					print(stmt.code_statement)
-					print(block_codes[id(basic_block)])
-					print("#-----------------------------------block id: %d"%(id(basic_block)))
+					assemblyfile.write(stmt.code_statement)
+					assemblyfile.write('\n')
+					assemblyfile.write(block_codes[id(basic_block)])
+					assemblyfile.write('\n')
+					assemblyfile.write("#-----------------------------------block id: %d\n"%(id(basic_block)))
 	#-----print utility  functions..----
-	print_int_func = "print_int:\nli $v0,1\nsyscall\njr $ra\n"
-	scan_int_func = "scan_int:\nli $v0,5\nsyscall\njr $ra\n"
-	print "li $v0,10\nsyscall\n"
-	print print_int_func 
-	print scan_int_func
+
+	assemblyfile.write(exit_func)
+	assemblyfile.write(print_int_func)
+	assemblyfile.write(scan_int_func)
 
 	#constructEvictionCandidate()
 	# #print(NextUse.keys())
@@ -779,6 +825,7 @@ def main():
 	temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
 	# print machine_code
 
+	assemblyfile.close()
 
 if __name__ == '__main__':
 	main()
