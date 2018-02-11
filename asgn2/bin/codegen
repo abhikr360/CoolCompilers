@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from enum import Enum
 import csv
 import sys
