@@ -14,9 +14,9 @@ NextUse={}
 UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0}
 UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-# UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 's0' : 0}
+# UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 's0' : 0, 's1' : 0}
 TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
 
 VariableData = {}
@@ -385,7 +385,7 @@ def GetReg(stmt, block):
 	# 	empty_reg = VariableData[useless_var][1]
 	# 	stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
 	# 	UsableRegisters[empty_reg] = 0
-	print(UsableRegisters.values())
+	# print(UsableRegisters.values())
 	if 0 in UsableRegisters.values():
 		empty_reg = FindEmptyReg()
 	else:
@@ -445,7 +445,7 @@ def main():
 	# data_code = data_code + 'space: .asciiz " "\n':
 
 
-	# la $a0, m1
+	# la $a0, space
 	# li $v0, 4
 	# syscall
 #-------------------------------------------- Local Symbol Table-------------------------
@@ -470,8 +470,8 @@ def main():
 
 
 
-	os.system('rm -f temp.asm')
-	assemblyfile=open('temp.asm','w')
+	os.system('rm -f temp1.asm')
+	assemblyfile=open('temp1.asm','w')
 	assemblyfile.write(data_code)
 	assemblyfile.write(machine_code)
 	assemblyfile.write("main:\n")
@@ -541,13 +541,13 @@ def main():
 	for x in basic_block_list:
 		for st in x:
 			# infunction=['main']
-			print("%s translating" %(st.linenum))
+			# print("%s translating" %(st.linenum))
 
 			UpdateVariableData(st,x)
 
-			print("variable data updated :  %s" % st.linenum)
-			print (VariableData)
-			print UsableRegisters
+			# print("variable data updated :  %s" % st.linenum)
+			# print (VariableData)
+			# print UsableRegisters
 
 			if(st.instr_typ == InstrType.ASSIGN and st.operator == None):
 				if(st.in1_type == EntryType.VARIABLE):
@@ -757,7 +757,7 @@ def main():
 			elif(st.instr_typ == InstrType.EXIT):
 				st.code_statement = st.code_statement + "jal exit_func\n"
 
-			print("%s translated" %(st.linenum))
+			# print("%s translated" %(st.linenum))
 		#print("-------------------------------------------------------------------")
 		#print(VariableData)
 		#print(UsableRegisters)

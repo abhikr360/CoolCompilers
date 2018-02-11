@@ -41,6 +41,7 @@ sw $t0, jaj
 #-----------------------------------block id: 139956143754056
 rev:
 
+la $s0, array
 lw $t2, i
 lw $t0,t
 sll $t7, $t2, 2
@@ -48,7 +49,6 @@ add $t8, $s0, $t7
 lw $t0, 0($t8)
 
 lw $t1, jaj
-sw $s0, array
 la $s0, rev_array
 sll $t7, $t1, 2
 add $t8, $s0, $t7
