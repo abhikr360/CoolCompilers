@@ -1,96 +1,68 @@
 .data
 space: .asciiz " "
-i : .word 0
-jaj : .word 0
-array : .space 12
-rev_array : .space 12
-t : .word 0
+a : .word 0
+c : .word 0
+e : .word 0
+d : .word 0
+f : .word 0
 .text
 main:
-lw $s0,i
-li $s0, 0
+lw $t5,a
+li $t5, 2
 
-sw $s0, i
+lw $s6,c
+li $s6, 3
 
-#-----------------------------------block id: 140197921004144
-scan:
+sw $t5, a
+sw $s6, c
 
-la $s0, array
-lw $t2, i
-jal scan_int
-sll $t7, $t2, 2
-add $t8, $s0, $t7
-sw $v0,0($t8)
+bge $t5,$s6,L
 
-addi $t2, $t2, 1
+#-----------------------------------block id: 139684614404720
+lw $t5, a
+lw $s6, c
+mult $t5, $s6
+mflo $t5
 
-li $t7,3
-sw $t2, i
+sw $t5, a
+sw $s6, c
 
-blt $t2,$t7,scan
+#-----------------------------------block id: 139684614405008
+L:
 
-#-----------------------------------block id: 140197921004360
-lw $s0,i
-li $s0, 0
+lw $t5, c
+lw $s6, a
+sub $t5, $t5, $s6
 
-lw $t2,jaj
-li $t2, 2
-
-sw $s0, i
-sw $t2, jaj
-
-#-----------------------------------block id: 140197921004432
-rev:
-
-la $s0, array
-lw $t2, i
-lw $t0,t
-sll $t7, $t2, 2
-add $t8, $s0, $t7
-lw $t0, 0($t8)
-
-lw $t1, jaj
-la $s0, rev_array
-sll $t7, $t1, 2
-add $t8, $s0, $t7
-sw $t0, 0($t8)
-addi $t2, $t2, 1
-
-addi $t1, $t1, -1
-
-li $t7,3
-sw $t2, i
-sw $t1, jaj
-sw $t0, t
-
-blt $t2,$t7,rev
-
-#-----------------------------------block id: 140197921004504
-lw $s0,i
-li $s0, 0
-
-sw $s0, i
-
-#-----------------------------------block id: 140197921004576
-print:
-
-la $s0, rev_array
-lw $t2, i
-sll $t7, $t2, 2
-add $t8, $s0, $t7
-lw $a0,0($t8)
+move $a0,$t5
 jal print_int
+
+lw $s5,d
+li $s5, 1
+
+lw $s4,e
+li $s4, 1
+
+lw $s3, f
+jal scan_int
+move $s3,$v0
+
+add $s3, $s3, $s5
+
+add $s3, $s3, $s4
 
 jal space_func
 
-addi $t2, $t2, 1
+move $a0,$s3
+jal print_int
 
-li $t7,3
-sw $t2, i
+sw $s6, a
+sw $t5, c
+sw $s4, e
+sw $s5, d
+sw $s3, f
 
-blt $t2,$t7,print
-
-#-----------------------------------block id: 140197921004648
+#-----------------------------------block id: 139684614405080
 exit_func:
 li $v0,10
 syscall

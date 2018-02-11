@@ -14,9 +14,9 @@ NextUse={}
 UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0}
 UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-# UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 's0' : 0}
+# UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 's0' : 0}
 TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
 
 VariableData = {}
@@ -834,6 +834,11 @@ def main():
 
 	# print machine_code
 
+	assemblyfile.close()
+	# print("assemblyfile temp.asm successfully created ")
+
+	assemblyfile = open('temp.asm', 'r')
+	print(assemblyfile.read())
 	assemblyfile.close()
 
 if __name__ == '__main__':
