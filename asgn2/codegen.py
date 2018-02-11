@@ -708,8 +708,7 @@ def main():
 							st.code_statement = st.code_statement + "sw $v0,0($t8)\n"
 						else:
 							st.code_statement = st.code_statement + "jal scan_int\n"
-							st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
-							st.code_statement = st.code_statement + "sll $t7, $t7, 2\n"%(st.in2)
+							st.code_statement = st.code_statement + "sll $t7, $%d, 2\n"%(st.in2)
 							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
 							# st.code_statement = st.code_statement + "lw "
 							st.code_statement = st.code_statement + "sw $v0,0($t8)\n" 
