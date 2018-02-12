@@ -1,69 +1,63 @@
 .data
 space: .asciiz " "
-n : .word 0
-ans : .word 0
+a : .word 0
+c : .word 0
 .text
 main:
-lw $t5, n
-jal scan_int
-move $t5,$v0
+lw $t5,a
+li $t5, 2
 
-lw $s6,ans
-li $s6, 1
+sw $t5, a
 
-sw $t5, n
-sw $s6, ans
+#-----------------------------------block id: 140234410926736
+L:
 
-jal factorial
+lw $t5, a
+addi $t5, $t5, 1
 
-#-----------------------------------block id: 139671700789872
-lw $t5, ans
-move $a0,$t5
+li $t7,9
+sw $t5, a
+
+ble $t5,$t7,L
+
+#-----------------------------------block id: 140234410926952
+
+jal func
+
+#-----------------------------------block id: 140234410927024
+lw $t5,c
+li $t5, -1
+
+lw $s6, a
+add $s6, $s6, $t5
+
+move $a0,$s6
 jal print_int
 
-sw $t5, ans
+jal space_func
+
+sw $s6, a
+sw $t5, c
 
 jal exit_func
 
-#-----------------------------------block id: 139671700790016
-factorial:
+#-----------------------------------block id: 140234410927096
+func:
 add $sp, $sp, -4
 sw $ra, ($sp)
 
-lw $t5, n
-li $t7,1
-sw $t5, n
-
-ble $t5,$t7,ret
-
-#-----------------------------------block id: 139671700790088
-lw $t5, n
-addi $t5, $t5, -1
-
-sw $t5, n
-
-jal factorial
-
-#-----------------------------------block id: 139671700790232
-lw $t5, n
-addi $t5, $t5, 1
-
-lw $s6, ans
-mult $s6, $t5
-mflo $s6
-
-sw $t5, n
-sw $s6, ans
-
-#-----------------------------------block id: 139671700790160
-ret:
+lw $t5, a
+li $t7, 2
+div $t5, $t7
+mflo $t5
 
 lw $ra, ($sp)
 add $sp, $sp, 4
+sw $t5, a
 
 jr $ra
 
-#-----------------------------------block id: 139671700790304
+#-----------------------------------block id: 140234410927168
 exit_func:
 li $v0,10
 syscall
