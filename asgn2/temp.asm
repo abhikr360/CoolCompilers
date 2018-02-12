@@ -1,96 +1,69 @@
 .data
 space: .asciiz " "
-i : .word 0
-jaj : .word 0
-array : .space 12
-rev_array : .space 12
-t : .word 0
+n : .word 0
+ans : .word 0
 .text
 main:
-lw $t5,i
-li $t5, 0
-
-sw $t5, i
-
-#-----------------------------------block id: 140461103215248
-scan:
-
-la $t5, array
-lw $s6, i
+lw $t5, n
 jal scan_int
-sll $t7, $s6, 2
-add $t8, $t5, $t7
-sw $v0,0($t8)
+move $t5,$v0
 
-addi $s6, $s6, 1
+lw $s6,ans
+li $s6, 1
 
-li $t7,3
-sw $s6, i
+sw $t5, n
+sw $s6, ans
 
-blt $s6,$t7,scan
+jal factorial
 
-#-----------------------------------block id: 140461103215464
-lw $t5,i
-li $t5, 0
-
-lw $s6,jaj
-li $s6, 2
-
-sw $t5, i
-sw $s6, jaj
-
-#-----------------------------------block id: 140461103215536
-rev:
-
-la $t5, array
-lw $s6, i
-lw $s5,t
-sll $t7, $s6, 2
-add $t8, $t5, $t7
-lw $s5, 0($t8)
-
-lw $s4, jaj
-la $s3, rev_array
-sll $t7, $s4, 2
-add $t8, $s3, $t7
-sw $s5, 0($t8)
-addi $s6, $s6, 1
-
-addi $s4, $s4, -1
-
-li $t7,3
-sw $s6, i
-sw $s4, jaj
-sw $s5, t
-
-blt $s6,$t7,rev
-
-#-----------------------------------block id: 140461103215608
-lw $t5,i
-li $t5, 0
-
-sw $t5, i
-
-#-----------------------------------block id: 140461103215680
-print:
-
-la $t5, rev_array
-lw $s6, i
-sll $t7, $s6, 2
-add $t8, $t5, $t7
-lw $a0,0($t8)
+#-----------------------------------block id: 139671700789872
+lw $t5, ans
+move $a0,$t5
 jal print_int
 
-jal space_func
+sw $t5, ans
 
-addi $s6, $s6, 1
+jal exit_func
 
-li $t7,3
-sw $s6, i
+#-----------------------------------block id: 139671700790016
+factorial:
+add $sp, $sp, -4
+sw $ra, ($sp)
 
-blt $s6,$t7,print
+lw $t5, n
+li $t7,1
+sw $t5, n
 
-#-----------------------------------block id: 140461103215752
+ble $t5,$t7,ret
+
+#-----------------------------------block id: 139671700790088
+lw $t5, n
+addi $t5, $t5, -1
+
+sw $t5, n
+
+jal factorial
+
+#-----------------------------------block id: 139671700790232
+lw $t5, n
+addi $t5, $t5, 1
+
+lw $s6, ans
+mult $s6, $t5
+mflo $s6
+
+sw $t5, n
+sw $s6, ans
+
+#-----------------------------------block id: 139671700790160
+ret:
+
+lw $ra, ($sp)
+add $sp, $sp, 4
+
+jr $ra
+
+#-----------------------------------block id: 139671700790304
 exit_func:
 li $v0,10
 syscall

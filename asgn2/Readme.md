@@ -12,6 +12,7 @@ Variable name in TAC cannot be a keyword in MIPS. For eg. j,jal,b
 
 Main function should not have FUNC_RETURN
 For arrays, dataType in TAC should be Array but the EntryType in our code will be Variable
+We also support recursive function calls
 
 ### Library Functions ###
 PRINT_INT can print an integer variable, array[i], a number
