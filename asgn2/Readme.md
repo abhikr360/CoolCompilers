@@ -37,7 +37,7 @@ Tushar Gupta   150771 33%
 + FUNC_CALL,foo ```call function foo```
 + FUNC_RETURN ```return from current function```
 + LABEL,L ```mark this line as label L```
-+ FUNC_LABEL,foo ```function foo()```
++ FUNC_LABEL,foo ```label for function foo()```
 
 ### Library Functions ###
 
