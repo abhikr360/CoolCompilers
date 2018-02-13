@@ -24,9 +24,9 @@ SPACE for printing space
 
 All of us consent to the following effort distribution for our group for asgn2:
 
-Abhishek Kumar 150035 34%
-Madhukant      150368 33%
-Tushar Gupta   150771 33%
+Abhishek Kumar 150035 34%  
+Madhukant      150368 33%  
+Tushar Gupta   150771 33%  
 
 + ASSIGN,var,12 ```var = 12```
 + ADD|SUB|MUL|DIV a,b,c ```a = b +|-|*|/ c```  b,c can be variable as well as integer
