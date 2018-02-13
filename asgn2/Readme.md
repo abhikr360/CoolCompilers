@@ -27,3 +27,21 @@ All of us consent to the following effort distribution for our group for asgn2:
 Abhishek Kumar 150035 34%
 Madhukant      150368 33%
 Tushar Gupta   150771 33%
+
++ ASSIGN,var,12 ```var = 12```
++ ADD|SUB|MUL|DIV a,b,c ```a = b +|-|*|/ c```  b,c can be variable as well as integer
++ GOTO L ```goto label L```
++ IFGOTO,LESS_THAN_EQUALS | LESS_THAN | EQUALS | NOT_EQUALS | GREATER_THAN | GREATER_THAN_EQUALS ,a,10,L ```goto label L if a cond_op 10```
++ INDEX_ASSIGN_L,arr,index,val  ```arr[index] = value```
++ INDEX_ASSIGN_R,dest,arr,index   ```dest = arr[index]```
++ FUNC_CALL,foo ```call function foo```
++ FUNC_RETURN ```return from current function```
++ LABEL,L ```mark this line as label L```
++ FUNC_LABEL,foo ```function foo()```
+
+### Library Functions ###
+
++ SCAN_INT,dest ```scanf("%d",dest)```
++ PRINT_INT,src ```printf("%d",src)```
++ EXIT ```exit()```
++ SPACE ```printf(" ")```
