@@ -27,7 +27,7 @@ tokens = (
    'LBRACE',
    'RBRACE',
    'PERIOD',
-   'MAIN',
+   # 'MAIN',
    'OBJECT',
 
    # # DATA TYPES
@@ -84,7 +84,7 @@ reserved = {
   'inherits' : 'INHERITS',
   'public' : 'PUBLIC',
   'private' : 'PRIVATE',
-  'main' : 'MAIN',
+  #'main' : 'MAIN',
   'Object' : 'OBJECT',
   'while' : 'WHILE',
   'loop' : 'LOOP',
