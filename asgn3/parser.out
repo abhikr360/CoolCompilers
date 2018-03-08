@@ -1,0 +1,183 @@
+Created by PLY version 3.10 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    SELF_TYPE
+    OBJECT
+    IMPORT
+    PRIVATE
+    TILDA
+    MAIN
+    PUBLIC
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> imports classes
+Rule 2     program -> classes
+Rule 3     imports -> imports import ID SEMICOLON
+Rule 4     imports -> import ID SEMICOLON
+Rule 5     classes -> classes class SEMICOLON
+Rule 6     classes -> class SEMICOLON
+Rule 7     class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list_opt RBRACE
+Rule 8     class -> CLASS CLASS_TYPE LBRACE features_list_opt RBRACE
+Rule 9     class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE RBRACE
+Rule 10    class -> CLASS CLASS_TYPE LBRACE RBRACE
+Rule 11    features_list -> features_list feature
+Rule 12    features_list -> feature
+Rule 13    feature -> modifier ID LPAREN formal_parameter_list RPAREN COLON type LBRACE expression RBRACE
+Rule 14    feature -> modifier ID LPAREN RPAREN COLON type LBRACE expression RBRACE
+Rule 15    feature -> ID LPAREN formal_parameter_list RPAREN COLON type LBRACE expression RBRACE
+Rule 16    feature -> ID LPAREN RPAREN COLON type LBRACE expression RBRACE
+Rule 17    feature -> modifier formal
+Rule 18    feature -> modifier
+Rule 19    feature -> public
+Rule 20    feature -> private
+Rule 21    type -> CLASS_TYPE
+Rule 22    type -> INTEGER_TYPE
+Rule 23    type -> BOOL_TYPE
+Rule 24    type -> STRING_TYPE
+Rule 25    formal_parameter_list -> formal_parameter_list formal_parameter
+Rule 26    formal_parameter_list -> formal_parameter
+Rule 27    formal_parameter -> ID LSQRBRACKET RSQRBRACKET COLON type
+Rule 28    formal -> ID COLON type GETS expression
+Rule 29    formal -> ID COLON type
+Rule 30    formal -> ID COLON type LSQRBRACKET RSQRBRACKET
+Rule 31    expression -> ID GETS expression
+Rule 32    expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression
+Rule 33    expression -> expression PERIOD ID LPAREN argument_list RPAREN
+Rule 34    expression -> expression PERIOD ID LPAREN RPAREN
+Rule 35    expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN
+Rule 36    expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN
+Rule 37    expression -> if_then_else
+Rule 38    expression -> while
+Rule 39    expression -> for
+Rule 40    expression -> block_expression
+Rule 41    expression -> let_expression
+Rule 42    expression -> NEW type
+Rule 43    expression -> ISVOID expression
+Rule 44    expression -> expression PLUS expression
+Rule 45    expression -> expression MINUS expression
+Rule 46    expression -> expression TIMES expression
+Rule 47    expression -> expression DIVIDE expression
+Rule 48    expression -> expression MOD expression
+Rule 49    expression -> expression LT expression
+Rule 50    expression -> expression GT expression
+Rule 51    expression -> expression LTEQ expression
+Rule 52    expression -> expression GTEQ expression
+Rule 53    expression -> expression EQUAL expression
+Rule 54    expression -> expression OR expression
+Rule 55    expression -> expression AND expression
+Rule 56    expression -> NOT expression
+Rule 57    expression -> LPAREN expression RPAREN
+Rule 58    expression -> SELF
+Rule 59    expression -> ID
+Rule 60    expression -> ID LSQRBRACKET expression RSQRBRACKET
+Rule 61    expression -> INTEGER
+Rule 62    expression -> STRING
+Rule 63    expression -> TRUE
+Rule 64    expression -> FALSE
+Rule 65    expression -> BREAK
+Rule 66    expression -> CONTINUE
+Rule 67    argument_list -> argument_list expression
+Rule 68    argument_list -> expression
+Rule 69    if_then_else -> IF expression THEN expression ELSE expression FI
+Rule 70    while -> WHILE expression LOOP expression POOL
+Rule 71    for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression LOOP expression POOL
+Rule 72    block_expression -> LBRACE block_list RBRACE
+Rule 73    block_list -> block_list expression SEMICOLON
+Rule 74    block_list -> expression SEMICOLON
+Rule 75    let_expression -> LET formal IN expression
+Rule 76    nested_lets -> nested_lets COMMA format
+Rule 77    nested_lets -> formal IN expression
+
+Terminals, with rules where they appear
+
+AND                  : 55
+AT                   : 35 36
+BOOL_TYPE            : 23
+BREAK                : 65
+CLASS                : 7 8 9 10
+CLASS_TYPE           : 7 7 8 9 9 10 21 35 36
+COLON                : 13 14 15 16 27 28 29 30
+COMMA                : 76
+CONTINUE             : 66
+DIVIDE               : 47
+ELSE                 : 69
+EQUAL                : 53
+FALSE                : 64
+FI                   : 69
+FOR                  : 71
+GETS                 : 28 31 32
+GT                   : 50
+GTEQ                 : 52
+ID                   : 3 4 13 14 15 16 27 28 29 30 31 32 33 34 35 36 59 60
+IF                   : 69
+IMPORT               : 
+IN                   : 75 77
+INHERITS             : 7 9
+INTEGER              : 61
+INTEGER_TYPE         : 22
+ISVOID               : 43
+LBRACE               : 7 8 9 10 13 14 15 16 72
+LET                  : 75
+LOOP                 : 70 71
+LPAREN               : 13 14 15 16 33 34 35 36 57 71
+LSQRBRACKET          : 27 30 32 60
+LT                   : 49
+LTEQ                 : 51
+MAIN                 : 
+MINUS                : 45
+MOD                  : 48
+NEW                  : 42
+NOT                  : 56
+OBJECT               : 
+OR                   : 54
+PERIOD               : 33 34 35 36
+PLUS                 : 44
+POOL                 : 70 71
+PRIVATE              : 
+PUBLIC               : 
+RBRACE               : 7 8 9 10 13 14 15 16 72
+RPAREN               : 13 14 15 16 33 34 35 36 57
+RSQRBRACKET          : 27 30 32 60
+SELF                 : 58
+SELF_TYPE            : 
+SEMICOLON            : 3 4 5 6 71 71 73 74
+STRING               : 62
+STRING_TYPE          : 24
+THEN                 : 69
+TILDA                : 
+TIMES                : 46
+TRUE                 : 63
+WHILE                : 70
+error                : 
+
+Nonterminals, with rules where they appear
+
+argument_list        : 33 35 67
+block_expression     : 40
+block_list           : 72 73
+class                : 5 6
+classes              : 1 2 5
+expression           : 13 14 15 16 28 31 32 32 33 34 35 36 43 44 44 45 45 46 46 47 47 48 48 49 49 50 50 51 51 52 52 53 53 54 54 55 55 56 57 60 67 68 69 69 69 70 70 71 71 71 71 73 74 75 77
+feature              : 11 12
+features_list        : 11
+features_list_opt    : 7 8
+for                  : 39
+formal               : 17 75 77
+formal_parameter     : 25 26
+formal_parameter_list : 13 15 25
+format               : 76
+if_then_else         : 37
+import               : 3 4
+imports              : 1 3
+let_expression       : 41
+modifier             : 13 14 17 18
+nested_lets          : 76
+private              : 20
+program              : 0
+public               : 19
+type                 : 13 14 15 16 27 28 29 30 42
+while                : 38
+
