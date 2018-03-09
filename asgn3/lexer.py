@@ -27,7 +27,7 @@ tokens = (
    'LBRACE',
    'RBRACE',
    'PERIOD',
-   # 'MAIN',
+   #'MAIN',
    'OBJECT',
 
    # # DATA TYPES
@@ -265,53 +265,9 @@ with open(input_file) as file:
 
 # Give the lexer some input
 lexer.input(data)
-
-collect = []
 # Tokenize
 while True:
     tok = lexer.token()
     if not tok: 
         break
-    # print(tok)
-
-#TOKEN HAS TYPE AND VALUE
-
-    collect.append(tok)
-
-print_list = []
-
-for single_token in tokens:
-	print_list_element = []
-	token_list = []
-	token_str = ""
-	token_count = 0
-	for lex_tokens in collect:
-		if(single_token == lex_tokens.type):
-			token_count = token_count + 1
-			if(lex_tokens.value not in token_list):
-				token_list.append(lex_tokens.value)
-				if(token_count > 1):
-					token_str = token_str + '                        '
-				token_str = token_str + str(lex_tokens.value)
-				#print(token_str)
-	if(token_count == 0):
-		continue
-	if(single_token in reserved.values()):
-		print_list.append(["Keyword_"+single_token, str(token_count), token_str])
-	else:
-		print_list.append([single_token, str(token_count), token_str])
-	# print(single_token + ':' + str(token_count))
-	# print(str(token_list))
-	# print (single_token in reserved.values())
-	# print("--------------------------------------------")
-
-#print(print_list)
-# print("------------------------------------------------------")
-
-header = Table([["Tokens", "Occurences", "Lexemes"]],20,True)
-print(header)
-print("------------------------------------------------------")
-
-table = Table(print_list, 20, True)
-
-print(table)
+    print(tok)
