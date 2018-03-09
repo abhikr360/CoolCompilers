@@ -29,31 +29,23 @@ def p_program(p):
   rule.append(2)
 
 def p_imports_multiple(p):
-  '''
-    imports : imports import ID SEMICOLON
-  '''
+    'imports : imports IMPORT ID SEMICOLON'
   rule.append(3)
 
 def p_imports(p):
-  '''
-    imports : import ID SEMICOLON
-  '''
+  'imports : IMPORT ID SEMICOLON'
   rule.append(4)
 
 def p_classes_multiple(p):
-  '''
-    classes : classes class SEMICOLON
-  '''
+  'classes : classes class SEMICOLON'
   rule.append(5)
 
 def p_classes(p):
-  '''
-    classes : class SEMICOLON
-  '''
+  'classes : class SEMICOLON'
   rule.append(6)
 
 def p_class_with_inheritance_with_features_list(p):
-  'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list_opt RBRACE'
+  'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE'
   rule.append(7)
 
 def p_class_with_features_list(p):

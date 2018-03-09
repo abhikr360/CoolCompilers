@@ -29,35 +29,27 @@ def p_program(p):
   rule.append(2)
 
 def p_imports_multiple(p):
-  '''
-    imports : imports import ID SEMICOLON
-  '''
+  'imports : imports IMPORT ID SEMICOLON'
   rule.append(3)
 
 def p_imports(p):
-  '''
-    imports : import ID SEMICOLON
-  '''
+  'imports : IMPORT ID SEMICOLON'
   rule.append(4)
 
 def p_classes_multiple(p):
-  '''
-    classes : classes class SEMICOLON
-  '''
+  'classes : classes class SEMICOLON'
   rule.append(5)
 
 def p_classes(p):
-  '''
-    classes : class SEMICOLON
-  '''
+  'classes : class SEMICOLON'
   rule.append(6)
 
 def p_class_with_inheritance_with_features_list(p):
-  'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list_opt RBRACE'
+  'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE'
   rule.append(7)
 
 def p_class_with_features_list(p):
-  'class : CLASS CLASS_TYPE LBRACE features_list_opt RBRACE'
+  'class : CLASS CLASS_TYPE LBRACE features_list RBRACE'
   rule.append(8)
 
 def p_class_with_features_inheritance(p):
@@ -69,11 +61,11 @@ def p_class(p):
   rule.append(10)
 
 def p_features_list_mult(p):
-  'features_list : features_list feature'
+  'features_list : features_list feature SEMICOLON'
   rule.append(11)
 
 def p_features_list(p):
-  'features_list : feature'
+  'features_list : feature SEMICOLON'
   rule.append(12)
   
 def p_feature_with_modifier_with_formal_parameter_list(p):
@@ -96,16 +88,16 @@ def p_feature_modifier_formal(p):
   'feature : modifier formal'
   rule.append(17)
 
-def p_feature_modifier(p):
-  'feature : modifier'
+def p_feature_formal(p):
+  'feature : formal'
   rule.append(18)
 
 def p_modifier_public(p):
-  'feature : public'
+  'modifier : PUBLIC'
   rule.append(19)
 
 def p_modifier_private(p):
-  'feature : private'
+  'modifier : PRIVATE'
   rule.append(20)
 
 def p_type_class_type(p):
@@ -124,6 +116,14 @@ def p_type_string_type(p):
   'type : STRING_TYPE'
   rule.append(24)
 
+def p_type_object(p):
+  'type : OBJECT'
+  rule.append(76)
+
+def p_type_self_type(p):
+  'type : SELF_TYPE'
+  rule.append(78)
+
 def p_formal_parameter_list_many(p):
   'formal_parameter_list : formal_parameter_list formal_parameter'
   rule.append(25)
@@ -136,20 +136,20 @@ def p_formal_parameter(p):
   'formal_parameter : ID COLON type'
   rule.append(27)
 
-def p_formal_parameter(p):
+def p_formal_parameter_arr(p):
   'formal_parameter : ID LSQRBRACKET RSQRBRACKET COLON type'
   rule.append(28)
 
 def p_formal_with_assign(p):
-  'formal : ID COLON type GETS expression'
+  'formal : ID COLON type GETS expression SEMICOLON'
   rule.append(29)
 
 def p_formal(p):
-  'formal : ID COLON type'
+  'formal : ID COLON type SEMICOLON'
   rule.append(30)
 
 def p_formal_arr(p):
-  'formal : ID COLON type LSQRBRACKET RSQRBRACKET'
+  'formal : ID COLON type LSQRBRACKET RSQRBRACKET SEMICOLON'
   rule.append(31)
 
 def p_expression_assign(p):
@@ -168,13 +168,21 @@ def p_expression_function_call(p):
   'expression : expression PERIOD ID LPAREN RPAREN'
   rule.append(35)
 
+def p_expression_function_call_with_arguments_2(p):
+  'expression : ID LPAREN argument_list RPAREN'
+  rule.append(79)
+
+def p_expression_function_call_2(p):
+  'expression : ID LPAREN RPAREN'
+  rule.append(80)
+
 def p_expression_at_function_with_arguments(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN'
   rule.append(36)
 
 def p_expression_at_function(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN'
-  rule.append(36)
+  rule.append(81)
 
 def p_expression_if_then_else(p):
   'expression : if_then_else'
@@ -257,6 +265,10 @@ def p_expression_not(p):
   'expression : NOT expression'
   rule.append(56)
 
+def p_expression_tilda(p):
+  'expression : TILDA expression'
+  rule.append(77)
+
 def p_expression_paren(p):
   'expression : LPAREN expression RPAREN'
   rule.append(57)
@@ -333,22 +345,14 @@ def p_let_expression(p):
   'let_expression : LET formal IN expression'
   rule.append(75)
 
-def p_nested_lets_many(p):
-  'nested_lets : nested_lets COMMA format'
-  rule.append(76)
-
-def p_nested_lets(p):
-  'nested_lets : formal IN expression'
-  rule.append(77)
-
 def p_error(p):
   """Error rule for Syntax Errors handling and reporting."""
   if p is None:
     print("Error! Unexpected end of input!")
   else:
     error = "Syntax error! Line: {}, position: {}, character: {}, type: {}".format(p.lineno, p.lexpos, p.value, p.type)
-    elf.error_list.append(error)
-    p.errok()
+    # elf.error_list.append(error)
+    # p.errok()
 
 
 
@@ -359,7 +363,12 @@ if(len(sys.argv)<2):
   print("Please enter file")
 else:
   f = open(sys.argv[1], 'r')
+  print(f.read())
   parser.parse(f.read())
+  print(sys.argv[1])
+  f.close()
+  # parser.parse("5+3*2")
+  print("aa")
   print(rule)
 
 
