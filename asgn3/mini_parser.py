@@ -381,7 +381,6 @@ parser  = yacc.yacc()
 input_file = sys.argv[1]
 with open(input_file) as file:
     data = file.read()
-
 parser.parse(data)
 # f.close()
 print(rule)

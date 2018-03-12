@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Parser</title>
+</head>
+<body>
+<h1>Code Snippet is -</h1>
+<pre><code>
+class Main inherits IO {
+   main(): SELF_TYPE {
+	out_string("Hello, World.\n")
+   };
+};
+
+</code>
+</pre>
+start -> program
+</body>
+</html>
