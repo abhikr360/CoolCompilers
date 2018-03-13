@@ -4,5 +4,9 @@ code {
 
 pre {
     white-space: pre-wrap;
-    /*background: hsl(30,80%,90%);*/
+    background: hsl(95,95%,95%);
+}
+mark {
+	background-color: white;
+	color: red;
 }

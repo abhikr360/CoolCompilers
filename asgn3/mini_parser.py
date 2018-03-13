@@ -384,6 +384,12 @@ with open(input_file) as file:
     data = file.read()
 parser.parse(data)
 # f.close()
+
+i=0
+for x in rule:
+    rule[i]=x+1
+    i=i+1
 print(rule)
+
 
 convert_to_HTML(rule,input_file)
