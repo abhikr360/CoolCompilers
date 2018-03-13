@@ -3,6 +3,7 @@
 import ply.yacc as yacc
 import sys
 from lexer import tokens
+from output_format import *
 
 precedence = (
         ('right', 'GETS'),
@@ -384,3 +385,5 @@ with open(input_file) as file:
 parser.parse(data)
 # f.close()
 print(rule)
+
+convert_to_HTML(rule,input_file)
