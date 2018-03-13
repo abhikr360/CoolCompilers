@@ -152,6 +152,7 @@ def p_formal_arr(p):
   'formal : ID COLON type LSQRBRACKET RSQRBRACKET SEMICOLON'
   rule.append(31)
 
+
 def p_expression_assign(p):
   'expression : ID GETS expression'
   rule.append(32)
@@ -159,6 +160,8 @@ def p_expression_assign(p):
 def p_expression_assign_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET GETS expression'
   rule.append(33)
+
+
 
 def p_expression_function_call_with_arguments(p):
   'expression : expression PERIOD ID LPAREN argument_list RPAREN'
@@ -176,6 +179,7 @@ def p_expression_function_call_2(p):
   'expression : ID LPAREN RPAREN'
   rule.append(80)
 
+
 def p_expression_at_function_with_arguments(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN'
   rule.append(36)
@@ -183,7 +187,7 @@ def p_expression_at_function_with_arguments(p):
 def p_expression_at_function(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN'
   rule.append(81)
-
+-------------------------------------------------
 def p_expression_if_then_else(p):
   'expression : if_then_else'
   rule.append(37)
@@ -195,7 +199,7 @@ def p_expression_while(p):
 def p_expression_for(p):
   'expression : for'
   rule.append(39)
-
+------------------------------------
 def p_expression_block_expression(p):
   'expression : block_expression'
   rule.append(40)
@@ -204,10 +208,11 @@ def p_expression_let_expression(p):
   'expression : let_expression'
   rule.append(41)
 
+
+
 def p_expression_new(p):
   'expression : NEW type'
   rule.append(42)
-
 
 def p_expression_isvoid(p):
   'expression : ISVOID expression'
@@ -309,6 +314,9 @@ def p_expression_continue(p):
   'expression : CONTINUE'
   rule.append(66)
 
+
+
+
 def p_argument_list_many(p):
   'argument_list : argument_list expression'
   rule.append(67)
@@ -328,6 +336,8 @@ def p_while(p):
 def p_for(p):
   'for : FOR LPAREN expression SEMICOLON expression SEMICOLON expression LOOP expression POOL'
   rule.append(71)
+
+
 
 def p_block_expression(p):
   'block_expression : LBRACE block_list RBRACE'
@@ -351,8 +361,7 @@ def p_error(p):
     print("Error! Unexpected end of input!")
   else:
     error = "Syntax error! Line: {}, position: {}, character: {}, type: {}".format(p.lineno, p.lexpos, p.value, p.type)
-    # elf.error_list.append(error)
-    # p.errok()
+    print(error)
 
 
 

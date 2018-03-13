@@ -1,0 +1,12 @@
+code { 
+    background: hsl(95, 95%, 95%); 
+}
+
+pre {
+    white-space: pre-wrap;
+    background: hsl(95,95%,95%);
+}
+mark {
+	background-color: white;
+	color: red;
+}
