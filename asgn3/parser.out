@@ -53,13 +53,14 @@ Grammar
 Rule 0     S' -> program
 Rule 1     program -> classes
 Rule 2     classes -> class SEMICOLON
-Rule 3     class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE
-Rule 4     features_list -> feature SEMICOLON
-Rule 5     feature -> ID LPAREN RPAREN COLON type LBRACE expression RBRACE
-Rule 6     type -> SELF_TYPE
-Rule 7     expression -> ID LPAREN argument_list RPAREN
-Rule 8     argument_list -> expression
-Rule 9     expression -> STRING
+Rule 3     classes -> classes class SEMICOLON
+Rule 4     class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE
+Rule 5     features_list -> feature SEMICOLON
+Rule 6     feature -> ID LPAREN RPAREN COLON type LBRACE expression RBRACE
+Rule 7     type -> SELF_TYPE
+Rule 8     expression -> ID LPAREN argument_list RPAREN
+Rule 9     argument_list -> expression
+Rule 10    expression -> STRING
 
 Terminals, with rules where they appear
 
@@ -67,9 +68,9 @@ AND                  :
 AT                   : 
 BOOL_TYPE            : 
 BREAK                : 
-CLASS                : 3
-CLASS_TYPE           : 3 3
-COLON                : 5
+CLASS                : 4
+CLASS_TYPE           : 4 4
+COLON                : 6
 COMMA                : 
 CONTINUE             : 
 DIVIDE               : 
@@ -81,18 +82,18 @@ FOR                  :
 GETS                 : 
 GT                   : 
 GTEQ                 : 
-ID                   : 5 7
+ID                   : 6 8
 IF                   : 
 IMPORT               : 
 IN                   : 
-INHERITS             : 3
+INHERITS             : 4
 INTEGER              : 
 INTEGER_TYPE         : 
 ISVOID               : 
-LBRACE               : 3 5
+LBRACE               : 4 6
 LET                  : 
 LOOP                 : 
-LPAREN               : 5 7
+LPAREN               : 6 8
 LSQRBRACKET          : 
 LT                   : 
 LTEQ                 : 
@@ -107,13 +108,13 @@ PLUS                 :
 POOL                 : 
 PRIVATE              : 
 PUBLIC               : 
-RBRACE               : 3 5
-RPAREN               : 5 7
+RBRACE               : 4 6
+RPAREN               : 6 8
 RSQRBRACKET          : 
 SELF                 : 
-SELF_TYPE            : 6
-SEMICOLON            : 2 4
-STRING               : 9
+SELF_TYPE            : 7
+SEMICOLON            : 2 3 5
+STRING               : 10
 STRING_TYPE          : 
 THEN                 : 
 TILDA                : 
@@ -124,14 +125,14 @@ error                :
 
 Nonterminals, with rules where they appear
 
-argument_list        : 7
-class                : 2
-classes              : 1
-expression           : 5 8
-feature              : 4
-features_list        : 3
+argument_list        : 8
+class                : 2 3
+classes              : 1 3
+expression           : 6 9
+feature              : 5
+features_list        : 4
 program              : 0
-type                 : 5
+type                 : 6
 
 Parsing method: LALR
 
@@ -140,7 +141,8 @@ state 0
     (0) S' -> . program
     (1) program -> . classes
     (2) classes -> . class SEMICOLON
-    (3) class -> . CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE
+    (3) classes -> . classes class SEMICOLON
+    (4) class -> . CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE
 
     CLASS           shift and go to state 2
 
@@ -156,7 +158,7 @@ state 1
 
 state 2
 
-    (3) class -> CLASS . CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE
+    (4) class -> CLASS . CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE
 
     CLASS_TYPE      shift and go to state 5
 
@@ -164,199 +166,219 @@ state 2
 state 3
 
     (1) program -> classes .
+    (3) classes -> classes . class SEMICOLON
+    (4) class -> . CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE
 
     $end            reduce using rule 1 (program -> classes .)
+    CLASS           shift and go to state 2
 
+    class                          shift and go to state 6
 
 state 4
 
     (2) classes -> class . SEMICOLON
 
-    SEMICOLON       shift and go to state 6
+    SEMICOLON       shift and go to state 7
 
 
 state 5
 
-    (3) class -> CLASS CLASS_TYPE . INHERITS CLASS_TYPE LBRACE features_list RBRACE
+    (4) class -> CLASS CLASS_TYPE . INHERITS CLASS_TYPE LBRACE features_list RBRACE
 
-    INHERITS        shift and go to state 7
+    INHERITS        shift and go to state 8
 
 
 state 6
 
-    (2) classes -> class SEMICOLON .
+    (3) classes -> classes class . SEMICOLON
 
-    $end            reduce using rule 2 (classes -> class SEMICOLON .)
+    SEMICOLON       shift and go to state 9
 
 
 state 7
 
-    (3) class -> CLASS CLASS_TYPE INHERITS . CLASS_TYPE LBRACE features_list RBRACE
+    (2) classes -> class SEMICOLON .
 
-    CLASS_TYPE      shift and go to state 8
+    CLASS           reduce using rule 2 (classes -> class SEMICOLON .)
+    $end            reduce using rule 2 (classes -> class SEMICOLON .)
 
 
 state 8
 
-    (3) class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE . LBRACE features_list RBRACE
+    (4) class -> CLASS CLASS_TYPE INHERITS . CLASS_TYPE LBRACE features_list RBRACE
 
-    LBRACE          shift and go to state 9
+    CLASS_TYPE      shift and go to state 10
 
 
 state 9
 
-    (3) class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE . features_list RBRACE
-    (4) features_list -> . feature SEMICOLON
-    (5) feature -> . ID LPAREN RPAREN COLON type LBRACE expression RBRACE
+    (3) classes -> classes class SEMICOLON .
 
-    ID              shift and go to state 12
+    CLASS           reduce using rule 3 (classes -> classes class SEMICOLON .)
+    $end            reduce using rule 3 (classes -> classes class SEMICOLON .)
 
-    features_list                  shift and go to state 10
-    feature                        shift and go to state 11
 
 state 10
 
-    (3) class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list . RBRACE
+    (4) class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE . LBRACE features_list RBRACE
 
-    RBRACE          shift and go to state 13
+    LBRACE          shift and go to state 11
 
 
 state 11
 
-    (4) features_list -> feature . SEMICOLON
+    (4) class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE . features_list RBRACE
+    (5) features_list -> . feature SEMICOLON
+    (6) feature -> . ID LPAREN RPAREN COLON type LBRACE expression RBRACE
 
-    SEMICOLON       shift and go to state 14
+    ID              shift and go to state 14
 
+    features_list                  shift and go to state 12
+    feature                        shift and go to state 13
 
 state 12
 
-    (5) feature -> ID . LPAREN RPAREN COLON type LBRACE expression RBRACE
+    (4) class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list . RBRACE
 
-    LPAREN          shift and go to state 15
+    RBRACE          shift and go to state 15
 
 
 state 13
 
-    (3) class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE .
+    (5) features_list -> feature . SEMICOLON
 
-    SEMICOLON       reduce using rule 3 (class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE .)
+    SEMICOLON       shift and go to state 16
 
 
 state 14
 
-    (4) features_list -> feature SEMICOLON .
+    (6) feature -> ID . LPAREN RPAREN COLON type LBRACE expression RBRACE
 
-    RBRACE          reduce using rule 4 (features_list -> feature SEMICOLON .)
+    LPAREN          shift and go to state 17
 
 
 state 15
 
-    (5) feature -> ID LPAREN . RPAREN COLON type LBRACE expression RBRACE
+    (4) class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE .
 
-    RPAREN          shift and go to state 16
+    SEMICOLON       reduce using rule 4 (class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE .)
 
 
 state 16
 
-    (5) feature -> ID LPAREN RPAREN . COLON type LBRACE expression RBRACE
+    (5) features_list -> feature SEMICOLON .
 
-    COLON           shift and go to state 17
+    RBRACE          reduce using rule 5 (features_list -> feature SEMICOLON .)
 
 
 state 17
 
-    (5) feature -> ID LPAREN RPAREN COLON . type LBRACE expression RBRACE
-    (6) type -> . SELF_TYPE
+    (6) feature -> ID LPAREN . RPAREN COLON type LBRACE expression RBRACE
 
-    SELF_TYPE       shift and go to state 18
+    RPAREN          shift and go to state 18
 
-    type                           shift and go to state 19
 
 state 18
 
-    (6) type -> SELF_TYPE .
+    (6) feature -> ID LPAREN RPAREN . COLON type LBRACE expression RBRACE
 
-    LBRACE          reduce using rule 6 (type -> SELF_TYPE .)
+    COLON           shift and go to state 19
 
 
 state 19
 
-    (5) feature -> ID LPAREN RPAREN COLON type . LBRACE expression RBRACE
+    (6) feature -> ID LPAREN RPAREN COLON . type LBRACE expression RBRACE
+    (7) type -> . SELF_TYPE
 
-    LBRACE          shift and go to state 20
+    SELF_TYPE       shift and go to state 20
 
+    type                           shift and go to state 21
 
 state 20
 
-    (5) feature -> ID LPAREN RPAREN COLON type LBRACE . expression RBRACE
-    (7) expression -> . ID LPAREN argument_list RPAREN
-    (9) expression -> . STRING
+    (7) type -> SELF_TYPE .
 
-    ID              shift and go to state 22
-    STRING          shift and go to state 23
+    LBRACE          reduce using rule 7 (type -> SELF_TYPE .)
 
-    expression                     shift and go to state 21
 
 state 21
 
-    (5) feature -> ID LPAREN RPAREN COLON type LBRACE expression . RBRACE
+    (6) feature -> ID LPAREN RPAREN COLON type . LBRACE expression RBRACE
 
-    RBRACE          shift and go to state 24
+    LBRACE          shift and go to state 22
 
 
 state 22
 
-    (7) expression -> ID . LPAREN argument_list RPAREN
+    (6) feature -> ID LPAREN RPAREN COLON type LBRACE . expression RBRACE
+    (8) expression -> . ID LPAREN argument_list RPAREN
+    (10) expression -> . STRING
 
-    LPAREN          shift and go to state 25
+    ID              shift and go to state 24
+    STRING          shift and go to state 25
 
+    expression                     shift and go to state 23
 
 state 23
 
-    (9) expression -> STRING .
+    (6) feature -> ID LPAREN RPAREN COLON type LBRACE expression . RBRACE
 
-    RBRACE          reduce using rule 9 (expression -> STRING .)
-    RPAREN          reduce using rule 9 (expression -> STRING .)
+    RBRACE          shift and go to state 26
 
 
 state 24
 
-    (5) feature -> ID LPAREN RPAREN COLON type LBRACE expression RBRACE .
+    (8) expression -> ID . LPAREN argument_list RPAREN
 
-    SEMICOLON       reduce using rule 5 (feature -> ID LPAREN RPAREN COLON type LBRACE expression RBRACE .)
+    LPAREN          shift and go to state 27
 
 
 state 25
 
-    (7) expression -> ID LPAREN . argument_list RPAREN
-    (8) argument_list -> . expression
-    (7) expression -> . ID LPAREN argument_list RPAREN
-    (9) expression -> . STRING
+    (10) expression -> STRING .
 
-    ID              shift and go to state 22
-    STRING          shift and go to state 23
+    RPAREN          reduce using rule 10 (expression -> STRING .)
+    RBRACE          reduce using rule 10 (expression -> STRING .)
 
-    expression                     shift and go to state 27
-    argument_list                  shift and go to state 26
 
 state 26
 
-    (7) expression -> ID LPAREN argument_list . RPAREN
+    (6) feature -> ID LPAREN RPAREN COLON type LBRACE expression RBRACE .
 
-    RPAREN          shift and go to state 28
+    SEMICOLON       reduce using rule 6 (feature -> ID LPAREN RPAREN COLON type LBRACE expression RBRACE .)
 
 
 state 27
 
-    (8) argument_list -> expression .
+    (8) expression -> ID LPAREN . argument_list RPAREN
+    (9) argument_list -> . expression
+    (8) expression -> . ID LPAREN argument_list RPAREN
+    (10) expression -> . STRING
 
-    RPAREN          reduce using rule 8 (argument_list -> expression .)
+    ID              shift and go to state 24
+    STRING          shift and go to state 25
 
+    expression                     shift and go to state 29
+    argument_list                  shift and go to state 28
 
 state 28
 
-    (7) expression -> ID LPAREN argument_list RPAREN .
+    (8) expression -> ID LPAREN argument_list . RPAREN
 
-    RBRACE          reduce using rule 7 (expression -> ID LPAREN argument_list RPAREN .)
-    RPAREN          reduce using rule 7 (expression -> ID LPAREN argument_list RPAREN .)
+    RPAREN          shift and go to state 30
+
+
+state 29
+
+    (9) argument_list -> expression .
+
+    RPAREN          reduce using rule 9 (argument_list -> expression .)
+
+
+state 30
+
+    (8) expression -> ID LPAREN argument_list RPAREN .
+
+    RPAREN          reduce using rule 8 (expression -> ID LPAREN argument_list RPAREN .)
+    RBRACE          reduce using rule 8 (expression -> ID LPAREN argument_list RPAREN .)
 

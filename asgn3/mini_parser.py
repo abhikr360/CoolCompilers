@@ -29,6 +29,9 @@ def p_classes(p):
   'classes : class SEMICOLON'
   rule.append(6)
 
+def p_classes_multiple(p):
+  'classes : classes class SEMICOLON'
+  rule.append(5)
 # def p_class_with_inheritance_with_features_list(p):
 #   'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE RBRACE'
 #   rule.append(7)

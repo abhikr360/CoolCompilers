@@ -5,9 +5,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'rightGETSleftORleftANDrightNOTnonassocLTEQGTEQLTGTEQUALleftPLUSMINUSleftTIMESDIVIDEMODrightISVOIDrightTILDAleftATleftPERIODIMPORT CLASS INHERITS PUBLIC PRIVATE SEMICOLON COLON ID LSQRBRACKET RSQRBRACKET LPAREN RPAREN LBRACE RBRACE PERIOD OBJECT CLASS_TYPE INTEGER INTEGER_TYPE BOOL_TYPE STRING_TYPE SELF_TYPE STRING TRUE FALSE MOD TILDA GT LT EQUAL LTEQ GTEQ GETS OR AND NOT IF THEN ELSE FI WHILE LOOP POOL FOR LET IN SELF BREAK CONTINUE ISVOID NEW PLUS MINUS TIMES DIVIDE COMMA ATprogram : classesclasses : class SEMICOLONclass : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACEfeatures_list : feature SEMICOLONfeature : ID LPAREN RPAREN COLON type LBRACE expression RBRACEtype : SELF_TYPEexpression : ID LPAREN argument_list RPARENargument_list : expressionexpression : STRING'
+_lr_signature = 'rightGETSleftORleftANDrightNOTnonassocLTEQGTEQLTGTEQUALleftPLUSMINUSleftTIMESDIVIDEMODrightISVOIDrightTILDAleftATleftPERIODIMPORT CLASS INHERITS PUBLIC PRIVATE SEMICOLON COLON ID LSQRBRACKET RSQRBRACKET LPAREN RPAREN LBRACE RBRACE PERIOD OBJECT CLASS_TYPE INTEGER INTEGER_TYPE BOOL_TYPE STRING_TYPE SELF_TYPE STRING TRUE FALSE MOD TILDA GT LT EQUAL LTEQ GTEQ GETS OR AND NOT IF THEN ELSE FI WHILE LOOP POOL FOR LET IN SELF BREAK CONTINUE ISVOID NEW PLUS MINUS TIMES DIVIDE COMMA ATprogram : classesclasses : class SEMICOLONclasses : classes class SEMICOLONclass : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACEfeatures_list : feature SEMICOLONfeature : ID LPAREN RPAREN COLON type LBRACE expression RBRACEtype : SELF_TYPEexpression : ID LPAREN argument_list RPARENargument_list : expressionexpression : STRING'
     
-_lr_action_items = {'INHERITS':([5,],[7,]),'LBRACE':([8,18,19,],[9,-6,20,]),'RPAREN':([15,23,26,27,28,],[16,-9,28,-8,-7,]),'CLASS_TYPE':([2,7,],[5,8,]),'SEMICOLON':([4,11,13,24,],[6,14,-3,-5,]),'RBRACE':([10,14,21,23,28,],[13,-4,24,-9,-7,]),'ID':([9,20,25,],[12,22,22,]),'COLON':([16,],[17,]),'LPAREN':([12,22,],[15,25,]),'SELF_TYPE':([17,],[18,]),'STRING':([20,25,],[23,23,]),'CLASS':([0,],[2,]),'$end':([1,3,6,],[0,-1,-2,]),}
+_lr_action_items = {'INHERITS':([5,],[8,]),'LBRACE':([10,20,21,],[11,-7,22,]),'RPAREN':([17,25,28,29,30,],[18,-10,30,-9,-8,]),'CLASS_TYPE':([2,8,],[5,10,]),'SEMICOLON':([4,6,13,15,26,],[7,9,16,-4,-6,]),'RBRACE':([12,16,23,25,30,],[15,-5,26,-10,-8,]),'ID':([11,22,27,],[14,24,24,]),'COLON':([18,],[19,]),'LPAREN':([14,24,],[17,27,]),'SELF_TYPE':([19,],[20,]),'STRING':([22,27,],[25,25,]),'CLASS':([0,3,7,9,],[2,2,-2,-3,]),'$end':([1,3,7,9,],[0,-1,-2,-3,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'program':([0,],[1,]),'expression':([20,25,],[21,27,]),'feature':([9,],[11,]),'features_list':([9,],[10,]),'classes':([0,],[3,]),'argument_list':([25,],[26,]),'type':([17,],[19,]),'class':([0,],[4,]),}
+_lr_goto_items = {'program':([0,],[1,]),'expression':([22,27,],[23,29,]),'feature':([11,],[13,]),'features_list':([11,],[12,]),'classes':([0,],[3,]),'argument_list':([27,],[28,]),'type':([19,],[21,]),'class':([0,3,],[4,6,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -28,11 +28,12 @@ _lr_productions = [
   ("S' -> program","S'",1,None,None,None),
   ('program -> classes','program',1,'p_program','mini_parser.py',25),
   ('classes -> class SEMICOLON','classes',2,'p_classes','mini_parser.py',29),
-  ('class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE','class',7,'p_class_with_inheritance_with_features_list','mini_parser.py',38),
-  ('features_list -> feature SEMICOLON','features_list',2,'p_features_list','mini_parser.py',42),
-  ('feature -> ID LPAREN RPAREN COLON type LBRACE expression RBRACE','feature',8,'p_feature','mini_parser.py',46),
-  ('type -> SELF_TYPE','type',1,'p_type_self_type','mini_parser.py',51),
-  ('expression -> ID LPAREN argument_list RPAREN','expression',4,'p_expression_function_call_with_arguments_2','mini_parser.py',55),
-  ('argument_list -> expression','argument_list',1,'p_argument_list','mini_parser.py',59),
-  ('expression -> STRING','expression',1,'p_expression_string','mini_parser.py',64),
+  ('classes -> classes class SEMICOLON','classes',3,'p_classes_multiple','mini_parser.py',33),
+  ('class -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE','class',7,'p_class_with_inheritance_with_features_list','mini_parser.py',41),
+  ('features_list -> feature SEMICOLON','features_list',2,'p_features_list','mini_parser.py',45),
+  ('feature -> ID LPAREN RPAREN COLON type LBRACE expression RBRACE','feature',8,'p_feature','mini_parser.py',49),
+  ('type -> SELF_TYPE','type',1,'p_type_self_type','mini_parser.py',54),
+  ('expression -> ID LPAREN argument_list RPAREN','expression',4,'p_expression_function_call_with_arguments_2','mini_parser.py',58),
+  ('argument_list -> expression','argument_list',1,'p_argument_list','mini_parser.py',62),
+  ('expression -> STRING','expression',1,'p_expression_string','mini_parser.py',67),
 ]
