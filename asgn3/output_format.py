@@ -41,8 +41,6 @@ def convert_to_HTML(rule_list,input_file):
 	for x in reversed(rule_list):
 		i = i+1
 		current_rule = grammar[x]
-		if(i==len(rule_list)):
-			break
 		
 		if(previous_rule == None):
 			f.write(current_rule+"\n")
@@ -53,11 +51,24 @@ def convert_to_HTML(rule_list,input_file):
 
 		# print "@"+current_rule
 		changed = changed_non_terminal(previous_rule,current_rule)
-		previous_rule = rreplace(previous_rule,changed,"<b>"+changed+"</b>")
-		print previous_rule
+		html_previous_rule = rreplace(previous_rule,changed,"<b>"+changed+"</b>")
+		print current_rule
+		rhs = current_rule[current_rule.find("->")+3:]
+		print html_previous_rule
+		f.write("<p>"+ html_previous_rule+"</p>\n")
+		# print rhs
+		# print previous_rule
+		# print changed
+		current_rule = rreplace(previous_rule,changed,rhs)
+		if(i==len(rule_list)):
+			f.write("<p>"+ current_rule+"</p>\n")
+			print current_rule
+		print current_rule
+
 		previous_rule = current_rule
 		# quit()
 
+		print "------------------------"
 		# print 
 
 
