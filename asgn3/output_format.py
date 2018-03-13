@@ -43,7 +43,7 @@ def convert_to_HTML(rule_list,input_file):
 		current_rule = grammar[x]
 		
 		if(previous_rule == None):
-			f.write("<p>S\' -> start </p>\n")
+			# f.write("<p>S\' -> start </p>\n")
 			# print "@"+current_rule
 			previous_rule = current_rule
 			continue

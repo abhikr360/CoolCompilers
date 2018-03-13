@@ -389,6 +389,7 @@ i=0
 for x in rule:
     rule[i]=x+1
     i=i+1
+rule.append(0)
 print(rule)
 
 
