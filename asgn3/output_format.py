@@ -27,7 +27,7 @@ def convert_to_HTML(rule_list,input_file):
 
 
 	# f = open('html_output.txt','w+')
-	f = open('temp.html','w+')
+	f = open('html_out/temp.html','w+')
 	previous_rule = None
 
 	with open(input_file) as file:
@@ -46,19 +46,23 @@ def convert_to_HTML(rule_list,input_file):
 			# f.write("<p>S\' -> start </p>\n")
 			# print "@"+current_rule
 			previous_rule = current_rule
+			rhs = current_rule[current_rule.find("->")+3:]
+			previous_rhs = rhs
 			continue
 
 
 		# print "@"+current_rule
 		changed = changed_non_terminal(previous_rule,current_rule)
-		html_previous_rule = rreplace(previous_rule,changed,"<mark>"+changed+"</mark>")
+		html_previous_rule = rreplace(previous_rule,previous_rhs,"<u1>"+previous_rhs+"</u1>")
+		html_previous_rule = rreplace(html_previous_rule,changed,"<mark>"+changed+"</mark>")
 		print current_rule
 		rhs = current_rule[current_rule.find("->")+3:]
 		print html_previous_rule
 		f.write("<p>"+ html_previous_rule+"</p>\n")
-		# print rhs
+		print rhs
 		# print previous_rule
 		# print changed
+		previous_rhs = rhs
 		current_rule = rreplace(previous_rule,changed,rhs)
 		if(i==len(rule_list)):
 			f.write("<p>"+ current_rule+"</p>\n")
