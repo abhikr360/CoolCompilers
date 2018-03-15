@@ -27,7 +27,12 @@ def convert_to_HTML(rule_list,input_file):
 
 
 	# f = open('html_output.txt','w+')
-	f = open('html_out/temp.html','w+')
+	file_name = input_file[input_file.find('/')+1:]
+	# print file_name
+	file_name = file_name[:file_name.find('.')]
+	file_name = file_name+'.html'
+	# print file_name
+	f = open(file_name,'w+')
 	previous_rule = None
 
 	with open(input_file) as file:

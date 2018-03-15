@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="html_output.css">
+<title>Parser</title>
+</head>
+<body>
+<h1>Code Snippet is -</h1>
+<pre>
+<code>
+class Main inherits IO {
+   main(): SELF_TYPE {
+	out_string("Hello, World.\n")
+   };
+};
+
+</code>
+</pre>
+<p><mark>red</mark> represent non-terminal expanded in next rule
+</p><p><u1>Underline</u1> represent rule into which non-terminal has expanded</p><p>.</p><p>.</p><p>.</p><p>S' -> <u1><mark>start</mark> </u1></p>
+<p>S' -> <u1><mark>program</mark> </u1> </p>
+<p>S' -> <u1><mark>classes</mark> </u1>  </p>
+<p>S' -> <u1><mark>class</mark> SEMICOLON </u1>   </p>
+<p>S' -> <u1>CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE <mark>features_list</mark> RBRACE </u1> SEMICOLON    </p>
+<p>S' -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE <u1><mark>feature</mark> SEMICOLON </u1> RBRACE  SEMICOLON    </p>
+<p>S' -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE <u1>ID LPAREN RPAREN COLON type LBRACE <mark>expression</mark> RBRACE </u1> SEMICOLON  RBRACE  SEMICOLON    </p>
+<p>S' -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE ID LPAREN RPAREN COLON type LBRACE <u1>ID LPAREN <mark>argument_list</mark> RPAREN </u1> RBRACE  SEMICOLON  RBRACE  SEMICOLON    </p>
+<p>S' -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE ID LPAREN RPAREN COLON type LBRACE ID LPAREN <u1><mark>expression</mark> </u1> RPAREN  RBRACE  SEMICOLON  RBRACE  SEMICOLON    </p>
+<p>S' -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE ID LPAREN RPAREN COLON <mark>type</mark> LBRACE ID LPAREN <u1>STRING </u1>  RPAREN  RBRACE  SEMICOLON  RBRACE  SEMICOLON    </p>
+<p>S' -> CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE ID LPAREN RPAREN COLON SELF_TYPE  LBRACE ID LPAREN STRING   RPAREN  RBRACE  SEMICOLON  RBRACE  SEMICOLON    </p>
+</body>
+</html>

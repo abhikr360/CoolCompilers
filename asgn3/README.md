@@ -1,7 +1,14 @@
-usage - 
-python -B mini_parser.py test/test1.cl
+## usage - 
 
-view result: 
-firefox html_out/temp.html
+bin/parser test/filename.cl
 
-#-B is for stop producing .pyc files
+## view parse tree: 
+
+firefox filename.html
+
+
+# Effort Sheet - 
+
+Abhishek Kumar - 100/3%
+Madhukant - 100/3%
+Tushar Gupta - 100/3%

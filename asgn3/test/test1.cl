@@ -47,7 +47,7 @@ class Main inherits IO{
    			} 
    		else 
    		{
-   			if (kumar = "randi") then
+   			if (kumar = "brilliant") then
    				all <- TRUE
    			else
    			{
@@ -59,7 +59,7 @@ class Main inherits IO{
    		}
    		fi;
 
-   		while(not(kumar = "randi")) loop
+   		while(not(kumar = "brilliant")) loop
    		{
    			confirm();
    			while(TRUE) loop

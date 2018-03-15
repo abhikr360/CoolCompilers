@@ -3,6 +3,7 @@
 import ply.yacc as yacc
 import sys
 from lexer import tokens
+from output_format import *
 
 precedence = (
         ('right', 'GETS'),
@@ -20,6 +21,10 @@ precedence = (
 
 rule = []
 
+def p_start(p):
+  'start : program'
+  rule.append(0)
+
 def p_program_with_imports(p):
   'program : imports classes'
   rule.append(1)
@@ -36,17 +41,19 @@ def p_imports(p):
   'imports : IMPORT ID SEMICOLON'
   rule.append(4)
 
+
 def p_classes_multiple(p):
   'classes : classes class SEMICOLON'
   rule.append(5)
+
 
 def p_classes(p):
   'classes : class SEMICOLON'
   rule.append(6)
 
 def p_class_with_inheritance_with_features_list(p):
-  'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE'
-  rule.append(7)
+    'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE'
+    rule.append(7)
 
 def p_class_with_features_list(p):
   'class : CLASS CLASS_TYPE LBRACE features_list RBRACE'
@@ -67,7 +74,7 @@ def p_features_list_mult(p):
 def p_features_list(p):
   'features_list : feature SEMICOLON'
   rule.append(12)
-  
+
 def p_feature_with_modifier_with_formal_parameter_list(p):
   'feature : modifier ID LPAREN formal_parameter_list RPAREN COLON type LBRACE expression RBRACE'
   rule.append(13)
@@ -118,105 +125,84 @@ def p_type_string_type(p):
 
 def p_type_object(p):
   'type : OBJECT'
-  rule.append(76)
+  rule.append(25)
 
 def p_type_self_type(p):
   'type : SELF_TYPE'
-  rule.append(78)
+  rule.append(26)
 
 def p_formal_parameter_list_many(p):
-  'formal_parameter_list : formal_parameter_list formal_parameter'
-  rule.append(25)
+  'formal_parameter_list : formal_parameter_list COMMA formal_parameter'
+  rule.append(27)
 
 def p_formal_parameter_list(p):
   'formal_parameter_list : formal_parameter'
-  rule.append(26)
+  rule.append(28)
 
 def p_formal_parameter(p):
   'formal_parameter : ID COLON type'
-  rule.append(27)
+  rule.append(29)
 
 def p_formal_parameter_arr(p):
   'formal_parameter : ID LSQRBRACKET RSQRBRACKET COLON type'
-  rule.append(28)
-
-def p_formal_with_assign(p):
-  'formal : ID COLON type GETS expression SEMICOLON'
-  rule.append(29)
-
-def p_formal(p):
-  'formal : ID COLON type SEMICOLON'
   rule.append(30)
 
-def p_formal_arr(p):
-  'formal : ID COLON type LSQRBRACKET RSQRBRACKET SEMICOLON'
+def p_formal_with_assign(p):
+  'formal : ID COLON type GETS expression'
   rule.append(31)
+
+def p_formal(p):
+  'formal : ID COLON type'
+  rule.append(32)
+
+def p_formal_arr(p):
+  'formal : ID COLON type LSQRBRACKET RSQRBRACKET'
+  rule.append(33)
+
+
+def p_expression_block_expression(p):
+  'expression : block_expression'
+  rule.append(34)
+
+
+def p_block_expression(p):
+  'block_expression : LBRACE block_list RBRACE'
+  rule.append(35)
+
+def p_block_list_many(p):
+  'block_list : block_list expression SEMICOLON'
+  rule.append(36)
+
+def p_block_list(p):
+  'block_list : expression SEMICOLON'
+  rule.append(37)
 
 
 def p_expression_assign(p):
   'expression : ID GETS expression'
-  rule.append(32)
+  rule.append(38)
 
 def p_expression_assign_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET GETS expression'
-  rule.append(33)
-
-
-
-def p_expression_function_call_with_arguments(p):
-  'expression : expression PERIOD ID LPAREN argument_list RPAREN'
-  rule.append(34)
-
-def p_expression_function_call(p):
-  'expression : expression PERIOD ID LPAREN RPAREN'
-  rule.append(35)
+  rule.append(39)
 
 def p_expression_function_call_with_arguments_2(p):
   'expression : ID LPAREN argument_list RPAREN'
-  rule.append(79)
+  rule.append(40)
 
 def p_expression_function_call_2(p):
   'expression : ID LPAREN RPAREN'
-  rule.append(80)
-
-
-def p_expression_at_function_with_arguments(p):
-  'expression : expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN'
-  rule.append(36)
-
-def p_expression_at_function(p):
-  'expression : expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN'
-  rule.append(81)
--------------------------------------------------
-def p_expression_if_then_else(p):
-  'expression : if_then_else'
-  rule.append(37)
-
-def p_expression_while(p):
-  'expression : while'
-  rule.append(38)
-
-def p_expression_for(p):
-  'expression : for'
-  rule.append(39)
-------------------------------------
-def p_expression_block_expression(p):
-  'expression : block_expression'
-  rule.append(40)
-
-def p_expression_let_expression(p):
-  'expression : let_expression'
   rule.append(41)
 
 
-
-def p_expression_new(p):
-  'expression : NEW type'
+def p_argument_list(p):
+  'argument_list : expression'
   rule.append(42)
 
-def p_expression_isvoid(p):
-  'expression : ISVOID expression'
+def p_argument_list_many(p):
+  'argument_list : argument_list COMMA expression'
   rule.append(43)
+
 
 def p_expression_plus(p):
   'expression : expression PLUS expression'
@@ -272,119 +258,140 @@ def p_expression_not(p):
 
 def p_expression_tilda(p):
   'expression : TILDA expression'
-  rule.append(77)
+  rule.append(57)
 
 def p_expression_paren(p):
   'expression : LPAREN expression RPAREN'
-  rule.append(57)
+  rule.append(58)
 
 def p_expression_self(p):
   'expression : SELF'
-  rule.append(58)
+  rule.append(59)
 
 def p_expression_id(p):
   'expression : ID'
-  rule.append(59)
+  rule.append(60)
 
 def p_expression_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET'
-  rule.append(60)
+  rule.append(61)
 
 def p_expression_integer(p):
   'expression : INTEGER'
-  rule.append(61)
+  rule.append(62)
 
 def p_expression_string(p):
   'expression : STRING'
-  rule.append(62)
+  rule.append(63)
 
 def p_expression_true(p):
   'expression : TRUE'
-  rule.append(63)
+  rule.append(64)
 
 def p_expression_false(p):
   'expression : FALSE'
-  rule.append(64)
+  rule.append(65)
 
 def p_expression_break(p):
   'expression : BREAK'
-  rule.append(65)
+  rule.append(66)
 
 def p_expression_continue(p):
   'expression : CONTINUE'
-  rule.append(66)
-
-
-
-
-def p_argument_list_many(p):
-  'argument_list : argument_list expression'
   rule.append(67)
 
-def p_argument_list(p):
-  'argument_list : expression'
+def p_expression_function_call_with_arguments(p):
+  'expression : expression PERIOD ID LPAREN argument_list RPAREN'
   rule.append(68)
+
+def p_expression_function_call(p):
+  'expression : expression PERIOD ID LPAREN RPAREN'
+  rule.append(69)
+
+def p_expression_new(p):
+  'expression : NEW type'
+  rule.append(70)
+
+def p_expression_isvoid(p):
+  'expression : ISVOID expression'
+  rule.append(71)
+
+def p_expression_let_expression(p):
+  'expression : let_expression'
+  rule.append(72)
+
+def p_let_expression(p):
+  'let_expression : LET formal IN expression TEL'
+  rule.append(73)
+
+# Nested Lets
+
+def p_expression_at_function_with_arguments(p):
+  'expression : expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN'
+  rule.append(74)
+
+def p_expression_at_function(p):
+  'expression : expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN'
+  rule.append(75)
+
+
+def p_expression_if_then_else(p):
+  'expression : if_then_else'
+  rule.append(76)
 
 def p_if_then_else(p):
   'if_then_else : IF expression THEN expression ELSE expression FI'
-  rule.append(69)
+  rule.append(77)
+
+def p_expression_while(p):
+  'expression : while'
+  rule.append(78)
 
 def p_while(p):
   'while : WHILE expression LOOP expression POOL'
-  rule.append(70)
+  rule.append(79)
+
+def p_expression_for(p):
+  'expression : for'
+  rule.append(80)
 
 def p_for(p):
-  'for : FOR LPAREN expression SEMICOLON expression SEMICOLON expression LOOP expression POOL'
-  rule.append(71)
+  'for : FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL'
+  rule.append(81)
 
 
 
-def p_block_expression(p):
-  'block_expression : LBRACE block_list RBRACE'
-  rule.append(72)
 
-def p_block_list_many(p):
-  'block_list : block_list expression SEMICOLON'
-  rule.append(73)
-
-def p_block_list(p):
-  'block_list : expression SEMICOLON'
-  rule.append(74)
-
-def p_let_expression(p):
-  'let_expression : LET formal IN expression'
-  rule.append(75)
 
 def p_error(p):
   """Error rule for Syntax Errors handling and reporting."""
+  print("-------------------------- Error ---------------------------------")
   if p is None:
     print("Error! Unexpected end of input!")
   else:
     error = "Syntax error! Line: {}, position: {}, character: {}, type: {}".format(p.lineno, p.lexpos, p.value, p.type)
     print(error)
-
-
-
+    print type(p.type)
 
 parser  = yacc.yacc()
 
-if(len(sys.argv)<2):
-  print("Please enter file")
-else:
-  f = open(sys.argv[1], 'r')
-  print(f.read())
-  parser.parse(f.read())
-  print(sys.argv[1])
-  f.close()
-  # parser.parse("5+3*2")
-  print("aa")
-  print(rule)
+
+# f = open(sys.argv[1], 'r')
+# print(f.read())
 
 
+input_file = sys.argv[1]
+with open(input_file) as file:
+    data = file.read()
+parser.parse(data)
+# f.close()
+
+i=0
+for x in rule:
+    rule[i]=x+1
+    i=i+1
+rule.append(0)
+print(rule)
 
 
-
-
-
-
-
+convert_to_HTML(rule,input_file)
