@@ -10,3 +10,19 @@ mark {
 	background-color: white;
 	color: red;
 }
+
+mark:hover {
+	background-color: red;
+	color: white;
+	display: "tt";
+}
+
+u1 {
+    /*text-decoration: underline;*/
+    /*text-decoration-color: blue;*/
+    border-bottom: 2px solid blue;
+}
+/*
+.bottom_space {
+    margin-bottom: 3cm;
+}*/

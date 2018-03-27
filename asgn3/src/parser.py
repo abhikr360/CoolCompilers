@@ -370,7 +370,8 @@ def p_error(p):
     print("Error! Unexpected end of input!")
   else:
     error = "Syntax error! Line: {}, position: {}, character: {}, type: {}".format(p.lineno, p.lexpos, p.value, p.type)
-    print(p)
+    print(error)
+    print type(p.type)
 
 parser  = yacc.yacc()
 
@@ -389,6 +390,7 @@ i=0
 for x in rule:
     rule[i]=x+1
     i=i+1
+rule.append(0)
 print(rule)
 
 
