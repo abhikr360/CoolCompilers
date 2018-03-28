@@ -21,6 +21,18 @@ precedence = (
 
 rule = []
 
+tempCount=[0]
+def newtemp():
+  tempCount[0] += 1
+  return 't.' + str(tempCount[0]) 
+
+jumpCount = [0]
+def newjump():
+  jumpCount[0] += 1
+  return 'label.' + str(jumpCount[0]) 
+
+breaklist=[]
+
 def p_start(p):
   'start : program'
   rule.append(0)
@@ -100,41 +112,78 @@ def p_class(p):
 
   # CLASS Unimplemented
 
-  #--------------------------------------------  DONE ----------------------------------------------
 
 def p_features_list_mult(p):
   'features_list : features_list feature SEMICOLON'
   rule.append(11)
 
+  code = p[1].code
+  code.extend(p[2].code)
+  p[0] = TREE.FeatureList(code=code)
+
+
+  
 def p_features_list(p):
   'features_list : feature SEMICOLON'
   rule.append(12)
 
-  code = p[1].code
-  code.append('FUNC_RETURN')
-  p[0]=TREE.FeatureList(code=code)
+  p[0] = TREE.FeatureList(code = p[1].code)
 
 
 def p_feature_with_modifier_with_formal_parameter_list(p):
   'feature : modifier ID LPAREN formal_parameter_list RPAREN COLON type LBRACE expression RBRACE'
   rule.append(13)
 
+
+
+  # modifier, type not implemented
+  code = p[4].code
+  code=code.append('FUNC_LABEL,'+p[2])
+  code.extend(p[8].code)
+  code.append('FUNC_RETURN')
+  p[0]=TREE.Feature(code=code)
+
+
+
 def p_feature_with_modifier(p):
   'feature : modifier ID LPAREN RPAREN COLON type LBRACE expression RBRACE'
   rule.append(14)
+
+  # modifier, type not implemented
+  code=['FUNC_LABEL,'+p[2]]
+  code.extend(p[8].code)
+  code.append('FUNC_RETURN')
+  p[0]=TREE.Feature(code=code)
+
+
 
 def p_feature_with_formal_parameter_list(p):
   'feature : ID LPAREN formal_parameter_list RPAREN COLON type LBRACE expression RBRACE'
   rule.append(15)
 
+  # type not implemented
+
+  code = p[3].code
+  code=code.append('FUNC_LABEL,'+p[1])
+  code.extend(p[7].code)
+  code.append('FUNC_RETURN')
+  p[0]=TREE.Feature(code=code)
+
 def p_feature(p):
   'feature : ID LPAREN RPAREN COLON type LBRACE expression RBRACE'
   rule.append(16)
+
+
+  # type not implemented
+
   code=['FUNC_LABEL,'+p[1]]
-  # print(type(code), type(p[7].code), p[7])
   code.extend(p[7].code)
+  code.append('FUNC_RETURN')
   p[0]=TREE.Feature(code=code)
 
+
+
+#--------------------------------------------  Not DONE ----------------------------------------------
 
 def p_feature_modifier_formal(p):
   'feature : modifier formal'
@@ -206,22 +255,35 @@ def p_formal_arr(p):
   rule.append(33)
 
 
+# -----------------------------------------------------------------------------------------------------------------------
+
 def p_expression_block_expression(p):
   'expression : block_expression'
   rule.append(34)
+
+  p[0] = TREE.Expression(code=p[1].code) 
+
 
 
 def p_block_expression(p):
   'block_expression : LBRACE block_list RBRACE'
   rule.append(35)
 
+  p[0] = TREE.BlockExpression(code=p[2].code)
+
 def p_block_list_many(p):
   'block_list : block_list expression SEMICOLON'
   rule.append(36)
+  code = p[1].code
+  code.extend(p[2].code)
+  p[0] = TREE.BlockList(code=code)
 
 def p_block_list(p):
   'block_list : expression SEMICOLON'
   rule.append(37)
+
+  
+  p[0] = TREE.BlockList(code=p[1].code)
 
 
 def p_expression_assign(p):
@@ -256,103 +318,281 @@ def p_argument_list_many(p):
   'argument_list : argument_list COMMA expression'
   rule.append(43)
 
+  code = p[3].code
+  code.append('FUNC_PARAM,{}'.format(p[3].place))
+
+  p[0]=TREE.ArgumentList(code=code)
 
 def p_expression_plus(p):
   'expression : expression PLUS expression'
   rule.append(44)
 
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.append('ADD,' + t + ',' + p[1].place + ',' + p[3].place)
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
+
+
+
+
 def p_expression_minus(p):
   'expression : expression MINUS expression'
   rule.append(45)
+
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.append('SUB,' + t + ',' + p[1].place + ',' + p[3].place)
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
 def p_expression_times(p):
   'expression : expression TIMES expression'
   rule.append(46)
 
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.append('MUL,' + t + ',' + p[1].place + ',' + p[3].place)
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
+
 def p_expression_divide(p):
   'expression : expression DIVIDE expression'
   rule.append(47)
+
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.append('DIV,' + t + ',' + p[1].place + ',' + p[3].place)
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
 def p_expression_mod(p):
   'expression : expression MOD expression'
   rule.append(48)
 
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.append('MOD,' + t + ',' + p[1].place + ',' + p[3].place)
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
+
 def p_expression_lt(p):
   'expression : expression LT expression'
   rule.append(49)
+
+  t = newtemp()
+  j_if = newjump()
+  j_fi = newjump()
+  code = p[1].code
+  code.extend(p[3].code)
+  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append("IFGOTO,LESS_THAN," + p[1].place + ',' + p[3].place + ',' + j_if)
+  code.append("ASSIGN," + t + ',0')
+  code.append("JUMP," + j_fi)
+  code.append("LABEL,"+j_if)
+  code.append("ASSIGN," + t + ',1')
+  code.append("LABEL," + j_fi)
+
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
 
 def p_expression_gt(p):
   'expression : expression GT expression'
   rule.append(50)
 
+  t = newtemp()
+  j_if = newjump()
+  j_fi = newjump()
+  code = p[1].code
+  code.extend(p[3].code)
+  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append("IFGOTO,GREATER_THAN," + p[1].place + ',' + p[3].place + ',' + j_if)
+  code.append("ASSIGN," + t + ',0')
+  code.append("JUMP," + j_fi)
+  code.append("LABEL,"+j_if)
+  code.append("ASSIGN," + t + ',1')
+  code.append("LABEL," + j_fi)
+
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
+
+
 def p_expression_lteq(p):
   'expression : expression LTEQ expression'
   rule.append(51)
+
+  t = newtemp()
+  j_if = newjump()
+  j_fi = newjump()
+  code = p[1].code
+  code.extend(p[3].code)
+  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append("IFGOTO,LESS_THAN_EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
+  code.append("ASSIGN," + t + ',0')
+  code.append("JUMP," + j_fi)
+  code.append("LABEL,"+j_if)
+  code.append("ASSIGN," + t + ',1')
+  code.append("LABEL," + j_fi)
+
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
 
 def p_expression_gteq(p):
   'expression : expression GTEQ expression'
   rule.append(52)
 
+  t = newtemp()
+  j_if = newjump()
+  j_fi = newjump()
+  code = p[1].code
+  code.extend(p[3].code)
+  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append("IFGOTO,GREATER_THAN_EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
+  code.append("ASSIGN," + t + ',0')
+  code.append("JUMP," + j_fi)
+  code.append("LABEL,"+j_if)
+  code.append("ASSIGN," + t + ',1')
+  code.append("LABEL," + j_fi)
+
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
+
 def p_expression_equal(p):
   'expression : expression EQUAL expression'
   rule.append(53)
+
+  t = newtemp()
+  j_if = newjump()
+  j_fi = newjump()
+  code = p[1].code
+  code.extend(p[3].code)
+  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append("IFGOTO,EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
+  code.append("ASSIGN," + t + ',0')
+  code.append("JUMP," + j_fi)
+  code.append("LABEL,"+j_if)
+  code.append("ASSIGN," + t + ',1')
+  code.append("LABEL," + j_fi)
+
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
 
 def p_expression_or(p):
   'expression : expression OR expression'
   rule.append(54)
 
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.append('ADD,' + t + ',' + p[1].place + ',' + p[3].place)
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
+
 def p_expression_and(p):
   'expression : expression AND expression'
   rule.append(55)
+
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.append('MUL,' + t + ',' + p[1].place + ',' + p[3].place)
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
 def p_expression_not(p):
   'expression : NOT expression'
   rule.append(56)
 
+  t = newtemp()
+  j_if = newjump()
+  j_fi = newjump()
+  code = p[2].code
+  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append("IFGOTO,EQUALS," + p[2].place + ',0,' + j_if)
+  code.append("ASSIGN," + t + ',0')
+  code.append("JUMP," + j_fi)
+  code.append("LABEL,"+j_if)
+  code.append("ASSIGN," + t + ',1')
+  code.append("LABEL," + j_fi)
+
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
+
 def p_expression_tilda(p):
   'expression : TILDA expression'
   rule.append(57)
+
+  t = newtemp()
+  code = p[2].code
+  code.append('SUB,' + t + ',0,' + p[2].place)
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[2].datatype)
 
 def p_expression_paren(p):
   'expression : LPAREN expression RPAREN'
   rule.append(58)
 
+  t = p[2].place
+  code = p[2].code
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[2].datatype)
+
+
+# ---------------------------------------------------------------------------
 def p_expression_self(p):
   'expression : SELF'
   rule.append(59)
+# ---------------------------------------------------------------------------
+
 
 def p_expression_id(p):
   'expression : ID'
   rule.append(60)
 
+  t = p[1]
+
+  p[0] = TREE.Expression(place = t)
+
 def p_expression_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET'
   rule.append(61)
 
+  t = newtemp()
+  code = p[3].code
+  code.append('INDEX_ASSIGN_RIGHT,' + t + ',' + p[1].value + ',' + p[3].place)
+
+  p[0] = TREE.Expression(place = t, code = code)
+
+
 def p_expression_integer(p):
   'expression : INTEGER'
   rule.append(62)
+  t = newtemp()
+  p[0] = TREE.Expression(place=t)
 
 def p_expression_string(p):
   'expression : STRING'
   rule.append(63)
-  p[0] = TREE.Expression(code=[], place=p[1], datatype='STRING')
+  p[0] = TREE.Expression(place=p[1], datatype='STRING')
 
 def p_expression_true(p):
   'expression : TRUE'
   rule.append(64)
+  p[0] = TREE.Expression(place='1')
 
 def p_expression_false(p):
   'expression : FALSE'
   rule.append(65)
+  p[0] = TREE.Expression(place='0')
 
 def p_expression_break(p):
   'expression : BREAK'
   rule.append(66)
+  p[0] = TREE.Expression(code=['BREAK'])
 
 def p_expression_continue(p):
   'expression : CONTINUE'
   rule.append(67)
+  p[0] = TREE.Expression(code=['CONTINUE'])
 
 def p_expression_function_call_with_arguments(p):
   'expression : expression PERIOD ID LPAREN argument_list RPAREN'
@@ -393,25 +633,82 @@ def p_expression_if_then_else(p):
   'expression : if_then_else'
   rule.append(76)
 
+  p[0] = TREE.Expression(code=p[1].code)
+
 def p_if_then_else(p):
   'if_then_else : IF expression THEN expression ELSE expression FI'
   rule.append(77)
+
+  _if = newjump()
+  _fi = newjump()
+  code=p[2].code
+  code.append('IFGOTO,GREATER_THAN,' + p[2].place + ',0,', +  _if)
+  code.extend(p[6].code)
+  code.append('JUMP,' + _fi)
+  code.append('LABEL,' + _if)
+  code.extend(p[4].code)
+  code.append('LABEL,'+_fi)
+
+  p[0] = TREE.If_Then_Else(code=code)
 
 def p_expression_while(p):
   'expression : while'
   rule.append(78)
 
+  p[0] = TREE.Expression(code=p[1].code)
+
+
 def p_while(p):
   'while : WHILE expression LOOP expression POOL'
   rule.append(79)
+
+
+  _loop = newjump()
+  _pool = newjump()
+  code = ['LABEL,' + _loop]
+  code.extend(p[2].code)
+  code.append('IFGOTO,EQUALS,' + p[2].place + ',0,', +  _pool)
+  code.extend(p[4].code)
+  code.append('JUMP,'+_pool)
+  code.append('LABEL,'+_pool)
+  for i in range(len(code)):
+    if(code[i]=='BREAK'):
+      code[i]=_pool
+    elif(code[i]=='CONTINUE'):
+      code[i]=_loop
+
+  p[0] = TREE.While(code=code)
+
 
 def p_expression_for(p):
   'expression : for'
   rule.append(80)
 
+  p[0] = TREE.Expression(code=p[1].code)
+
 def p_for(p):
   'for : FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL'
   rule.append(81)
+
+  _for = newjump()
+  _rof = newjump()
+
+  code = p[3].code
+  code.append('LABEL,' + _for)
+  code.extend(p[5].code)
+  code.append('IFGOTO,EQUALS,'+p[5].place+',0,' + _rof)
+  code.extend(p[10].code)
+  code.extend(p[7].code)
+  code.append('JUMP,'+ _loop)
+  code.append('LABEL,' + _pool)
+
+  for i in range(len(code)):
+    if(code[i]=='BREAK'):
+      code[i]=_pool
+    elif(code[i]=='CONTINUE'):
+      code[i]=_loop
+
+  p[0] = TREE.For(code=code)
 
 
 
