@@ -31,7 +31,9 @@ def p_start(p):
 def p_program_with_imports(p):
   'program : imports classes'
   rule.append(1)
-  p[0]=TREE.ProgramImport(code=p[1].code)
+
+  # Import Unimplemented
+  p[0]=TREE.ProgramImport(code=p[2].code)
 
 def p_program(p):
   'program : classes'
@@ -41,38 +43,64 @@ def p_program(p):
 def p_imports_multiple(p):
   'imports : imports IMPORT ID SEMICOLON'
   rule.append(3)
+  # Unimplemented
 
 def p_imports(p):
   'imports : IMPORT ID SEMICOLON'
   rule.append(4)
+  # Unimplemented
 
 
 def p_classes_multiple(p):
   'classes : classes class SEMICOLON'
   rule.append(5)
 
+  code=p[1].code
+  code.extend(p[2].code)
+  p[0]=TREE.Classes(code=code)
+
+  # CLASS Unimplemented
 
 def p_classes(p):
   'classes : class SEMICOLON'
   rule.append(6)
+
   p[0]=TREE.Classes(code=p[1].code)
+
+  # CLASS Unimplemented
+
+
 
 def p_class_with_inheritance_with_features_list(p):
     'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE'
     rule.append(7)
+
+
     p[0]=TREE.Class(code=p[6].code)
+
+    # CLASS Unimplemented
 
 def p_class_with_features_list(p):
   'class : CLASS CLASS_TYPE LBRACE features_list RBRACE'
   rule.append(8)
 
+  p[0]=TREE.Class(code=p[4].code)
+
+  # CLASS Unimplemented
+
 def p_class_with_features_inheritance(p):
   'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE RBRACE'
   rule.append(9)
 
+  # CLASS Unimplemented
+
 def p_class(p):
   'class : CLASS CLASS_TYPE LBRACE RBRACE'
   rule.append(10)
+
+  # CLASS Unimplemented
+
+  #--------------------------------------------  DONE ----------------------------------------------
 
 def p_features_list_mult(p):
   'features_list : features_list feature SEMICOLON'
@@ -207,14 +235,9 @@ def p_expression_assign_arr(p):
 def p_expression_function_call_with_arguments_2(p):
   'expression : ID LPAREN argument_list RPAREN'
   rule.append(40)
-  # print(p[3].code)
   code = p[3].code
-  # print(code)
-  # print(type(p[1]))
   code.append('FUNC_CALL,'+p[1])
-  # print(code)
   p[0]=TREE.FunctionCall(code=code)
-  # print(p[0].code)
 
 
 def p_expression_function_call_2(p):
@@ -228,7 +251,6 @@ def p_argument_list(p):
 
   code = ['FUNC_PARAM,{}'.format(p[1].place)]
   p[0]=TREE.ArgumentList(code=code)
-  # print(p[0].code)
 
 def p_argument_list_many(p):
   'argument_list : argument_list COMMA expression'
