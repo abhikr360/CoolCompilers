@@ -21,6 +21,18 @@ precedence = (
 
 rule = []
 
+'''
+     NOT DONE
+
+
+
+# SCOPE
+# DATATYPE
+# Modify asgn2 to handle temporaries REGEX
+
+
+'''
+
 tempCount=[0]
 def newtemp():
   tempCount[0] += 1
@@ -36,6 +48,7 @@ breaklist=[]
 def p_start(p):
   'start : program'
   rule.append(0)
+
   p[0]=TREE.Start(code=p[1].code)
   for a in p[0].code:
     print(a)
@@ -193,6 +206,8 @@ def p_feature_formal(p):
   'feature : formal'
   rule.append(18)
 
+  p[0] = TREE.Feature(code=p[1].code)
+
 def p_modifier_public(p):
   'modifier : PUBLIC'
   rule.append(19)
@@ -237,6 +252,7 @@ def p_formal_parameter_list(p):
 def p_formal_parameter(p):
   'formal_parameter : ID COLON type'
   rule.append(29)
+  # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
 def p_formal_parameter_arr(p):
   'formal_parameter : ID LSQRBRACKET RSQRBRACKET COLON type'
@@ -246,9 +262,15 @@ def p_formal_with_assign(p):
   'formal : ID COLON type GETS expression'
   rule.append(31)
 
+  code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
+  # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
+  p[0]=TREE.Formal(code=code)
+
 def p_formal(p):
   'formal : ID COLON type'
   rule.append(32)
+
+  # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
 def p_formal_arr(p):
   'formal : ID COLON type LSQRBRACKET RSQRBRACKET'
@@ -289,6 +311,15 @@ def p_block_list(p):
 def p_expression_assign(p):
   'expression : ID GETS expression'
   rule.append(38)
+  code = p[3].code
+  print("CODE : ", code, p[3].place, p[3])
+  s = 'ASSIGN,' + p[1] +',' + p[3].place
+  code.append(s)
+  p[0] = TREE.Expression(code=code)
+  print("================")
+  print(p[0])
+
+  print("================")
 
 def p_expression_assign_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET GETS expression'
@@ -388,9 +419,13 @@ def p_expression_lt(p):
   t = newtemp()
   j_if = newjump()
   j_fi = newjump()
+  print("@@@@@@@@")
+  print(p[3].code)
+  print("@@@@@@@")
   code = p[1].code
   code.extend(p[3].code)
   # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+
   code.append("IFGOTO,LESS_THAN," + p[1].place + ',' + p[3].place + ',' + j_if)
   code.append("ASSIGN," + t + ',0')
   code.append("JUMP," + j_fi)
@@ -550,7 +585,7 @@ def p_expression_id(p):
 
   t = p[1]
 
-  p[0] = TREE.Expression(place = t)
+  p[0] = TREE.Expression(place = t, code=[])
 
 def p_expression_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET'
@@ -566,23 +601,24 @@ def p_expression_arr(p):
 def p_expression_integer(p):
   'expression : INTEGER'
   rule.append(62)
-  t = newtemp()
-  p[0] = TREE.Expression(place=t)
+
+  p[0] = TREE.Expression(code=[], place=str(p[1]))
+  print("----", p[0].code, p[0].place,p[0])
 
 def p_expression_string(p):
   'expression : STRING'
   rule.append(63)
-  p[0] = TREE.Expression(place=p[1], datatype='STRING')
+  p[0] = TREE.Expression(place=p[1], datatype='STRING', code=[])
 
 def p_expression_true(p):
   'expression : TRUE'
   rule.append(64)
-  p[0] = TREE.Expression(place='1')
+  p[0] = TREE.Expression(place='1', code=[])
 
 def p_expression_false(p):
   'expression : FALSE'
   rule.append(65)
-  p[0] = TREE.Expression(place='0')
+  p[0] = TREE.Expression(place='0', code=[])
 
 def p_expression_break(p):
   'expression : BREAK'
@@ -667,9 +703,9 @@ def p_while(p):
   _pool = newjump()
   code = ['LABEL,' + _loop]
   code.extend(p[2].code)
-  code.append('IFGOTO,EQUALS,' + p[2].place + ',0,', +  _pool)
+  code.append('IFGOTO,EQUALS,' + p[2].place + ',0,' +  _pool)
   code.extend(p[4].code)
-  code.append('JUMP,'+_pool)
+  code.append('JUMP,'+_loop)
   code.append('LABEL,'+_pool)
   for i in range(len(code)):
     if(code[i]=='BREAK'):
@@ -690,13 +726,16 @@ def p_for(p):
   'for : FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL'
   rule.append(81)
 
-  _for = newjump()
-  _rof = newjump()
+  _loop = newjump()
+  _pool = newjump()
 
   code = p[3].code
-  code.append('LABEL,' + _for)
+  # print("==================")
+  # print(p[3].code)
+  # print("==================")
+  code.append('LABEL,' + _loop)
   code.extend(p[5].code)
-  code.append('IFGOTO,EQUALS,'+p[5].place+',0,' + _rof)
+  code.append('IFGOTO,EQUALS,'+p[5].place+',0,' + _pool)
   code.extend(p[10].code)
   code.extend(p[7].code)
   code.append('JUMP,'+ _loop)
@@ -709,7 +748,6 @@ def p_for(p):
       code[i]=_loop
 
   p[0] = TREE.For(code=code)
-
 
 
 
