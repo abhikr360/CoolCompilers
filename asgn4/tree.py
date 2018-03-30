@@ -1,9 +1,10 @@
+# f = open('symtab.txt', 'wb')
 class Expression:
 	"""docstring for Expression"""
-	def __init__(self, code, place, datatype):
+	def __init__(self, code=[], place='', datatype='Int'):
 		self.code = code
 		self.place = place
-		self.type = datatype
+		self.datatype = datatype
 
 class ArgumentList:
 	"""docstring for ArgumentList"""
@@ -48,6 +49,49 @@ class Start:
 		self.code = code
 
 
+class If_Then_Else:
+	"""docstring for Class"""
+	def __init__(self, code):
+		self.code = code
+
+
+class While:
+	"""docstring for Class"""
+	def __init__(self, code):
+		self.code = code
+
+class For:
+	"""docstring for Class"""
+	def __init__(self, code):
+		self.code = code
+
+class BlockExpression:
+	"""docstring for BlockExpression"""
+	def __init__(self, code):
+		self.code=code
+
+class BlockList:
+	"""docstring for BlockExpression"""
+	def __init__(self, code):
+		self.code=code
+
+class Formal:
+	"""docstring for Formal"""
+	def __init__(self, code):
+		self.code = code
 		
+class FormalParameterList(object):
+	"""docstring for FormalParameterList"""
+	def __init__(self, code):
+		self.code = code
+
+
+class FormalParameter:
+	"""docstring for FormalParameter"""
+	def __init__(self, code, place, datatype):
+		self.code = code
+		self.place = place
+		self.datatype = datatype
 
 		
+				

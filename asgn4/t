@@ -1,0 +1,38 @@
+('----', [], '1', <tree.Expression instance at 0x7f3949d8e128>)
+('----', [], '0', <tree.Expression instance at 0x7f3949d8cfc8>)
+('CODE : ', [], '0', <tree.Expression instance at 0x7f3949d8cfc8>)
+================
+<tree.Expression instance at 0x7f3949d8ca70>
+================
+('----', [], '10', <tree.Expression instance at 0x7f3949d8cc68>)
+@@@@@@@@
+[]
+@@@@@@@
+('----', [], '1', <tree.Expression instance at 0x7f3949d8cfc8>)
+('CODE : ', ['ADD,t.2,i,1'], 't.2', <tree.Expression instance at 0x7f3949d91488>)
+================
+<tree.Expression instance at 0x7f3949d8e368>
+================
+('CODE : ', ['ADD,t.3,b,c'], 't.3', <tree.Expression instance at 0x7f3949d91248>)
+================
+<tree.Expression instance at 0x7f3949d8ccb0>
+================
+ASSIGN,i,1
+FUNC_LABEL,main
+ASSIGN,i,0
+LABEL,label.3
+IFGOTO,LESS_THAN,i,10,label.1
+ASSIGN,t.1,0
+JUMP,label.2
+LABEL,label.1
+ASSIGN,t.1,1
+LABEL,label.2
+IFGOTO,EQUALS,t.1,0,label.4
+ADD,t.3,b,c
+ASSIGN,a,t.3
+ADD,t.2,i,1
+ASSIGN,i,t.2
+JUMP,label.3
+LABEL,label.4
+FUNC_RETURN
+[22, 62, 31, 18, 12, 26, 62, 38, 60, 62, 49, 60, 62, 44, 38, 60, 60, 44, 38, 81, 80, 16, 11, 7, 6, 2, 0]

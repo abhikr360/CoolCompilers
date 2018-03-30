@@ -22,14 +22,16 @@ precedence = (
 rule = []
 
 '''
-     NOT DONE
+     TO BE DONE
 
 
-
+# Go over all the rules once and write code wherever necessary
+# Array
+# SymbolTable
 # SCOPE
 # DATATYPE
 # Modify asgn2 to handle temporaries REGEX
-
+# Change codegen to handle temporaries
 
 '''
 
@@ -103,7 +105,7 @@ def p_class_with_inheritance_with_features_list(p):
 
     p[0]=TREE.Class(code=p[6].code)
 
-    # CLASS Unimplemented
+    # CLASS, INHERITS Unimplemented
 
 def p_class_with_features_list(p):
   'class : CLASS CLASS_TYPE LBRACE features_list RBRACE'
@@ -196,11 +198,13 @@ def p_feature(p):
 
 
 
-#--------------------------------------------  Not DONE ----------------------------------------------
 
 def p_feature_modifier_formal(p):
   'feature : modifier formal'
   rule.append(17)
+
+  # modifier not implemented
+  p[0] = TREE.Feature(code=p[2].code)
 
 def p_feature_formal(p):
   'feature : formal'
@@ -212,13 +216,20 @@ def p_modifier_public(p):
   'modifier : PUBLIC'
   rule.append(19)
 
+  # modifier not implemented
+
 def p_modifier_private(p):
   'modifier : PRIVATE'
   rule.append(20)
 
+  # modifier not implemented
+
+
 def p_type_class_type(p):
   'type : CLASS_TYPE'
   rule.append(21)
+
+  # type to be handled with symbol table
 
 def p_type_integer_type(p):
   'type : INTEGER_TYPE'
@@ -239,24 +250,41 @@ def p_type_object(p):
 def p_type_self_type(p):
   'type : SELF_TYPE'
   rule.append(26)
-  # print(p[0], p[1])
+
 
 def p_formal_parameter_list_many(p):
   'formal_parameter_list : formal_parameter_list COMMA formal_parameter'
   rule.append(27)
 
+  code = p[1].code
+  code.append('POP_STACK,' + p[3].place)
+  p[0] = TREE.FormalParameterList(code=code)
+
+
 def p_formal_parameter_list(p):
   'formal_parameter_list : formal_parameter'
   rule.append(28)
 
+  code = ['POP_STACK,' + p[1].place]
+  p[0] = TREE.FormalParameterList(code=code)
+
+
+
+
 def p_formal_parameter(p):
   'formal_parameter : ID COLON type'
   rule.append(29)
-  # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
+
+  p[0] = TREE.FormalParameter(code=[], place=p[1], datatype=p[3])
 
 def p_formal_parameter_arr(p):
   'formal_parameter : ID LSQRBRACKET RSQRBRACKET COLON type'
   rule.append(30)
+
+  p[0] = TREE.FormalParameter(code=[], place=p[1], datatype='Array')
+
+
+#--------------------------------------------  Not DONE ----------------------------------------------
 
 def p_formal_with_assign(p):
   'formal : ID COLON type GETS expression'
