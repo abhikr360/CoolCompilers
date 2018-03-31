@@ -71,6 +71,7 @@ class Operator(Enum):
 	MUL = 9
 	DIV = 10
 	MOD = 11
+	POP_STACK=12
 
 
 
@@ -98,7 +99,7 @@ def set_inputs(row, curr_statement):
 	'''Reads input stores it in a list of classes'''
 	curr_statement.linenum = int(row[0])
 	#------------------------------------------------
-	assign_list = ["LESS_THAN", "GREATER_THAN", "LESS_THAN_EQUALS", "GREATER_THAN_EQUALS", "EQUALS", "NOT_EQUALS", "ADD", "SUB", "MUL", "DIV", "MOD"]
+	assign_list = ["LESS_THAN", "GREATER_THAN", "LESS_THAN_EQUALS", "GREATER_THAN_EQUALS", "EQUALS", "NOT_EQUALS", "ADD", "SUB", "MUL", "DIV", "MOD", "POP_STACK"]
 	if(row[1] == "ASSIGN" or row[1] in assign_list):
 		curr_statement.instr_typ = InstrType.ASSIGN
 		if(row[1] in assign_list):
@@ -110,7 +111,10 @@ def set_inputs(row, curr_statement):
 	#         --------------- For row 2 ----------------------
 
 	if(curr_statement.instr_typ == InstrType.ASSIGN):
-		if(curr_statement.operator <> None):					#for statements of type a = b + 2
+		if(curr_statement.operator == Operator.POP_STACK):
+			curr_statement.out=row[2]
+			curr_statement.out_type = EntryType.VARIABLE
+		if(curr_statement.operator <> None and curr_statement.operator <> Operator.POP_STACK ):					#for statements of type a = b + 2
 			curr_statement.out = row[2]
 			curr_statement.out_type = EntryType.VARIABLE
 
@@ -131,7 +135,7 @@ def set_inputs(row, curr_statement):
 				temp = row[4]
 				curr_statement.in2 = temp
 				curr_statement.in2_type = EntryType.VARIABLE
-		else:
+		elif(curr_statement.operator <> Operator.POP_STACK):
 			curr_statement.out = row[2]
 			curr_statement.out_type = EntryType.VARIABLE
 			try:
@@ -596,7 +600,7 @@ def main():
 					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
 						st.code_statement = st.code_statement + "mult $%s, $t7\n"%(VariableData[st.in1][1])
-						machine_code = machine_code + "mflo $%s\n"%(VariableData[st.out][1])
+						st.code_statement = st.code_statement + "mflo $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in1)
 						st.code_statement = st.code_statement + "mult $%s, $t7\n"%(VariableData[st.in2][1])
@@ -633,6 +637,9 @@ def main():
 						st.code_statement = st.code_statement + "mfhi $%s"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 % st.in2)
+				elif(st.operator == Operator.POP_STACK):
+					st.code_statement = st.code_statement + "lw $%s, ($sp)"%(VariableData[st.out][1])
+					st.code_statement = st.code_statement + "addiu $sp, $sp, 4"
 
 			elif(st.instr_typ == InstrType.FUNC_LABEL):
 				st.code_statement = st.code_statement + "%s:\n"%(st.label)

@@ -596,7 +596,7 @@ def main():
 					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in2)
 						st.code_statement = st.code_statement + "mult $%s, $t7\n"%(VariableData[st.in1][1])
-						machine_code = machine_code + "mflo $%s\n"%(VariableData[st.out][1])
+						st.code_statement = st.code_statement + "mflo $%s\n"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in1)
 						st.code_statement = st.code_statement + "mult $%s, $t7\n"%(VariableData[st.in2][1])
