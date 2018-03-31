@@ -28,8 +28,9 @@ class FeatureList:
 
 class Class:
 	"""docstring for Class"""
-	def __init__(self, code):
+	def __init__(self, code, symtab):
 		self.code = code
+		self.symtab = symtab
 class Classes:
 	"""docstring for Class"""
 	def __init__(self, code):
@@ -77,13 +78,15 @@ class BlockList:
 
 class Formal:
 	"""docstring for Formal"""
-	def __init__(self, code):
+	def __init__(self, code, symtab):
 		self.code = code
+		self.symtab = symtab
 		
 class FormalParameterList(object):
 	"""docstring for FormalParameterList"""
-	def __init__(self, code):
+	def __init__(self, code, symtab):
 		self.code = code
+		self.symtab = symtab
 
 
 class FormalParameter:

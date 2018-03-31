@@ -4,6 +4,7 @@ import ply.yacc as yacc
 import sys
 from lexer import tokens
 import tree as TREE
+from symtab import *
 
 precedence = (
         ('right', 'GETS'),
@@ -20,6 +21,10 @@ precedence = (
     )
 
 rule = []
+
+SymbolTables = []
+current_symbol_table = [None]  #not a list only one symboltable
+
 
 '''
      TO BE DONE
@@ -99,19 +104,23 @@ def p_classes(p):
 
 
 def p_class_with_inheritance_with_features_list(p):
-    'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE'
-    rule.append(7)
+  'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE features_list RBRACE'
+  rule.append(7)
 
+  newSymboltable = Symtab(parent=None,symtab_type='class',scope_name=p[2])
+  current_symbol_table[0] = newSymboltable
+  print 'entering data in symbol table'
+  p[0]=TREE.Class(code=p[6].code, symtab=newSymboltable)
 
-    p[0]=TREE.Class(code=p[6].code)
-
-    # CLASS, INHERITS Unimplemented
+  # CLASS, INHERITS Unimplemented
 
 def p_class_with_features_list(p):
   'class : CLASS CLASS_TYPE LBRACE features_list RBRACE'
   rule.append(8)
 
-  p[0]=TREE.Class(code=p[4].code)
+  newSymboltable = Symtab(parent=None,symtab_type='class',scope_name=p[2])
+  current_symbol_table[0] = newSymboltable
+  p[0]=TREE.Class(code=p[4].code, symtab=newSymboltable)
 
   # CLASS Unimplemented
 
@@ -119,11 +128,18 @@ def p_class_with_features_inheritance(p):
   'class : CLASS CLASS_TYPE INHERITS CLASS_TYPE LBRACE RBRACE'
   rule.append(9)
 
+  newSymboltable = Symtab(parent=None,symtab_type='class',scope_name=p[2])
+  current_symbol_table[0] = newSymboltable
+  p[0]=TREE.Class(code=p[4].code, symtab=newSymboltable)
+
   # CLASS Unimplemented
 
 def p_class(p):
   'class : CLASS CLASS_TYPE LBRACE RBRACE'
   rule.append(10)
+  newSymboltable = Symtab(parent=None,symtab_type='class',scope_name=p[2])
+  current_symbol_table[0] = newSymboltable
+  p[0]=TREE.Class(code=p[4].code, symtab=newSymboltable)
 
   # CLASS Unimplemented
 
@@ -292,17 +308,23 @@ def p_formal_with_assign(p):
 
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
-  p[0]=TREE.Formal(code=code)
+  p[0]=TREE.Formal(code=code, symtab=current_symbol_table[0])
+  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4)
 
 def p_formal(p):
   'formal : ID COLON type'
   rule.append(32)
+  p[0]=TREE.Formal(code=[], symtab=current_symbol_table[0])
+  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4)
 
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
 def p_formal_arr(p):
-  'formal : ID COLON type LSQRBRACKET RSQRBRACKET'
+  'formal : ID COLON type LSQRBRACKET INTEGER RSQRBRACKET'
   rule.append(33)
+
+  p[0]=TREE.Formal(code=[], symtab=current_symbol_table[0])
+  current_symbol_table[0].enter(name=p[1],datatype='Array',size=int(p[5]))
 
 
 # -----------------------------------------------------------------------------------------------------------------------

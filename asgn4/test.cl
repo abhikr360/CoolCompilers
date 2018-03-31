@@ -1,9 +1,15 @@
 class Main inherits IO {
-	i : Int <- 1;
+	i : Int[];
    main(): SELF_TYPE {
-		for(i<-0;i<10;i<-i+1)loop
+   	{
+   		for(i<-0;i<10;i<-i+1)loop
 			a<-b+c
-		pool
+		pool;
+		let new_cell : Cons <- new Cons in
+            new_cell.init(hd,self)
+        tel;
+   	}
+		
 
    };
 };
