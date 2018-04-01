@@ -60,6 +60,9 @@ def p_start(p):
   rule.append(0)
 
   p[0]=TREE.Start(code=p[1].code)
+  t = newtemp()
+  print "FUNC_CALL,Main.main,"+t
+  print "EXIT"
   for a in p[0].code:
     print(a)
 
@@ -203,7 +206,8 @@ def p_feature_header_body(p):
 
 def p_feature_header_with_modifier(p):
   'feature_header : DEF modifier ID COLON type'
-  code = ['FUNC_CALL,'+p[3]]
+
+  code = ['FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3]]
   p[0] = TREE.FeatureBody(code=code)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=p[3])
@@ -214,7 +218,7 @@ def p_feature_header_with_modifier(p):
 
 def p_feature_header(p):
   'feature_header : DEF ID COLON type'
-  code = ['FUNC_CALL,'+p[2]]
+  code = ['FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[2]]
   p[0] = TREE.FeatureBody(code=code)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=p[2])
@@ -380,6 +384,11 @@ def p_formal_parameter(p):
   rule.append(29)
 
   p[0] = TREE.FormalParameter(code=[], place=p[1], datatype=p[3])
+  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
 
   current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
 
@@ -388,6 +397,11 @@ def p_formal_parameter_arr(p):
   rule.append(30)
 
   p[0] = TREE.FormalParameter(code=[], place=p[1], datatype='Array')
+  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
 
 
   current_symbol_table[0].enter(name=p[1], datatype=p[5].place, size=4*1000, isArray=True)
@@ -400,6 +414,12 @@ def p_formal_with_assign(p):
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
   p[0]=TREE.Formal(code=code)
 
+  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
+
   current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
 
 def p_formal(p):
@@ -407,6 +427,13 @@ def p_formal(p):
   rule.append(32)
   p[0]=TREE.Formal(code=[])
 
+  # print "type in formal " + p[3].place
+  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
+  # quit()
 
   current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
 
@@ -417,7 +444,11 @@ def p_formal_arr(p):
   rule.append(33)
 
   p[0]=TREE.Formal(code=[])
-
+  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
   current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]), isArray =False)
 
 
@@ -508,8 +539,9 @@ def p_argument_list_many(p):
   'argument_list : argument_list COMMA expression'
   rule.append(43)
 
-  code = p[1].code
+  code = []
   code.append('FUNC_PARAM,{}'.format(p[3].place))
+  code.extend(p[1].code)
 
   p[0]=TREE.ArgumentList(code=code)
 
@@ -804,8 +836,8 @@ def p_expression_function_call(p):
   'expression : expression PERIOD ID LPAREN RPAREN'
   rule.append(69)
   t=newtemp()
-  print "calling object function : ",current_symbol_table[0].getVariable(p[1].place).datatype
-  quit()
+  # print "calling object function : ",current_symbol_table[0].getVariable(p[1].place).datatype
+  # quit()
   
   code = p[1].code
   code.append('FUNC_CALL,'+p[1].place+'.'+p[3]+','+t)
@@ -964,6 +996,12 @@ def p_formaldehyde_with_assign_many(p):
   code = p[1].code
   code.append('ASSIGN,%s,%s'%(p[3], p[7].place))
 
+  if p[5].place in ClassDict or p[5].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
+
   p[0]=TREE.Formal(code=code)
 
 
@@ -973,6 +1011,13 @@ def p_formaldehyde_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type'
   # rule.append(32)
   p[0]=TREE.Formal(code=[])
+  # print p[3]
+  # quit()
+  if p[5].place in ClassDict or p[5].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
 
   current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4, isArray =False)
 
@@ -982,6 +1027,11 @@ def p_formaldehyde_arr_many(p):
   # rule.append(33)
 
   p[0]=TREE.Formal(code=[])
+  if p[5].place in ClassDict or p[5].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
 
   current_symbol_table[0].enter(name=p[3],datatype='Array',size=4*int(p[7]), isArray =True)
 
@@ -993,6 +1043,11 @@ def p_formaldehyde_with_assign(p):
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
   p[0]=TREE.Formal(code=code)
+  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
 
   current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4, isArray =False)
 
@@ -1001,6 +1056,11 @@ def p_formaldehyde(p):
   # rule.append(32)
   p[0]=TREE.Formal(code=[])
   current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4, isArray =False)
+  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
 
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
@@ -1009,6 +1069,11 @@ def p_formaldehyde_arr(p):
   # rule.append(33)
 
   p[0]=TREE.Formal(code=[])
+  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+    pass
+    # print ClassDict[p[3].place].scope_name
+  else:
+    sys.exit('No object found named ' + p[3].place)
 
   current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]), isArray =True)
 
@@ -1030,7 +1095,7 @@ parser  = yacc.yacc()
 # print(f.read())
 
 
-input_file = 'test.cl'
+input_file = sys.argv[1]
 with open(input_file) as file:
     data = file.read()
 parser.parse(data)

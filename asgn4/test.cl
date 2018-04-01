@@ -13,6 +13,7 @@ class Chinese inherits IO {
 class Main inherits IO {
 	
 		i : Int[2];
+		b : String;
 		a : Chinese;
 		def main2 : SELF_TYPE () {
 			a.main()
