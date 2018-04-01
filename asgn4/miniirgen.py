@@ -24,6 +24,7 @@ rule = []
 
 SymbolTables = []
 current_symbol_table = [Symtab(parent=None, symtab_type='class', scope_name='GLOBAL')]  #not a list only one symboltable
+ClassDict = {}
 
 '''
      TO BE DONE
@@ -105,13 +106,15 @@ def p_classes(p):
 
 def p_class_header_body(p):
   'class : class_header class_body'
-  p[0] = TREE.Class(code=p[2].code,symtab=None)
+  p[0] = TREE.Class(code=p[2].code)
+
 
 
 def p_class_header_with_inheritance(p):
   'class_header : CLASS CLASS_TYPE INHERITS CLASS_TYPE'
 
   new_sym_tab = Symtab(parent=None, symtab_type="CLASS", scope_name=p[2])
+  ClassDict[p[2]] = new_sym_tab
   SymbolTables.append(new_sym_tab)
   current_symbol_table[0] = new_sym_tab
 
@@ -121,6 +124,7 @@ def p_class_header(p):
 
 
   new_sym_tab = Symtab(parent=None, symtab_type="CLASS", scope_name=p[2])
+  ClassDict[p[2]] = new_sym_tab
   current_symbol_table[0] = new_sym_tab
 
 def p_class_body_empty(p):
@@ -128,7 +132,7 @@ def p_class_body_empty(p):
 
 def p_class_body(p):
   'class_body : LBRACE features_list RBRACE'
-  p[0] = TREE.Class(code=p[2].code,symtab=None)
+  p[0] = TREE.Class(code=p[2].code)
 
 # def p_class_with_inheritance_with_features_list(p):
 #   'class : class_header INHERITS CLASS_TYPE LBRACE features_list RBRACE'
@@ -198,38 +202,40 @@ def p_feature_header_body(p):
 
 
 def p_feature_header_with_modifier(p):
-  'feature_header : DEF modifier ID'
+  'feature_header : DEF modifier ID COLON type'
   code = ['FUNC_CALL,'+p[3]]
   p[0] = TREE.FeatureBody(code=code)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=p[3])
-  current_symbol_table[0].methods.append(new_sym_tab)
+  # current_symbol_table[0].methods.append(new_sym_tab)
+  current_symbol_table[0].enter_method(p[3],p[5])
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
 
-def p_feature_header_with_modifier(p):
-  'feature_header : DEF ID'
+def p_feature_header(p):
+  'feature_header : DEF ID COLON type'
   code = ['FUNC_CALL,'+p[2]]
   p[0] = TREE.FeatureBody(code=code)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=p[2])
-  current_symbol_table[0].methods.append(new_sym_tab)
+  current_symbol_table[0].enter_method(p[2],p[4])
+  # current_symbol_table[0].methods.append(new_sym_tab,p[4])
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
 
 def p_feature_body_with_formal_parameter_list(p):
-  'feature_body : LPAREN formal_parameter_list RPAREN COLON type LBRACE expression RBRACE'
+  'feature_body : LPAREN formal_parameter_list RPAREN LBRACE expression RBRACE'
   code = p[2].code
-  code.extend(p[7].code)
+  code.extend(p[5].code)
   code.append('FUNC_RETURN')
   p[0]=TREE.Feature(code=code)
 
 
 
 def p_feature_body(p):
-  'feature_body : LPAREN RPAREN COLON type LBRACE expression RBRACE'
+  'feature_body : LPAREN RPAREN LBRACE expression RBRACE'
   # print p[6]
-  code = p[6].code
+  code = p[4].code
   code.append('FUNC_RETURN')
   p[0]=TREE.Feature(code=code)
 
@@ -392,14 +398,14 @@ def p_formal_with_assign(p):
   rule.append(31)
 
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
-  p[0]=TREE.Formal(code=code, symtab=current_symbol_table[0])
+  p[0]=TREE.Formal(code=code)
 
   current_symbol_table[0].enter(name=p[1], datatype='Int', size=4)
 
 def p_formal(p):
   'formal : ID COLON type'
   rule.append(32)
-  p[0]=TREE.Formal(code=[], symtab=current_symbol_table[0])
+  p[0]=TREE.Formal(code=[])
 
 
   current_symbol_table[0].enter(name=p[1], datatype='Int', size=4)
@@ -410,7 +416,7 @@ def p_formal_arr(p):
   'formal : ID COLON type LSQRBRACKET INTEGER RSQRBRACKET'
   rule.append(33)
 
-  p[0]=TREE.Formal(code=[], symtab=current_symbol_table[0])
+  p[0]=TREE.Formal(code=[])
 
   current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]))
 
@@ -450,6 +456,8 @@ def p_block_list(p):
 def p_expression_assign(p):
   'expression : ID GETS expression'
   rule.append(38)
+  var = current_symbol_table[0].getVariable(p[1])
+
   code = p[3].code
   print("CODE : ", code, p[3].place, p[3])
   s = 'ASSIGN,' + p[1] +',' + p[3].place
@@ -463,12 +471,16 @@ def p_expression_assign(p):
 def p_expression_assign_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET GETS expression'
   rule.append(39)
+  var = current_symbol_table[0].getVariable(p[1])
+
   code = ['INDEX_ASSIGN_L,'+p[1]+','+p[3].place+','+p[6].place]
   p[0].Expression(code=code,place=p[6].place)
 
 def p_expression_function_call_with_arguments_2(p):
   'expression : ID LPAREN argument_list RPAREN'
   rule.append(40)
+  met = current_symbol_table[0].getMethod(p[1])
+  
   code = p[3].code
   code.append('FUNC_CALL,'+p[1])
   p[0]=TREE.FunctionCall(code=code)
@@ -477,6 +489,8 @@ def p_expression_function_call_with_arguments_2(p):
 def p_expression_function_call_2(p):
   'expression : ID LPAREN RPAREN'
   rule.append(41)
+  met = current_symbol_table[0].getMethod(p[1])
+
   t=newtemp()
   code = ['FUNC_CALL,'+p[1]+','+t]
   p[0] = TREE.Expression(code=code,place=t)
@@ -727,6 +741,7 @@ def p_expression_self(p):
 def p_expression_id(p):
   'expression : ID'
   rule.append(60)
+  var = current_symbol_table[0].getVariable(p[1])
 
   t = p[1]
 
@@ -735,6 +750,7 @@ def p_expression_id(p):
 def p_expression_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET'
   rule.append(61)
+  var = current_symbol_table[0].getVariable(p[1])
 
   t = newtemp()
   code = p[3].code
@@ -788,6 +804,9 @@ def p_expression_function_call(p):
   'expression : expression PERIOD ID LPAREN RPAREN'
   rule.append(69)
   t=newtemp()
+  print "calling object function : ",p[1].place
+  quit()
+  
   code = p[1].code
   code.append('FUNC_CALL,'+p[1].place+'.'+p[3]+','+t)
   p[0] = TREE.Expression(code=code,place=t)
@@ -945,7 +964,7 @@ def p_formaldehyde_with_assign_many(p):
   code = p[1].code
   code.append('ASSIGN,%s,%s'%(p[3], p[7].place))
 
-  p[0]=TREE.Formal(code=code, symtab=current_symbol_table[0])
+  p[0]=TREE.Formal(code=code)
 
 
   current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4)
@@ -953,7 +972,7 @@ def p_formaldehyde_with_assign_many(p):
 def p_formaldehyde_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type'
   # rule.append(32)
-  p[0]=TREE.Formal(code=[], symtab=current_symbol_table[0])
+  p[0]=TREE.Formal(code=[])
 
   current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4)
 
@@ -962,7 +981,7 @@ def p_formaldehyde_arr_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type LSQRBRACKET INTEGER RSQRBRACKET'
   # rule.append(33)
 
-  p[0]=TREE.Formal(code=[], symtab=current_symbol_table[0])
+  p[0]=TREE.Formal(code=[])
 
   current_symbol_table[0].enter(name=p[3],datatype='Array',size=4*int(p[7]))
 
@@ -973,15 +992,14 @@ def p_formaldehyde_with_assign(p):
 
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
-  p[0]=TREE.Formal(code=code, symtab=current_symbol_table[0])
+  p[0]=TREE.Formal(code=code)
 
   current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4)
 
 def p_formaldehyde(p):
   'formaldehyde : ID COLON type'
   # rule.append(32)
-  p[0]=TREE.Formal(code=[], symtab=current_symbol_table[0])
-
+  p[0]=TREE.Formal(code=[])
   current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4)
 
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
@@ -990,7 +1008,7 @@ def p_formaldehyde_arr(p):
   'formaldehyde : ID COLON type LSQRBRACKET INTEGER RSQRBRACKET'
   # rule.append(33)
 
-  p[0]=TREE.Formal(code=[], symtab=current_symbol_table[0])
+  p[0]=TREE.Formal(code=[])
 
   current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]))
 
@@ -1022,3 +1040,6 @@ print(rule)
 for s in SymbolTables:
   print("===========")
   s.printsymtab()
+print "*****class dictionary*****"
+for x in ClassDict:
+	print ClassDict[x].scope_name
