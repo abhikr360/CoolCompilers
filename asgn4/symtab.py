@@ -2,9 +2,10 @@ import sys
 
 class Variable:
 	"""docstring for Variable"""
-	def __init__(self,name, datatype='Int', size=4):
+	def __init__(self,name, datatype='Int', size=4,isArray=False):
 		self.name = name
 		self.datatype = datatype
+		self.isArray = isArray
 		self.size = size
 
 
@@ -24,11 +25,11 @@ class Symtab:
 		self.scope_name = scope_name 	# name of class or method or let id
 		self.lets = []
 
-	def enter(self,name,datatype='Int',size=4):
+	def enter(self,name,datatype='Int',size=4,isArray=False):
 		if(self.search(name)):
 			sys.exit("Variable %s already present in symbol table"%name)
 		else:
-			newvar = Variable(name,datatype,size)
+			newvar = Variable(name,datatype,size,isArray)
 			self.variables.append(newvar)
 
 	def enter_method(self, name,datatype='Int'):

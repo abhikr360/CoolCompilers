@@ -381,7 +381,7 @@ def p_formal_parameter(p):
 
   p[0] = TREE.FormalParameter(code=[], place=p[1], datatype=p[3])
 
-  current_symbol_table[0].enter(name=p[1], datatype='Int', size=4)
+  current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
 
 def p_formal_parameter_arr(p):
   'formal_parameter : ID LSQRBRACKET RSQRBRACKET COLON type'
@@ -390,7 +390,7 @@ def p_formal_parameter_arr(p):
   p[0] = TREE.FormalParameter(code=[], place=p[1], datatype='Array')
 
 
-  current_symbol_table[0].enter(name=p[1], datatype='Array', size=4*1000)
+  current_symbol_table[0].enter(name=p[1], datatype=p[5].place, size=4*1000, isArray=True)
 
 
 def p_formal_with_assign(p):
@@ -400,7 +400,7 @@ def p_formal_with_assign(p):
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
   p[0]=TREE.Formal(code=code)
 
-  current_symbol_table[0].enter(name=p[1], datatype='Int', size=4)
+  current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
 
 def p_formal(p):
   'formal : ID COLON type'
@@ -408,7 +408,7 @@ def p_formal(p):
   p[0]=TREE.Formal(code=[])
 
 
-  current_symbol_table[0].enter(name=p[1], datatype='Int', size=4)
+  current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
 
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
@@ -418,7 +418,7 @@ def p_formal_arr(p):
 
   p[0]=TREE.Formal(code=[])
 
-  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]))
+  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]), isArray =False)
 
 
 #--------------------------------------------  Not DONE ----------------------------------------------
@@ -804,7 +804,7 @@ def p_expression_function_call(p):
   'expression : expression PERIOD ID LPAREN RPAREN'
   rule.append(69)
   t=newtemp()
-  print "calling object function : ",p[1].place
+  print "calling object function : ",current_symbol_table[0].getVariable(p[1].place).datatype
   quit()
   
   code = p[1].code
@@ -967,14 +967,14 @@ def p_formaldehyde_with_assign_many(p):
   p[0]=TREE.Formal(code=code)
 
 
-  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4)
+  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4, isArray =False)
 
 def p_formaldehyde_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type'
   # rule.append(32)
   p[0]=TREE.Formal(code=[])
 
-  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4)
+  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4, isArray =False)
 
 
 def p_formaldehyde_arr_many(p):
@@ -983,7 +983,7 @@ def p_formaldehyde_arr_many(p):
 
   p[0]=TREE.Formal(code=[])
 
-  current_symbol_table[0].enter(name=p[3],datatype='Array',size=4*int(p[7]))
+  current_symbol_table[0].enter(name=p[3],datatype='Array',size=4*int(p[7]), isArray =True)
 
 
 def p_formaldehyde_with_assign(p):
@@ -994,13 +994,13 @@ def p_formaldehyde_with_assign(p):
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
   p[0]=TREE.Formal(code=code)
 
-  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4)
+  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4, isArray =False)
 
 def p_formaldehyde(p):
   'formaldehyde : ID COLON type'
   # rule.append(32)
   p[0]=TREE.Formal(code=[])
-  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4)
+  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4, isArray =False)
 
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
@@ -1010,7 +1010,7 @@ def p_formaldehyde_arr(p):
 
   p[0]=TREE.Formal(code=[])
 
-  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]))
+  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]), isArray =True)
 
 
 def p_error(p):
