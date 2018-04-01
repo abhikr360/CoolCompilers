@@ -30,12 +30,10 @@ current_symbol_table = [Symtab(parent=None, symtab_type='class', scope_name='GLO
 
 
 # Go over all the rules once and write code wherever necessary
-# Array
-# SymbolTable
-# SCOPE
-# DATATYPE
-# Modify asgn2 to handle temporaries REGEX
-# Change codegen to handle temporaries
+# Array --
+# SymbolTable --
+# SCOPE --
+# DATATYPE --
 
 '''
 

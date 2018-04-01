@@ -21,6 +21,17 @@ class Feature:
 	def __init__(self, code):
 		self.code = code
 
+class FeatureHeader:
+	"""docstring for FeatureHeader"""
+	def __init__(self, code):
+		self.code = code
+
+class FeatureBody:
+	"""docstring for FeatureBody"""
+	def __init__(self, code):
+		self.code = code
+		
+
 class FeatureList:
 	"""docstring for FeatureList"""
 	def __init__(self, code):
@@ -96,5 +107,15 @@ class FormalParameter:
 		self.place = place
 		self.datatype = datatype
 
-		
+
+
+class Let(object):
+		"""docstring for Let"""
+		def __init__(self, code=[]):
+			self.code=code
 				
+class Type(object):
+	"""docstring for Type"""
+	def __init__(self,place):
+		self.place = place
+		

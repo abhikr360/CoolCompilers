@@ -27,6 +27,7 @@ tokens = (
    'LBRACE',
    'RBRACE',
    'PERIOD',
+   'DEF',
    #'MAIN',
    'OBJECT',
 
@@ -112,7 +113,8 @@ reserved = {
   'TRUE' : 'TRUE',
   'FALSE' : 'FALSE',
   'SELF_TYPE' : 'SELF_TYPE',
-  'CLASS_TYPE' : 'CLASS_TYPE'
+  'CLASS_TYPE' : 'CLASS_TYPE',
+  'def' : 'DEF'
 
 }
 
@@ -268,8 +270,8 @@ with open(input_file) as file:
 # Give the lexer some input
 lexer.input(data)
 # Tokenize
-# while True:
-#     tok = lexer.token()
-#     if not tok: 
-#         break
-#     print(tok)
+while True:
+    tok = lexer.token()
+    if not tok: 
+        break
+    print(tok)

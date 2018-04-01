@@ -13,9 +13,9 @@ class Symtab:
 		self.variables = []
 		self.parent = parent
 		self.methods = []
-		self.symtab_type = symtab_type
-		self.scope_name = scope_name
-		# self.classes = []
+		self.symtab_type = symtab_type    # symbol table type class or method or let type
+		self.scope_name = scope_name 	# name of class or method or let id
+		self.lets = []
 
 	def enter(self,name,datatype='Int',size=4):
 		if(self.search(name)):
@@ -38,7 +38,7 @@ class Symtab:
 		return None
 
 	def search(self,name):
-		for variable_entry in current_sym_tab.variables:
+		for variable_entry in self.variables:
 			if(variable_entry.name == name):
 				return True
 
@@ -57,3 +57,7 @@ class Symtab:
 
 		# sys.exit('Error no scope found for %s',name)
 		return None
+
+	def printsymtab(self):
+		for v in self.variables:
+			print(v.name, v.datatype, v.size)
