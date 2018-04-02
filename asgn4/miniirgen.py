@@ -61,7 +61,7 @@ def p_start(p):
 
   p[0]=TREE.Start(code=p[1].code)
   t = newtemp()
-  print "FUNC_CALL,Main.main,"+t
+  print "FUNC_CALL,THE_MAIN_CLASS,"+t
   print "EXIT"
   for a in p[0].code:
     print(a)
@@ -93,6 +93,7 @@ def p_classes_multiple(p):
   'classes : classes class SEMICOLON'
   rule.append(5)
 
+
   code=p[1].code
   code.extend(p[2].code)
   p[0]=TREE.Classes(code=code)
@@ -109,7 +110,10 @@ def p_classes(p):
 
 def p_class_header_body(p):
   'class : class_header class_body'
-  p[0] = TREE.Class(code=p[2].code)
+
+  code = p[1].code
+  code.extend(p[2].code)
+  p[0] = TREE.Class(code=code)
 
 
 
@@ -122,9 +126,20 @@ def p_class_header_with_inheritance(p):
   current_symbol_table[0] = new_sym_tab
 
 
+  if(p[2]=='Main'):
+    pass
+    code = ['FUNC_LABEL,THE_MAIN_CLASS']
+  else:
+    code=["Class header code here with inheritance"]
+
+  p[0] = TREE.ClassHeader(code=code)
+
+
 def p_class_header(p):
   'class_header : CLASS CLASS_TYPE'
 
+  code=["Class header code here"]
+  p[0] = TREE.ClassHeader(code=code)
 
   new_sym_tab = Symtab(parent=None, symtab_type="CLASS", scope_name=p[2])
   ClassDict[p[2]] = new_sym_tab
@@ -198,7 +213,7 @@ def p_feature_header_body(p):
   'feature : feature_header feature_body'
   code = p[1].code
   code.extend(p[2].code)
-  p[0] = TREE.FeatureHeader(code=code)
+  p[0] = TREE.FeatureHeader(code=code,datatype=p[1].datatype)
 
 
   current_symbol_table[0]=current_symbol_table[0].parent
@@ -208,7 +223,7 @@ def p_feature_header_with_modifier(p):
   'feature_header : DEF modifier ID COLON type'
 
   code = ['FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3]]
-  p[0] = TREE.FeatureBody(code=code)
+  p[0] = TREE.FeatureHeader(code=code, datatype=p[5].place)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=p[3])
   # current_symbol_table[0].methods.append(new_sym_tab)
@@ -219,7 +234,7 @@ def p_feature_header_with_modifier(p):
 def p_feature_header(p):
   'feature_header : DEF ID COLON type'
   code = ['FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[2]]
-  p[0] = TREE.FeatureBody(code=code)
+  p[0] = TREE.FeatureHeader(code=code, datatype=p[4].place)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=p[2])
   current_symbol_table[0].enter_method(p[2],p[4])
@@ -232,7 +247,7 @@ def p_feature_body_with_formal_parameter_list(p):
   code = p[2].code
   code.extend(p[5].code)
   code.append('FUNC_RETURN')
-  p[0]=TREE.Feature(code=code)
+  p[0]=TREE.FeatureBody(code=code)
 
 
 
@@ -241,7 +256,7 @@ def p_feature_body(p):
   # print p[6]
   code = p[4].code
   code.append('FUNC_RETURN')
-  p[0]=TREE.Feature(code=code)
+  p[0]=TREE.FeatureBody(code=code)
 
 
 # def p_feature_with_modifier_with_formal_parameter_list(p):
@@ -303,13 +318,13 @@ def p_feature_modifier_formal(p):
   rule.append(17)
 
   # modifier not implemented
-  p[0] = TREE.Feature(code=p[2].code)
+  p[0] = TREE.Feature(code=p[2].code, datatype=p[2].datatype)
 
 def p_feature_formal(p):
   'feature : formal'
   rule.append(18)
 
-  p[0] = TREE.Feature(code=p[1].code)
+  p[0] = TREE.Feature(code=p[1].code, datatype=p[1].datatype)
 
 def p_modifier_public(p):
   'modifier : PUBLIC'
@@ -459,7 +474,7 @@ def p_expression_block_expression(p):
   'expression : block_expression'
   rule.append(34)
 
-  p[0] = TREE.Expression(code=p[1].code) 
+  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype) 
 
 
 
@@ -467,21 +482,21 @@ def p_block_expression(p):
   'block_expression : LBRACE block_list RBRACE'
   rule.append(35)
 
-  p[0] = TREE.BlockExpression(code=p[2].code)
+  p[0] = TREE.BlockExpression(code=p[2].code, datatype=p[2].datatype)
 
 def p_block_list_many(p):
   'block_list : block_list expression SEMICOLON'
   rule.append(36)
   code = p[1].code
   code.extend(p[2].code)
-  p[0] = TREE.BlockList(code=code)
+  p[0] = TREE.BlockList(code=code, datatype=p[2].datatype)
 
 def p_block_list(p):
   'block_list : expression SEMICOLON'
   rule.append(37)
 
   
-  p[0] = TREE.BlockList(code=p[1].code)
+  p[0] = TREE.BlockList(code=p[1].code,datatype=p[1].datatype)
 
 
 def p_expression_assign(p):
@@ -490,14 +505,14 @@ def p_expression_assign(p):
   var = current_symbol_table[0].getVariable(p[1])
 
   code = p[3].code
-  print("CODE : ", code, p[3].place, p[3])
+  # print("CODE : ", code, p[3].place, p[3])
   s = 'ASSIGN,' + p[1] +',' + p[3].place
   code.append(s)
-  p[0] = TREE.Expression(code=code)
-  print("================")
-  print(p[0])
+  p[0] = TREE.Expression(code=code, datatype=p[3].datatype)
+  # print("================")
+  # print(p[0])
 
-  print("================")
+  # print("================")
 
 def p_expression_assign_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET GETS expression'
@@ -505,7 +520,7 @@ def p_expression_assign_arr(p):
   var = current_symbol_table[0].getVariable(p[1])
 
   code = ['INDEX_ASSIGN_L,'+p[1]+','+p[3].place+','+p[6].place]
-  p[0].Expression(code=code,place=p[6].place)
+  p[0].Expression(code=code,place=p[6].place, datatype='Array')
 
 def p_expression_function_call_with_arguments_2(p):
   'expression : ID LPAREN argument_list RPAREN'
@@ -514,7 +529,8 @@ def p_expression_function_call_with_arguments_2(p):
   
   code = p[3].code
   code.append('FUNC_CALL,'+p[1])
-  p[0]=TREE.FunctionCall(code=code)
+  datatype = met.datatype
+  p[0]=TREE.FunctionCall(code=code, datatype=datatype)
 
 
 def p_expression_function_call_2(p):
@@ -524,8 +540,8 @@ def p_expression_function_call_2(p):
 
   t=newtemp()
   code = ['FUNC_CALL,'+p[1]+','+t]
-  p[0] = TREE.Expression(code=code,place=t)
-
+  datatype = met.datatype
+  p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
 
 
 def p_argument_list(p):
@@ -610,9 +626,9 @@ def p_expression_lt(p):
   t = newtemp()
   j_if = newjump()
   j_fi = newjump()
-  print("@@@@@@@@")
-  print(p[3].code)
-  print("@@@@@@@")
+  # print("@@@@@@@@")
+  # print(p[3].code)
+  # print("@@@@@@@")
   code = p[1].code
   code.extend(p[3].code)
   # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
@@ -788,20 +804,20 @@ def p_expression_arr(p):
   code = p[3].code
   code.append('INDEX_ASSIGN_R,' + t + ',' + p[1].value + ',' + p[3].place)
 
-  p[0] = TREE.Expression(place = t, code = code)
+  p[0] = TREE.Expression(place = t, code = code, datatype='Array')
 
 
 def p_expression_integer(p):
   'expression : INTEGER'
   rule.append(62)
 
-  p[0] = TREE.Expression(code=[], place=str(p[1]))
-  print("----", p[0].code, p[0].place,p[0])
+  p[0] = TREE.Expression(code=[], place=str(p[1]), datatype='Int')
+  # print("----", p[0].code, p[0].place,p[0])
 
 def p_expression_string(p):
   'expression : STRING'
   rule.append(63)
-  p[0] = TREE.Expression(place=p[1], datatype='STRING', code=[])
+  p[0] = TREE.Expression(place=p[1], datatype='String', code=[])
 
 def p_expression_true(p):
   'expression : TRUE'
@@ -829,7 +845,9 @@ def p_expression_function_call_with_arguments(p):
   t=newtemp()
   code = p[1].code
   code.extend(p[5].code)
-  code.append('FUNC_CALL,'+p[1].place+'.'+p[3]+','+t)
+  # print(".................................", p[1].place)
+  code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
+  datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t)
 
 def p_expression_function_call(p):
@@ -840,27 +858,28 @@ def p_expression_function_call(p):
   # quit()
   
   code = p[1].code
-  code.append('FUNC_CALL,'+p[1].place+'.'+p[3]+','+t)
-  p[0] = TREE.Expression(code=code,place=t)
+  code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
+  datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
+  p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
 
 def p_expression_new(p):
   'expression : NEW type'
   rule.append(70)
   t=newtemp()
   code = ['FUNC_CALL,constructor,'+t]
-  p[0] = TREE.Expression(code=code,place=t)
+  p[0] = TREE.Expression(code=code,place=t, datatype=p[2].place)
 
 def p_expression_isvoid(p):
   'expression : ISVOID expression'
   rule.append(71)
   t=newtemp()
   code = ['FUNC_CALL,isvoid,'+t]
-  p[0] = TREE.Expression(code=code,place=t)
+  p[0] = TREE.Expression(code=code,place=t, datatype=p[2].datatype)
 
 def p_expression_let_expression(p):
   'expression : let_expression'
   rule.append(72)
-  p[0] = TREE.Expression(code = p[1].code)
+  p[0] = TREE.Expression(code = p[1].code, datatype=p[1].datatype)
 
 
 def p_let_to_let(p):
@@ -881,13 +900,12 @@ def p_let_expression(p):
 
   code = p[2].code
   code.extend(p[4].code)
-  p[0] = TREE.Let(code = code)
+  p[0] = TREE.Let(code = code, datatype=p[4].datatype)
 
   current_symbol_table[0] = current_symbol_table[0].parent
 
 
 
-# Nested Lets
 
 def p_expression_at_function_with_arguments(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN'
@@ -903,12 +921,17 @@ def p_expression_at_function(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN'
   rule.append(75)
 
+  t=newtemp()
+  ode = p[1].code
+  code=['to handle AT']
+  p[0] = TREE.Expression(code=code,place=t)
+
 
 def p_expression_if_then_else(p):
   'expression : if_then_else'
   rule.append(76)
 
-  p[0] = TREE.Expression(code=p[1].code)
+  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype)
 
 def p_if_then_else(p):
   'if_then_else : IF expression THEN expression ELSE expression FI'
@@ -924,13 +947,13 @@ def p_if_then_else(p):
   code.extend(p[4].code)
   code.append('LABEL,'+_fi)
 
-  p[0] = TREE.If_Then_Else(code=code)
+  p[0] = TREE.If_Then_Else(code=code, datatype=p[6].datatype)
 
 def p_expression_while(p):
   'expression : while'
   rule.append(78)
 
-  p[0] = TREE.Expression(code=p[1].code)
+  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype)
 
 
 def p_while(p):
@@ -952,14 +975,14 @@ def p_while(p):
     elif(code[i]=='CONTINUE'):
       code[i]=_loop
 
-  p[0] = TREE.While(code=code)
+  p[0] = TREE.While(code=code, datatype=p[4].datatype)
 
 
 def p_expression_for(p):
   'expression : for'
   rule.append(80)
 
-  p[0] = TREE.Expression(code=p[1].code)
+  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype)
 
 def p_for(p):
   'for : FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL'
@@ -986,7 +1009,7 @@ def p_for(p):
     elif(code[i]=='CONTINUE'):
       code[i]=_loop
 
-  p[0] = TREE.For(code=code)
+  p[0] = TREE.For(code=code, datatype=p[10].datatype)
 
 
 def p_formaldehyde_with_assign_many(p):
