@@ -4,9 +4,8 @@ class Japanese inherits IO {
    	   	
    	   	for(i<-0;i<10;i<-i+1)loop
 			i<-i+i
-		pool    
+		pool
    	};
-		
 
 };
 
@@ -15,7 +14,7 @@ class Main inherits IO {
 		i : Int[2];
 		b : String;
 		c : Japanese;
-
+		
 		def main : SELF_TYPE (a : Int, b : Int) {
 			{
 				c.main(i,c,b);

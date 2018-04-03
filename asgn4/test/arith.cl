@@ -1,23 +1,22 @@
-(*a contribution  Anne Sheets (sheets@cory)Tests the arithmetic operationsvarious other things*)
 
 class A {
 
    var : Int <- 0;
 
-   value : Int () { var };
+   def value : Int () { var };
 
-   set_var : SELF_TYPE (num : Int)  {
+   def set_var : SELF_TYPE (num : Int)  {
       {
          var <- num;
          self;
       }
    };
 
-   method1 : SELF_TYPE (num : Int) {  
+   def method1 : SELF_TYPE (num : Int) {  
       self
    };
 
-   method2 : B (num1 : Int, num2 : Int) {  
+   def method2 : B (num1 : Int, num2 : Int) {  
       let x : Int in
 	 {
             x <- num1 + num2;
@@ -27,7 +26,7 @@ class A {
       
    };
 
-   method3 : C (num : Int) : C {  
+   def method3 : C (num : Int) : C {  
       let x : Int in
 	 {
             x <- ~num;
@@ -36,7 +35,7 @@ class A {
       
    };
 
-   method4 : D (num1 : Int, num2 : Int){  
+   def method4 : D (num1 : Int, num2 : Int){  
             if num2 < num1 then
                let x : Int in
 		  {
@@ -54,7 +53,7 @@ class A {
             fi
    };
 
-   method5 : E (num : Int){  
+   def method5 : E (num : Int){  
       let x : Int <- 1 in
 	 {
 	    let y : Int <- 1 in
@@ -74,7 +73,7 @@ class A {
 
 class B inherits A { 
 
-   method5 : E (num : Int){ 
+   def method5 : E (num : Int){ 
       let x : Int in
 	 {
             x <- num * num;
@@ -87,7 +86,7 @@ class B inherits A {
 
 class C inherits B {
 
-   method6 : A (num : Int){
+   def method6 : A (num : Int){
       let x : Int in
          {
             x <- ~num;
@@ -96,7 +95,7 @@ class C inherits B {
       tel
    };
 
-   method5 : E (num : Int){ 
+   def method5 : E (num : Int){ 
       let x : Int in
 	 {
             x <- num * num * num;
@@ -109,12 +108,12 @@ class C inherits B {
 
 class D inherits B {  
 		
-   method7 : Bool (num : Int){  
+   def method7 : Bool (num : Int){  
       (let x : Int <- num in
             if x < 0 then method7(~x) else
-            if 0 = x then true else
-            if 1 = x then false else
-	    if 2 = x then false else
+            if 0 = x then TRUE else
+            if 1 = x then FALSE else
+	    if 2 = x then FALSE else
 	       method7(x - 3)
 	    fi fi fi fi
       )
@@ -124,7 +123,7 @@ class D inherits B {
 
 class E inherits D {
 
-   method6 : A (num : Int){  
+   def method6 : A (num : Int){  
       let x : Int in
          {
             x <- num / 8;
@@ -135,23 +134,9 @@ class E inherits D {
 
 };
 
-(* The following code is from atoi.cl in ~cs164/examples *)
-
-(*
-   The class A2I provides integer-to-string and string-to-integer
-conversion routines.  To use these routines, either inherit them
-in the class where needed, have a dummy variable bound to
-something of type A2I, or simpl write (new A2I).method(argument).
-*)
-
-
-(*
-   c2i   Converts a 1-character string to an integer.  Aborts
-         if the string is not "0" through "9"
-*)
 class A2I {
 
-     c2i : Int (char : String){
+     def c2i : Int (char : String){
 	if char = "0" then 0 else
 	if char = "1" then 1 else
 	if char = "2" then 2 else
@@ -167,10 +152,7 @@ class A2I {
         fi fi fi fi fi fi fi fi fi fi
      };
 
-(*
-   i2c is the inverse of c2i.
-*)
-     i2c : String (i : Int){
+     def i2c : String (i : Int){
 	if i = 0 then "0" else
 	if i = 1 then "1" else
 	if i = 2 then "2" else
@@ -185,15 +167,7 @@ class A2I {
         fi fi fi fi fi fi fi fi fi fi
      };
 
-(*
-   a2i converts an ASCII string into an integer.  The empty string
-is converted to 0.  Signed and unsigned strings are handled.  The
-method aborts if the string does not represent an integer.  Very
-long strings of digits produce strange answers because of arithmetic 
-overflow.
-
-*)
-     a2i : Int (s : String){
+     def a2i : Int (s : String){
         if s.length() = 0 then 0 else
 	if s.substr(0,1) = "-" then ~a2i_aux(s.substr(1,s.length()-1)) else
         if s.substr(0,1) = "+" then a2i_aux(s.substr(1,s.length()-1)) else
@@ -201,11 +175,8 @@ overflow.
         fi fi fi
      };
 
-(* a2i_aux converts the usigned portion of the string.  As a
-   programming example, this method is written iteratively.  *)
 
-
-     a2i_aux : Int (s : String){
+     def a2i_aux : Int (s : String){
 	let int : Int <- 0 in	
            {	
                let j : Int <- s.length() in
@@ -223,19 +194,16 @@ overflow.
         tel
      };
 
-(* i2a converts an integer to a string.  Positive and negative 
-   numbers are handled correctly.  *)
 
-    i2a : String (i : Int){
+    def i2a : String (i : Int){
 	if i = 0 then "0" else 
         if 0 < i then i2a_aux(i) else
           "-".concat(i2a_aux(i * ~1)) 
         fi fi
     };
 	
-(* i2a_aux is an example using recursion.  *)		
 
-    i2a_aux : String (i : Int){
+    def i2a_aux : String (i : Int){
         if i = 0 then "" else 
 	    let next : Int <- i / 10 in
 		i2a_aux(next).concat(i2c(i - next * 10))
@@ -250,10 +218,10 @@ class Main inherits IO {
    char : String;
    avar : A; 
    a_var : A;
-   flag : Bool <- true;
+   flag : Bool <- TRUE;
 
 
-   menu : String (){
+   def menu : String (){
       {
          out_string("\n\tTo add a number to ");
          print(avar);
@@ -285,7 +253,7 @@ class Main inherits IO {
       }
    };
 
-   prompt : String (){
+   def prompt : String (){
       {
          out_string("\n");
          out_string("Please enter a number...  ");
@@ -293,7 +261,7 @@ class Main inherits IO {
       }
    };
 
-   get_int : Int (){
+   def get_int : Int (){
       {
 	 let z : A2I <- new A2I in
 	    let s : String <- prompt() in
@@ -303,20 +271,20 @@ class Main inherits IO {
       }
    };
 
-   is_even : Bool (num : Int){
+   def is_even : Bool (num : Int){
       let x : Int <- num in
             if x < 0 then is_even(~x) else
-            if 0 = x then true else
-	    if 1 = x then false else
+            if 0 = x then TRUE else
+	    if 1 = x then FALSE else
 	          is_even(x - 2)
 	    fi fi fi
       tel
    };
 
-   class_type : SELF_TYPE (var : A){
+   def class_type : SELF_TYPE (var : A){
       
  
-   print : SELF_TYPE (var : A){
+   def print : SELF_TYPE (var : A){
      let z : A2I <- new A2I in
 	{
 	   out_string(z.i2a(var.value()));
@@ -325,7 +293,7 @@ class Main inherits IO {
      tel
    };
 
-   main : Object (){
+   def main : Object (){
       {
          avar <- (new A);
          while flag loop
@@ -396,7 +364,7 @@ class Main inherits IO {
 		      else
                   if char = "j" then avar <- (new A)
 		      else
-                  if char = "q" then flag <- false
+                  if char = "q" then flag <- FALSE
 		      else
                       avar <- (new A).method1(avar.value())
                   fi fi fi fi fi fi fi fi fi fi;
