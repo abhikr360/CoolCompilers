@@ -26,7 +26,7 @@ class A {
       
    };
 
-   def method3 : C (num : Int) : C {  
+   def method3 : C (num : Int) {  
       let x : Int in
 	 {
             x <- ~num;

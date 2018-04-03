@@ -41,7 +41,9 @@ ClassDict = {}
 tempCount=[0]
 def newtemp():
   tempCount[0] += 1
-  return 't.' + str(tempCount[0]) 
+  temp_name = 't.' + str(tempCount[0])
+  current_symbol_table[0].enter(name = temp_name)
+  return temp_name
 
 jumpCount = [0]
 def newjump():
@@ -784,6 +786,8 @@ def p_expression_paren(p):
 def p_expression_self(p):
   'expression : SELF'
   rule.append(59)
+
+  p[0] = TREE.Expression(code = ['SELF'])
 # ---------------------------------------------------------------------------
 
 
@@ -867,6 +871,7 @@ def p_expression_new(p):
   'expression : NEW type'
   rule.append(70)
   t=newtemp()
+  current_symbol_table[0].getVariable(t).datatype = p[2].place
   code = ['FUNC_CALL,constructor,'+t]
   p[0] = TREE.Expression(code=code,place=t, datatype=p[2].place)
 
