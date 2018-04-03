@@ -412,7 +412,7 @@ def p_formal_parameter_arr(p):
   rule.append(30)
 
   p[0] = TREE.FormalParameter(code=[], place=p[1], datatype='Array')
-  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+  if p[5].place in ClassDict or p[5].place in ['Int','String']:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -520,7 +520,7 @@ def p_expression_assign_arr(p):
   var = current_symbol_table[0].getVariable(p[1])
 
   code = ['INDEX_ASSIGN_L,'+p[1]+','+p[3].place+','+p[6].place]
-  p[0].Expression(code=code,place=p[6].place, datatype='Array')
+  p[0] = TREE.Expression(code=code,place=p[6].place, datatype='Array')
 
 def p_expression_function_call_with_arguments_2(p):
   'expression : ID LPAREN argument_list RPAREN'
@@ -802,7 +802,7 @@ def p_expression_arr(p):
 
   t = newtemp()
   code = p[3].code
-  code.append('INDEX_ASSIGN_R,' + t + ',' + p[1].value + ',' + p[3].place)
+  code.append('INDEX_ASSIGN_R,' + t + ',' + p[1] + ',' + p[3].place)
 
   p[0] = TREE.Expression(place = t, code = code, datatype='Array')
 
@@ -940,7 +940,7 @@ def p_if_then_else(p):
   _if = newjump()
   _fi = newjump()
   code=p[2].code
-  code.append('IFGOTO,GREATER_THAN,' + p[2].place + ',0,', +  _if)
+  code.append('IFGOTO,GREATER_THAN,' + p[2].place + ',0,' +  _if)
   code.extend(p[6].code)
   code.append('JUMP,' + _fi)
   code.append('LABEL,' + _if)
