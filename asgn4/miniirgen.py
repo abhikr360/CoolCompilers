@@ -1011,10 +1011,12 @@ def p_for(p):
 
   for i in range(len(code)):
     if(code[i]=='BREAK'):
-      code[i]=_pool
+      code[i]='JUMP,'+_pool
+      # sys.exit(_pool)
     elif(code[i]=='CONTINUE'):
-      code[i]=_loop
+      code[i]='JUMP,'+_loop
 
+  # print "agsdiagsdia"
   p[0] = TREE.For(code=code, datatype=p[10].datatype)
 
 
@@ -1062,7 +1064,7 @@ def p_formaldehyde_arr_many(p):
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[3],datatype='Array',size=p[7].place, isArray =True)
+  current_symbol_table[0].enter(name=p[3],datatype='Array',size=4000, isArray =True)
 
 
 def p_formaldehyde_with_assign(p):
@@ -1104,7 +1106,7 @@ def p_formaldehyde_arr(p):
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]), isArray =True)
+  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4000, isArray =True)
 
 
 def p_error(p):
@@ -1131,9 +1133,9 @@ parser.parse(data)
 # print(rule)
 
 
-# for s in SymbolTables:
-#   print("===========")
-#   s.printsymtab()
+for s in SymbolTables:
+  print("===========")
+  s.printsymtab()
 # print "*****class dictionary*****"
 # for x in ClassDict:
 # 	print ClassDict[x].scope_name

@@ -1,2 +1,4 @@
 TODO list -
 1. handle out_string out_int 
+2. habndle minus  number like -4 -5 instead of ~
+3. currently default size of array is 1000
