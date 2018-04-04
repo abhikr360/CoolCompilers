@@ -17,7 +17,7 @@ class Main inherits IO {
 		
 		def main : SELF_TYPE (a : Int, b : Int) {
 			{
-				c.main(i,c,b);
+				c.main2(i,c,b);
 				b <- 2;
 				let c : Int <- 0 in 
 				b <- 4

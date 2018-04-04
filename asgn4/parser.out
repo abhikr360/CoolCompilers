@@ -38,7 +38,7 @@ Rule 32    formal_parameter -> ID COLON type
 Rule 33    formal_parameter -> ID LSQRBRACKET RSQRBRACKET COLON type
 Rule 34    formal -> ID COLON type GETS expression
 Rule 35    formal -> ID COLON type
-Rule 36    formal -> ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+Rule 36    formal -> ID COLON type LSQRBRACKET expression RSQRBRACKET
 Rule 37    expression -> block_expression
 Rule 38    block_expression -> LBRACE block_list RBRACE
 Rule 39    block_list -> block_list expression SEMICOLON
@@ -90,10 +90,10 @@ Rule 84    expression -> for
 Rule 85    for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL
 Rule 86    formaldehyde -> formaldehyde COMMA ID COLON type GETS expression
 Rule 87    formaldehyde -> formaldehyde COMMA ID COLON type
-Rule 88    formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+Rule 88    formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET
 Rule 89    formaldehyde -> ID COLON type GETS expression
 Rule 90    formaldehyde -> ID COLON type
-Rule 91    formaldehyde -> ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+Rule 91    formaldehyde -> ID COLON type LSQRBRACKET expression RSQRBRACKET
 
 Terminals, with rules where they appear
 
@@ -121,7 +121,7 @@ IF                   : 81
 IMPORT               : 4 5
 IN                   : 77
 INHERITS             : 9
-INTEGER              : 36 65 88 91
+INTEGER              : 65
 INTEGER_TYPE         : 25
 ISVOID               : 74
 LBRACE               : 11 12 18 19 38
@@ -167,7 +167,7 @@ class                : 6 7
 class_body           : 8
 class_header         : 8
 classes              : 2 3 6
-expression           : 18 19 34 39 40 41 42 42 45 46 47 47 48 48 49 49 50 50 51 51 52 52 53 53 54 54 55 55 56 56 57 57 58 58 59 60 61 64 71 72 74 77 78 79 81 81 81 83 83 85 85 85 85 86 89
+expression           : 18 19 34 36 39 40 41 42 42 45 46 47 47 48 48 49 49 50 50 51 51 52 52 53 53 54 54 55 55 56 56 57 57 58 58 59 60 61 64 71 72 74 77 78 79 81 81 81 83 83 85 85 85 85 86 88 89 91
 feature              : 13 14
 feature_body         : 15
 feature_header       : 15
@@ -356,7 +356,7 @@ state 15
     (23) modifier -> . PRIVATE
     (34) formal -> . ID COLON type GETS expression
     (35) formal -> . ID COLON type
-    (36) formal -> . ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (36) formal -> . ID COLON type LSQRBRACKET expression RSQRBRACKET
 
     RBRACE          shift and go to state 21
     DEF             shift and go to state 29
@@ -441,7 +441,7 @@ state 24
     (23) modifier -> . PRIVATE
     (34) formal -> . ID COLON type GETS expression
     (35) formal -> . ID COLON type
-    (36) formal -> . ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (36) formal -> . ID COLON type LSQRBRACKET expression RSQRBRACKET
 
     RBRACE          shift and go to state 34
     DEF             shift and go to state 29
@@ -476,7 +476,7 @@ state 27
     (20) feature -> modifier . formal
     (34) formal -> . ID COLON type GETS expression
     (35) formal -> . ID COLON type
-    (36) formal -> . ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (36) formal -> . ID COLON type LSQRBRACKET expression RSQRBRACKET
 
     ID              shift and go to state 28
 
@@ -486,7 +486,7 @@ state 28
 
     (34) formal -> ID . COLON type GETS expression
     (35) formal -> ID . COLON type
-    (36) formal -> ID . COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (36) formal -> ID . COLON type LSQRBRACKET expression RSQRBRACKET
 
     COLON           shift and go to state 39
 
@@ -584,7 +584,7 @@ state 39
 
     (34) formal -> ID COLON . type GETS expression
     (35) formal -> ID COLON . type
-    (36) formal -> ID COLON . type LSQRBRACKET INTEGER RSQRBRACKET
+    (36) formal -> ID COLON . type LSQRBRACKET expression RSQRBRACKET
     (24) type -> . CLASS_TYPE
     (25) type -> . INTEGER_TYPE
     (26) type -> . BOOL_TYPE
@@ -663,10 +663,6 @@ state 47
 
     (29) type -> SELF_TYPE .
 
-    GETS            reduce using rule 29 (type -> SELF_TYPE .)
-    LSQRBRACKET     reduce using rule 29 (type -> SELF_TYPE .)
-    IN              reduce using rule 29 (type -> SELF_TYPE .)
-    COMMA           reduce using rule 29 (type -> SELF_TYPE .)
     LPAREN          reduce using rule 29 (type -> SELF_TYPE .)
     RBRACE          reduce using rule 29 (type -> SELF_TYPE .)
     PLUS            reduce using rule 29 (type -> SELF_TYPE .)
@@ -684,24 +680,24 @@ state 47
     PERIOD          reduce using rule 29 (type -> SELF_TYPE .)
     AT              reduce using rule 29 (type -> SELF_TYPE .)
     SEMICOLON       reduce using rule 29 (type -> SELF_TYPE .)
+    RSQRBRACKET     reduce using rule 29 (type -> SELF_TYPE .)
     LOOP            reduce using rule 29 (type -> SELF_TYPE .)
     THEN            reduce using rule 29 (type -> SELF_TYPE .)
     RPAREN          reduce using rule 29 (type -> SELF_TYPE .)
-    RSQRBRACKET     reduce using rule 29 (type -> SELF_TYPE .)
+    COMMA           reduce using rule 29 (type -> SELF_TYPE .)
     POOL            reduce using rule 29 (type -> SELF_TYPE .)
     ELSE            reduce using rule 29 (type -> SELF_TYPE .)
     TEL             reduce using rule 29 (type -> SELF_TYPE .)
     FI              reduce using rule 29 (type -> SELF_TYPE .)
+    IN              reduce using rule 29 (type -> SELF_TYPE .)
+    GETS            reduce using rule 29 (type -> SELF_TYPE .)
+    LSQRBRACKET     reduce using rule 29 (type -> SELF_TYPE .)
 
 
 state 48
 
     (24) type -> CLASS_TYPE .
 
-    GETS            reduce using rule 24 (type -> CLASS_TYPE .)
-    LSQRBRACKET     reduce using rule 24 (type -> CLASS_TYPE .)
-    IN              reduce using rule 24 (type -> CLASS_TYPE .)
-    COMMA           reduce using rule 24 (type -> CLASS_TYPE .)
     LPAREN          reduce using rule 24 (type -> CLASS_TYPE .)
     RBRACE          reduce using rule 24 (type -> CLASS_TYPE .)
     PLUS            reduce using rule 24 (type -> CLASS_TYPE .)
@@ -719,24 +715,24 @@ state 48
     PERIOD          reduce using rule 24 (type -> CLASS_TYPE .)
     AT              reduce using rule 24 (type -> CLASS_TYPE .)
     SEMICOLON       reduce using rule 24 (type -> CLASS_TYPE .)
+    RSQRBRACKET     reduce using rule 24 (type -> CLASS_TYPE .)
     LOOP            reduce using rule 24 (type -> CLASS_TYPE .)
     THEN            reduce using rule 24 (type -> CLASS_TYPE .)
     RPAREN          reduce using rule 24 (type -> CLASS_TYPE .)
-    RSQRBRACKET     reduce using rule 24 (type -> CLASS_TYPE .)
+    COMMA           reduce using rule 24 (type -> CLASS_TYPE .)
     POOL            reduce using rule 24 (type -> CLASS_TYPE .)
     ELSE            reduce using rule 24 (type -> CLASS_TYPE .)
     TEL             reduce using rule 24 (type -> CLASS_TYPE .)
     FI              reduce using rule 24 (type -> CLASS_TYPE .)
+    IN              reduce using rule 24 (type -> CLASS_TYPE .)
+    GETS            reduce using rule 24 (type -> CLASS_TYPE .)
+    LSQRBRACKET     reduce using rule 24 (type -> CLASS_TYPE .)
 
 
 state 49
 
     (28) type -> OBJECT .
 
-    GETS            reduce using rule 28 (type -> OBJECT .)
-    LSQRBRACKET     reduce using rule 28 (type -> OBJECT .)
-    IN              reduce using rule 28 (type -> OBJECT .)
-    COMMA           reduce using rule 28 (type -> OBJECT .)
     LPAREN          reduce using rule 28 (type -> OBJECT .)
     RBRACE          reduce using rule 28 (type -> OBJECT .)
     PLUS            reduce using rule 28 (type -> OBJECT .)
@@ -754,24 +750,24 @@ state 49
     PERIOD          reduce using rule 28 (type -> OBJECT .)
     AT              reduce using rule 28 (type -> OBJECT .)
     SEMICOLON       reduce using rule 28 (type -> OBJECT .)
+    RSQRBRACKET     reduce using rule 28 (type -> OBJECT .)
     LOOP            reduce using rule 28 (type -> OBJECT .)
     THEN            reduce using rule 28 (type -> OBJECT .)
     RPAREN          reduce using rule 28 (type -> OBJECT .)
-    RSQRBRACKET     reduce using rule 28 (type -> OBJECT .)
+    COMMA           reduce using rule 28 (type -> OBJECT .)
     POOL            reduce using rule 28 (type -> OBJECT .)
     ELSE            reduce using rule 28 (type -> OBJECT .)
     TEL             reduce using rule 28 (type -> OBJECT .)
     FI              reduce using rule 28 (type -> OBJECT .)
+    IN              reduce using rule 28 (type -> OBJECT .)
+    GETS            reduce using rule 28 (type -> OBJECT .)
+    LSQRBRACKET     reduce using rule 28 (type -> OBJECT .)
 
 
 state 50
 
     (27) type -> STRING_TYPE .
 
-    GETS            reduce using rule 27 (type -> STRING_TYPE .)
-    LSQRBRACKET     reduce using rule 27 (type -> STRING_TYPE .)
-    IN              reduce using rule 27 (type -> STRING_TYPE .)
-    COMMA           reduce using rule 27 (type -> STRING_TYPE .)
     LPAREN          reduce using rule 27 (type -> STRING_TYPE .)
     RBRACE          reduce using rule 27 (type -> STRING_TYPE .)
     PLUS            reduce using rule 27 (type -> STRING_TYPE .)
@@ -789,24 +785,24 @@ state 50
     PERIOD          reduce using rule 27 (type -> STRING_TYPE .)
     AT              reduce using rule 27 (type -> STRING_TYPE .)
     SEMICOLON       reduce using rule 27 (type -> STRING_TYPE .)
+    RSQRBRACKET     reduce using rule 27 (type -> STRING_TYPE .)
     LOOP            reduce using rule 27 (type -> STRING_TYPE .)
     THEN            reduce using rule 27 (type -> STRING_TYPE .)
     RPAREN          reduce using rule 27 (type -> STRING_TYPE .)
-    RSQRBRACKET     reduce using rule 27 (type -> STRING_TYPE .)
+    COMMA           reduce using rule 27 (type -> STRING_TYPE .)
     POOL            reduce using rule 27 (type -> STRING_TYPE .)
     ELSE            reduce using rule 27 (type -> STRING_TYPE .)
     TEL             reduce using rule 27 (type -> STRING_TYPE .)
     FI              reduce using rule 27 (type -> STRING_TYPE .)
+    IN              reduce using rule 27 (type -> STRING_TYPE .)
+    GETS            reduce using rule 27 (type -> STRING_TYPE .)
+    LSQRBRACKET     reduce using rule 27 (type -> STRING_TYPE .)
 
 
 state 51
 
     (25) type -> INTEGER_TYPE .
 
-    GETS            reduce using rule 25 (type -> INTEGER_TYPE .)
-    LSQRBRACKET     reduce using rule 25 (type -> INTEGER_TYPE .)
-    IN              reduce using rule 25 (type -> INTEGER_TYPE .)
-    COMMA           reduce using rule 25 (type -> INTEGER_TYPE .)
     LPAREN          reduce using rule 25 (type -> INTEGER_TYPE .)
     RBRACE          reduce using rule 25 (type -> INTEGER_TYPE .)
     PLUS            reduce using rule 25 (type -> INTEGER_TYPE .)
@@ -824,21 +820,25 @@ state 51
     PERIOD          reduce using rule 25 (type -> INTEGER_TYPE .)
     AT              reduce using rule 25 (type -> INTEGER_TYPE .)
     SEMICOLON       reduce using rule 25 (type -> INTEGER_TYPE .)
+    RSQRBRACKET     reduce using rule 25 (type -> INTEGER_TYPE .)
     LOOP            reduce using rule 25 (type -> INTEGER_TYPE .)
     THEN            reduce using rule 25 (type -> INTEGER_TYPE .)
     RPAREN          reduce using rule 25 (type -> INTEGER_TYPE .)
-    RSQRBRACKET     reduce using rule 25 (type -> INTEGER_TYPE .)
+    COMMA           reduce using rule 25 (type -> INTEGER_TYPE .)
     POOL            reduce using rule 25 (type -> INTEGER_TYPE .)
     ELSE            reduce using rule 25 (type -> INTEGER_TYPE .)
     TEL             reduce using rule 25 (type -> INTEGER_TYPE .)
     FI              reduce using rule 25 (type -> INTEGER_TYPE .)
+    IN              reduce using rule 25 (type -> INTEGER_TYPE .)
+    GETS            reduce using rule 25 (type -> INTEGER_TYPE .)
+    LSQRBRACKET     reduce using rule 25 (type -> INTEGER_TYPE .)
 
 
 state 52
 
     (34) formal -> ID COLON type . GETS expression
     (35) formal -> ID COLON type .
-    (36) formal -> ID COLON type . LSQRBRACKET INTEGER RSQRBRACKET
+    (36) formal -> ID COLON type . LSQRBRACKET expression RSQRBRACKET
 
     GETS            shift and go to state 61
     SEMICOLON       reduce using rule 35 (formal -> ID COLON type .)
@@ -849,10 +849,6 @@ state 53
 
     (26) type -> BOOL_TYPE .
 
-    GETS            reduce using rule 26 (type -> BOOL_TYPE .)
-    LSQRBRACKET     reduce using rule 26 (type -> BOOL_TYPE .)
-    IN              reduce using rule 26 (type -> BOOL_TYPE .)
-    COMMA           reduce using rule 26 (type -> BOOL_TYPE .)
     LPAREN          reduce using rule 26 (type -> BOOL_TYPE .)
     RBRACE          reduce using rule 26 (type -> BOOL_TYPE .)
     PLUS            reduce using rule 26 (type -> BOOL_TYPE .)
@@ -870,14 +866,18 @@ state 53
     PERIOD          reduce using rule 26 (type -> BOOL_TYPE .)
     AT              reduce using rule 26 (type -> BOOL_TYPE .)
     SEMICOLON       reduce using rule 26 (type -> BOOL_TYPE .)
+    RSQRBRACKET     reduce using rule 26 (type -> BOOL_TYPE .)
     LOOP            reduce using rule 26 (type -> BOOL_TYPE .)
     THEN            reduce using rule 26 (type -> BOOL_TYPE .)
     RPAREN          reduce using rule 26 (type -> BOOL_TYPE .)
-    RSQRBRACKET     reduce using rule 26 (type -> BOOL_TYPE .)
+    COMMA           reduce using rule 26 (type -> BOOL_TYPE .)
     POOL            reduce using rule 26 (type -> BOOL_TYPE .)
     ELSE            reduce using rule 26 (type -> BOOL_TYPE .)
     TEL             reduce using rule 26 (type -> BOOL_TYPE .)
     FI              reduce using rule 26 (type -> BOOL_TYPE .)
+    IN              reduce using rule 26 (type -> BOOL_TYPE .)
+    GETS            reduce using rule 26 (type -> BOOL_TYPE .)
+    LSQRBRACKET     reduce using rule 26 (type -> BOOL_TYPE .)
 
 
 state 54
@@ -1103,10 +1103,79 @@ state 61
 
 state 62
 
-    (36) formal -> ID COLON type LSQRBRACKET . INTEGER RSQRBRACKET
+    (36) formal -> ID COLON type LSQRBRACKET . expression RSQRBRACKET
+    (37) expression -> . block_expression
+    (41) expression -> . ID GETS expression
+    (42) expression -> . ID LSQRBRACKET expression RSQRBRACKET GETS expression
+    (43) expression -> . ID LPAREN argument_list RPAREN
+    (44) expression -> . ID LPAREN RPAREN
+    (47) expression -> . expression PLUS expression
+    (48) expression -> . expression MINUS expression
+    (49) expression -> . expression TIMES expression
+    (50) expression -> . expression DIVIDE expression
+    (51) expression -> . expression MOD expression
+    (52) expression -> . expression LT expression
+    (53) expression -> . expression GT expression
+    (54) expression -> . expression LTEQ expression
+    (55) expression -> . expression GTEQ expression
+    (56) expression -> . expression EQUAL expression
+    (57) expression -> . expression OR expression
+    (58) expression -> . expression AND expression
+    (59) expression -> . NOT expression
+    (60) expression -> . TILDA expression
+    (61) expression -> . LPAREN expression RPAREN
+    (62) expression -> . SELF
+    (63) expression -> . ID
+    (64) expression -> . ID LSQRBRACKET expression RSQRBRACKET
+    (65) expression -> . INTEGER
+    (66) expression -> . STRING
+    (67) expression -> . TRUE
+    (68) expression -> . FALSE
+    (69) expression -> . BREAK
+    (70) expression -> . CONTINUE
+    (71) expression -> . expression PERIOD ID LPAREN argument_list RPAREN
+    (72) expression -> . expression PERIOD ID LPAREN RPAREN
+    (73) expression -> . NEW type
+    (74) expression -> . ISVOID expression
+    (75) expression -> . let_expression
+    (78) expression -> . expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN
+    (79) expression -> . expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN
+    (80) expression -> . if_then_else
+    (82) expression -> . while
+    (84) expression -> . for
+    (38) block_expression -> . LBRACE block_list RBRACE
+    (77) let_expression -> . let formaldehyde IN expression TEL
+    (81) if_then_else -> . IF expression THEN expression ELSE expression FI
+    (83) while -> . WHILE expression LOOP expression POOL
+    (85) for -> . FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL
+    (76) let -> . LET
 
-    INTEGER         shift and go to state 95
+    ID              shift and go to state 73
+    NOT             shift and go to state 90
+    TILDA           shift and go to state 75
+    LPAREN          shift and go to state 80
+    SELF            shift and go to state 86
+    INTEGER         shift and go to state 76
+    STRING          shift and go to state 77
+    TRUE            shift and go to state 71
+    FALSE           shift and go to state 84
+    BREAK           shift and go to state 85
+    CONTINUE        shift and go to state 88
+    NEW             shift and go to state 70
+    ISVOID          shift and go to state 74
+    LBRACE          shift and go to state 83
+    IF              shift and go to state 69
+    WHILE           shift and go to state 68
+    FOR             shift and go to state 78
+    LET             shift and go to state 89
 
+    for                            shift and go to state 72
+    let_expression                 shift and go to state 67
+    while                          shift and go to state 87
+    let                            shift and go to state 79
+    block_expression               shift and go to state 81
+    expression                     shift and go to state 95
+    if_then_else                   shift and go to state 82
 
 state 63
 
@@ -1237,12 +1306,12 @@ state 67
     PERIOD          reduce using rule 75 (expression -> let_expression .)
     AT              reduce using rule 75 (expression -> let_expression .)
     SEMICOLON       reduce using rule 75 (expression -> let_expression .)
-    RBRACE          reduce using rule 75 (expression -> let_expression .)
-    LOOP            reduce using rule 75 (expression -> let_expression .)
     RPAREN          reduce using rule 75 (expression -> let_expression .)
     COMMA           reduce using rule 75 (expression -> let_expression .)
-    THEN            reduce using rule 75 (expression -> let_expression .)
+    RBRACE          reduce using rule 75 (expression -> let_expression .)
     RSQRBRACKET     reduce using rule 75 (expression -> let_expression .)
+    LOOP            reduce using rule 75 (expression -> let_expression .)
+    THEN            reduce using rule 75 (expression -> let_expression .)
     POOL            reduce using rule 75 (expression -> let_expression .)
     ELSE            reduce using rule 75 (expression -> let_expression .)
     TEL             reduce using rule 75 (expression -> let_expression .)
@@ -1440,12 +1509,12 @@ state 71
     PERIOD          reduce using rule 67 (expression -> TRUE .)
     AT              reduce using rule 67 (expression -> TRUE .)
     SEMICOLON       reduce using rule 67 (expression -> TRUE .)
-    RBRACE          reduce using rule 67 (expression -> TRUE .)
-    LOOP            reduce using rule 67 (expression -> TRUE .)
     RPAREN          reduce using rule 67 (expression -> TRUE .)
     COMMA           reduce using rule 67 (expression -> TRUE .)
-    THEN            reduce using rule 67 (expression -> TRUE .)
+    RBRACE          reduce using rule 67 (expression -> TRUE .)
     RSQRBRACKET     reduce using rule 67 (expression -> TRUE .)
+    LOOP            reduce using rule 67 (expression -> TRUE .)
+    THEN            reduce using rule 67 (expression -> TRUE .)
     POOL            reduce using rule 67 (expression -> TRUE .)
     ELSE            reduce using rule 67 (expression -> TRUE .)
     TEL             reduce using rule 67 (expression -> TRUE .)
@@ -1472,12 +1541,12 @@ state 72
     PERIOD          reduce using rule 84 (expression -> for .)
     AT              reduce using rule 84 (expression -> for .)
     SEMICOLON       reduce using rule 84 (expression -> for .)
-    RBRACE          reduce using rule 84 (expression -> for .)
-    LOOP            reduce using rule 84 (expression -> for .)
     RPAREN          reduce using rule 84 (expression -> for .)
     COMMA           reduce using rule 84 (expression -> for .)
-    THEN            reduce using rule 84 (expression -> for .)
+    RBRACE          reduce using rule 84 (expression -> for .)
     RSQRBRACKET     reduce using rule 84 (expression -> for .)
+    LOOP            reduce using rule 84 (expression -> for .)
+    THEN            reduce using rule 84 (expression -> for .)
     POOL            reduce using rule 84 (expression -> for .)
     ELSE            reduce using rule 84 (expression -> for .)
     TEL             reduce using rule 84 (expression -> for .)
@@ -1512,12 +1581,12 @@ state 73
     PERIOD          reduce using rule 63 (expression -> ID .)
     AT              reduce using rule 63 (expression -> ID .)
     SEMICOLON       reduce using rule 63 (expression -> ID .)
-    RBRACE          reduce using rule 63 (expression -> ID .)
-    LOOP            reduce using rule 63 (expression -> ID .)
     RPAREN          reduce using rule 63 (expression -> ID .)
     COMMA           reduce using rule 63 (expression -> ID .)
-    THEN            reduce using rule 63 (expression -> ID .)
+    RBRACE          reduce using rule 63 (expression -> ID .)
     RSQRBRACKET     reduce using rule 63 (expression -> ID .)
+    LOOP            reduce using rule 63 (expression -> ID .)
+    THEN            reduce using rule 63 (expression -> ID .)
     POOL            reduce using rule 63 (expression -> ID .)
     ELSE            reduce using rule 63 (expression -> ID .)
     TEL             reduce using rule 63 (expression -> ID .)
@@ -1696,12 +1765,12 @@ state 76
     PERIOD          reduce using rule 65 (expression -> INTEGER .)
     AT              reduce using rule 65 (expression -> INTEGER .)
     SEMICOLON       reduce using rule 65 (expression -> INTEGER .)
-    RBRACE          reduce using rule 65 (expression -> INTEGER .)
-    LOOP            reduce using rule 65 (expression -> INTEGER .)
     RPAREN          reduce using rule 65 (expression -> INTEGER .)
     COMMA           reduce using rule 65 (expression -> INTEGER .)
-    THEN            reduce using rule 65 (expression -> INTEGER .)
+    RBRACE          reduce using rule 65 (expression -> INTEGER .)
     RSQRBRACKET     reduce using rule 65 (expression -> INTEGER .)
+    LOOP            reduce using rule 65 (expression -> INTEGER .)
+    THEN            reduce using rule 65 (expression -> INTEGER .)
     POOL            reduce using rule 65 (expression -> INTEGER .)
     ELSE            reduce using rule 65 (expression -> INTEGER .)
     TEL             reduce using rule 65 (expression -> INTEGER .)
@@ -1728,12 +1797,12 @@ state 77
     PERIOD          reduce using rule 66 (expression -> STRING .)
     AT              reduce using rule 66 (expression -> STRING .)
     SEMICOLON       reduce using rule 66 (expression -> STRING .)
-    RBRACE          reduce using rule 66 (expression -> STRING .)
-    LOOP            reduce using rule 66 (expression -> STRING .)
     RPAREN          reduce using rule 66 (expression -> STRING .)
     COMMA           reduce using rule 66 (expression -> STRING .)
-    THEN            reduce using rule 66 (expression -> STRING .)
+    RBRACE          reduce using rule 66 (expression -> STRING .)
     RSQRBRACKET     reduce using rule 66 (expression -> STRING .)
+    LOOP            reduce using rule 66 (expression -> STRING .)
+    THEN            reduce using rule 66 (expression -> STRING .)
     POOL            reduce using rule 66 (expression -> STRING .)
     ELSE            reduce using rule 66 (expression -> STRING .)
     TEL             reduce using rule 66 (expression -> STRING .)
@@ -1753,10 +1822,10 @@ state 79
     (77) let_expression -> let . formaldehyde IN expression TEL
     (86) formaldehyde -> . formaldehyde COMMA ID COLON type GETS expression
     (87) formaldehyde -> . formaldehyde COMMA ID COLON type
-    (88) formaldehyde -> . formaldehyde COMMA ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (88) formaldehyde -> . formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET
     (89) formaldehyde -> . ID COLON type GETS expression
     (90) formaldehyde -> . ID COLON type
-    (91) formaldehyde -> . ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (91) formaldehyde -> . ID COLON type LSQRBRACKET expression RSQRBRACKET
 
     ID              shift and go to state 108
 
@@ -1857,12 +1926,12 @@ state 81
     PERIOD          reduce using rule 37 (expression -> block_expression .)
     AT              reduce using rule 37 (expression -> block_expression .)
     SEMICOLON       reduce using rule 37 (expression -> block_expression .)
-    RBRACE          reduce using rule 37 (expression -> block_expression .)
-    LOOP            reduce using rule 37 (expression -> block_expression .)
     RPAREN          reduce using rule 37 (expression -> block_expression .)
     COMMA           reduce using rule 37 (expression -> block_expression .)
-    THEN            reduce using rule 37 (expression -> block_expression .)
+    RBRACE          reduce using rule 37 (expression -> block_expression .)
     RSQRBRACKET     reduce using rule 37 (expression -> block_expression .)
+    LOOP            reduce using rule 37 (expression -> block_expression .)
+    THEN            reduce using rule 37 (expression -> block_expression .)
     POOL            reduce using rule 37 (expression -> block_expression .)
     ELSE            reduce using rule 37 (expression -> block_expression .)
     TEL             reduce using rule 37 (expression -> block_expression .)
@@ -1889,12 +1958,12 @@ state 82
     PERIOD          reduce using rule 80 (expression -> if_then_else .)
     AT              reduce using rule 80 (expression -> if_then_else .)
     SEMICOLON       reduce using rule 80 (expression -> if_then_else .)
-    RBRACE          reduce using rule 80 (expression -> if_then_else .)
-    LOOP            reduce using rule 80 (expression -> if_then_else .)
     RPAREN          reduce using rule 80 (expression -> if_then_else .)
     COMMA           reduce using rule 80 (expression -> if_then_else .)
-    THEN            reduce using rule 80 (expression -> if_then_else .)
+    RBRACE          reduce using rule 80 (expression -> if_then_else .)
     RSQRBRACKET     reduce using rule 80 (expression -> if_then_else .)
+    LOOP            reduce using rule 80 (expression -> if_then_else .)
+    THEN            reduce using rule 80 (expression -> if_then_else .)
     POOL            reduce using rule 80 (expression -> if_then_else .)
     ELSE            reduce using rule 80 (expression -> if_then_else .)
     TEL             reduce using rule 80 (expression -> if_then_else .)
@@ -2000,12 +2069,12 @@ state 84
     PERIOD          reduce using rule 68 (expression -> FALSE .)
     AT              reduce using rule 68 (expression -> FALSE .)
     SEMICOLON       reduce using rule 68 (expression -> FALSE .)
-    RBRACE          reduce using rule 68 (expression -> FALSE .)
-    LOOP            reduce using rule 68 (expression -> FALSE .)
     RPAREN          reduce using rule 68 (expression -> FALSE .)
     COMMA           reduce using rule 68 (expression -> FALSE .)
-    THEN            reduce using rule 68 (expression -> FALSE .)
+    RBRACE          reduce using rule 68 (expression -> FALSE .)
     RSQRBRACKET     reduce using rule 68 (expression -> FALSE .)
+    LOOP            reduce using rule 68 (expression -> FALSE .)
+    THEN            reduce using rule 68 (expression -> FALSE .)
     POOL            reduce using rule 68 (expression -> FALSE .)
     ELSE            reduce using rule 68 (expression -> FALSE .)
     TEL             reduce using rule 68 (expression -> FALSE .)
@@ -2032,12 +2101,12 @@ state 85
     PERIOD          reduce using rule 69 (expression -> BREAK .)
     AT              reduce using rule 69 (expression -> BREAK .)
     SEMICOLON       reduce using rule 69 (expression -> BREAK .)
-    RBRACE          reduce using rule 69 (expression -> BREAK .)
-    LOOP            reduce using rule 69 (expression -> BREAK .)
     RPAREN          reduce using rule 69 (expression -> BREAK .)
     COMMA           reduce using rule 69 (expression -> BREAK .)
-    THEN            reduce using rule 69 (expression -> BREAK .)
+    RBRACE          reduce using rule 69 (expression -> BREAK .)
     RSQRBRACKET     reduce using rule 69 (expression -> BREAK .)
+    LOOP            reduce using rule 69 (expression -> BREAK .)
+    THEN            reduce using rule 69 (expression -> BREAK .)
     POOL            reduce using rule 69 (expression -> BREAK .)
     ELSE            reduce using rule 69 (expression -> BREAK .)
     TEL             reduce using rule 69 (expression -> BREAK .)
@@ -2064,12 +2133,12 @@ state 86
     PERIOD          reduce using rule 62 (expression -> SELF .)
     AT              reduce using rule 62 (expression -> SELF .)
     SEMICOLON       reduce using rule 62 (expression -> SELF .)
-    RBRACE          reduce using rule 62 (expression -> SELF .)
-    LOOP            reduce using rule 62 (expression -> SELF .)
     RPAREN          reduce using rule 62 (expression -> SELF .)
     COMMA           reduce using rule 62 (expression -> SELF .)
-    THEN            reduce using rule 62 (expression -> SELF .)
+    RBRACE          reduce using rule 62 (expression -> SELF .)
     RSQRBRACKET     reduce using rule 62 (expression -> SELF .)
+    LOOP            reduce using rule 62 (expression -> SELF .)
+    THEN            reduce using rule 62 (expression -> SELF .)
     POOL            reduce using rule 62 (expression -> SELF .)
     ELSE            reduce using rule 62 (expression -> SELF .)
     TEL             reduce using rule 62 (expression -> SELF .)
@@ -2096,12 +2165,12 @@ state 87
     PERIOD          reduce using rule 82 (expression -> while .)
     AT              reduce using rule 82 (expression -> while .)
     SEMICOLON       reduce using rule 82 (expression -> while .)
-    RBRACE          reduce using rule 82 (expression -> while .)
-    LOOP            reduce using rule 82 (expression -> while .)
     RPAREN          reduce using rule 82 (expression -> while .)
     COMMA           reduce using rule 82 (expression -> while .)
-    THEN            reduce using rule 82 (expression -> while .)
+    RBRACE          reduce using rule 82 (expression -> while .)
     RSQRBRACKET     reduce using rule 82 (expression -> while .)
+    LOOP            reduce using rule 82 (expression -> while .)
+    THEN            reduce using rule 82 (expression -> while .)
     POOL            reduce using rule 82 (expression -> while .)
     ELSE            reduce using rule 82 (expression -> while .)
     TEL             reduce using rule 82 (expression -> while .)
@@ -2128,12 +2197,12 @@ state 88
     PERIOD          reduce using rule 70 (expression -> CONTINUE .)
     AT              reduce using rule 70 (expression -> CONTINUE .)
     SEMICOLON       reduce using rule 70 (expression -> CONTINUE .)
-    RBRACE          reduce using rule 70 (expression -> CONTINUE .)
-    LOOP            reduce using rule 70 (expression -> CONTINUE .)
     RPAREN          reduce using rule 70 (expression -> CONTINUE .)
     COMMA           reduce using rule 70 (expression -> CONTINUE .)
-    THEN            reduce using rule 70 (expression -> CONTINUE .)
+    RBRACE          reduce using rule 70 (expression -> CONTINUE .)
     RSQRBRACKET     reduce using rule 70 (expression -> CONTINUE .)
+    LOOP            reduce using rule 70 (expression -> CONTINUE .)
+    THEN            reduce using rule 70 (expression -> CONTINUE .)
     POOL            reduce using rule 70 (expression -> CONTINUE .)
     ELSE            reduce using rule 70 (expression -> CONTINUE .)
     TEL             reduce using rule 70 (expression -> CONTINUE .)
@@ -2315,9 +2384,39 @@ state 94
 
 state 95
 
-    (36) formal -> ID COLON type LSQRBRACKET INTEGER . RSQRBRACKET
+    (36) formal -> ID COLON type LSQRBRACKET expression . RSQRBRACKET
+    (47) expression -> expression . PLUS expression
+    (48) expression -> expression . MINUS expression
+    (49) expression -> expression . TIMES expression
+    (50) expression -> expression . DIVIDE expression
+    (51) expression -> expression . MOD expression
+    (52) expression -> expression . LT expression
+    (53) expression -> expression . GT expression
+    (54) expression -> expression . LTEQ expression
+    (55) expression -> expression . GTEQ expression
+    (56) expression -> expression . EQUAL expression
+    (57) expression -> expression . OR expression
+    (58) expression -> expression . AND expression
+    (71) expression -> expression . PERIOD ID LPAREN argument_list RPAREN
+    (72) expression -> expression . PERIOD ID LPAREN RPAREN
+    (78) expression -> expression . AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN
+    (79) expression -> expression . AT CLASS_TYPE PERIOD ID LPAREN RPAREN
 
     RSQRBRACKET     shift and go to state 129
+    PLUS            shift and go to state 118
+    MINUS           shift and go to state 115
+    TIMES           shift and go to state 122
+    DIVIDE          shift and go to state 116
+    MOD             shift and go to state 127
+    LT              shift and go to state 117
+    GT              shift and go to state 119
+    LTEQ            shift and go to state 125
+    GTEQ            shift and go to state 113
+    EQUAL           shift and go to state 114
+    OR              shift and go to state 126
+    AND             shift and go to state 124
+    PERIOD          shift and go to state 121
+    AT              shift and go to state 123
 
 
 state 96
@@ -2457,12 +2556,12 @@ state 100
     PERIOD          reduce using rule 73 (expression -> NEW type .)
     AT              reduce using rule 73 (expression -> NEW type .)
     SEMICOLON       reduce using rule 73 (expression -> NEW type .)
-    RBRACE          reduce using rule 73 (expression -> NEW type .)
-    LOOP            reduce using rule 73 (expression -> NEW type .)
     RPAREN          reduce using rule 73 (expression -> NEW type .)
     COMMA           reduce using rule 73 (expression -> NEW type .)
-    THEN            reduce using rule 73 (expression -> NEW type .)
+    RBRACE          reduce using rule 73 (expression -> NEW type .)
     RSQRBRACKET     reduce using rule 73 (expression -> NEW type .)
+    LOOP            reduce using rule 73 (expression -> NEW type .)
+    THEN            reduce using rule 73 (expression -> NEW type .)
     POOL            reduce using rule 73 (expression -> NEW type .)
     ELSE            reduce using rule 73 (expression -> NEW type .)
     TEL             reduce using rule 73 (expression -> NEW type .)
@@ -2737,12 +2836,12 @@ state 104
     OR              reduce using rule 74 (expression -> ISVOID expression .)
     AND             reduce using rule 74 (expression -> ISVOID expression .)
     SEMICOLON       reduce using rule 74 (expression -> ISVOID expression .)
-    RBRACE          reduce using rule 74 (expression -> ISVOID expression .)
-    LOOP            reduce using rule 74 (expression -> ISVOID expression .)
     RPAREN          reduce using rule 74 (expression -> ISVOID expression .)
     COMMA           reduce using rule 74 (expression -> ISVOID expression .)
-    THEN            reduce using rule 74 (expression -> ISVOID expression .)
+    RBRACE          reduce using rule 74 (expression -> ISVOID expression .)
     RSQRBRACKET     reduce using rule 74 (expression -> ISVOID expression .)
+    LOOP            reduce using rule 74 (expression -> ISVOID expression .)
+    THEN            reduce using rule 74 (expression -> ISVOID expression .)
     POOL            reduce using rule 74 (expression -> ISVOID expression .)
     ELSE            reduce using rule 74 (expression -> ISVOID expression .)
     TEL             reduce using rule 74 (expression -> ISVOID expression .)
@@ -2800,12 +2899,12 @@ state 105
     OR              reduce using rule 60 (expression -> TILDA expression .)
     AND             reduce using rule 60 (expression -> TILDA expression .)
     SEMICOLON       reduce using rule 60 (expression -> TILDA expression .)
-    RBRACE          reduce using rule 60 (expression -> TILDA expression .)
-    LOOP            reduce using rule 60 (expression -> TILDA expression .)
     RPAREN          reduce using rule 60 (expression -> TILDA expression .)
     COMMA           reduce using rule 60 (expression -> TILDA expression .)
-    THEN            reduce using rule 60 (expression -> TILDA expression .)
+    RBRACE          reduce using rule 60 (expression -> TILDA expression .)
     RSQRBRACKET     reduce using rule 60 (expression -> TILDA expression .)
+    LOOP            reduce using rule 60 (expression -> TILDA expression .)
+    THEN            reduce using rule 60 (expression -> TILDA expression .)
     POOL            reduce using rule 60 (expression -> TILDA expression .)
     ELSE            reduce using rule 60 (expression -> TILDA expression .)
     TEL             reduce using rule 60 (expression -> TILDA expression .)
@@ -2911,7 +3010,7 @@ state 107
     (77) let_expression -> let formaldehyde . IN expression TEL
     (86) formaldehyde -> formaldehyde . COMMA ID COLON type GETS expression
     (87) formaldehyde -> formaldehyde . COMMA ID COLON type
-    (88) formaldehyde -> formaldehyde . COMMA ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (88) formaldehyde -> formaldehyde . COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET
 
     IN              shift and go to state 139
     COMMA           shift and go to state 140
@@ -2921,7 +3020,7 @@ state 108
 
     (89) formaldehyde -> ID . COLON type GETS expression
     (90) formaldehyde -> ID . COLON type
-    (91) formaldehyde -> ID . COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (91) formaldehyde -> ID . COLON type LSQRBRACKET expression RSQRBRACKET
 
     COLON           shift and go to state 141
 
@@ -3101,12 +3200,12 @@ state 112
     OR              reduce using rule 59 (expression -> NOT expression .)
     AND             reduce using rule 59 (expression -> NOT expression .)
     SEMICOLON       reduce using rule 59 (expression -> NOT expression .)
-    RBRACE          reduce using rule 59 (expression -> NOT expression .)
-    LOOP            reduce using rule 59 (expression -> NOT expression .)
     RPAREN          reduce using rule 59 (expression -> NOT expression .)
     COMMA           reduce using rule 59 (expression -> NOT expression .)
-    THEN            reduce using rule 59 (expression -> NOT expression .)
+    RBRACE          reduce using rule 59 (expression -> NOT expression .)
     RSQRBRACKET     reduce using rule 59 (expression -> NOT expression .)
+    LOOP            reduce using rule 59 (expression -> NOT expression .)
+    THEN            reduce using rule 59 (expression -> NOT expression .)
     POOL            reduce using rule 59 (expression -> NOT expression .)
     ELSE            reduce using rule 59 (expression -> NOT expression .)
     TEL             reduce using rule 59 (expression -> NOT expression .)
@@ -4097,9 +4196,9 @@ state 128
 
 state 129
 
-    (36) formal -> ID COLON type LSQRBRACKET INTEGER RSQRBRACKET .
+    (36) formal -> ID COLON type LSQRBRACKET expression RSQRBRACKET .
 
-    SEMICOLON       reduce using rule 36 (formal -> ID COLON type LSQRBRACKET INTEGER RSQRBRACKET .)
+    SEMICOLON       reduce using rule 36 (formal -> ID COLON type LSQRBRACKET expression RSQRBRACKET .)
 
 
 state 130
@@ -4318,12 +4417,12 @@ state 134
     PERIOD          reduce using rule 44 (expression -> ID LPAREN RPAREN .)
     AT              reduce using rule 44 (expression -> ID LPAREN RPAREN .)
     SEMICOLON       reduce using rule 44 (expression -> ID LPAREN RPAREN .)
-    RBRACE          reduce using rule 44 (expression -> ID LPAREN RPAREN .)
-    LOOP            reduce using rule 44 (expression -> ID LPAREN RPAREN .)
     RPAREN          reduce using rule 44 (expression -> ID LPAREN RPAREN .)
     COMMA           reduce using rule 44 (expression -> ID LPAREN RPAREN .)
-    THEN            reduce using rule 44 (expression -> ID LPAREN RPAREN .)
+    RBRACE          reduce using rule 44 (expression -> ID LPAREN RPAREN .)
     RSQRBRACKET     reduce using rule 44 (expression -> ID LPAREN RPAREN .)
+    LOOP            reduce using rule 44 (expression -> ID LPAREN RPAREN .)
+    THEN            reduce using rule 44 (expression -> ID LPAREN RPAREN .)
     POOL            reduce using rule 44 (expression -> ID LPAREN RPAREN .)
     ELSE            reduce using rule 44 (expression -> ID LPAREN RPAREN .)
     TEL             reduce using rule 44 (expression -> ID LPAREN RPAREN .)
@@ -4399,12 +4498,12 @@ state 137
     (79) expression -> expression . AT CLASS_TYPE PERIOD ID LPAREN RPAREN
 
     SEMICOLON       reduce using rule 41 (expression -> ID GETS expression .)
-    RBRACE          reduce using rule 41 (expression -> ID GETS expression .)
-    LOOP            reduce using rule 41 (expression -> ID GETS expression .)
     RPAREN          reduce using rule 41 (expression -> ID GETS expression .)
     COMMA           reduce using rule 41 (expression -> ID GETS expression .)
-    THEN            reduce using rule 41 (expression -> ID GETS expression .)
+    RBRACE          reduce using rule 41 (expression -> ID GETS expression .)
     RSQRBRACKET     reduce using rule 41 (expression -> ID GETS expression .)
+    LOOP            reduce using rule 41 (expression -> ID GETS expression .)
+    THEN            reduce using rule 41 (expression -> ID GETS expression .)
     POOL            reduce using rule 41 (expression -> ID GETS expression .)
     ELSE            reduce using rule 41 (expression -> ID GETS expression .)
     TEL             reduce using rule 41 (expression -> ID GETS expression .)
@@ -4558,7 +4657,7 @@ state 140
 
     (86) formaldehyde -> formaldehyde COMMA . ID COLON type GETS expression
     (87) formaldehyde -> formaldehyde COMMA . ID COLON type
-    (88) formaldehyde -> formaldehyde COMMA . ID COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (88) formaldehyde -> formaldehyde COMMA . ID COLON type LSQRBRACKET expression RSQRBRACKET
 
     ID              shift and go to state 168
 
@@ -4567,7 +4666,7 @@ state 141
 
     (89) formaldehyde -> ID COLON . type GETS expression
     (90) formaldehyde -> ID COLON . type
-    (91) formaldehyde -> ID COLON . type LSQRBRACKET INTEGER RSQRBRACKET
+    (91) formaldehyde -> ID COLON . type LSQRBRACKET expression RSQRBRACKET
     (24) type -> . CLASS_TYPE
     (25) type -> . INTEGER_TYPE
     (26) type -> . BOOL_TYPE
@@ -4603,12 +4702,12 @@ state 142
     PERIOD          reduce using rule 61 (expression -> LPAREN expression RPAREN .)
     AT              reduce using rule 61 (expression -> LPAREN expression RPAREN .)
     SEMICOLON       reduce using rule 61 (expression -> LPAREN expression RPAREN .)
-    RBRACE          reduce using rule 61 (expression -> LPAREN expression RPAREN .)
-    LOOP            reduce using rule 61 (expression -> LPAREN expression RPAREN .)
     RPAREN          reduce using rule 61 (expression -> LPAREN expression RPAREN .)
     COMMA           reduce using rule 61 (expression -> LPAREN expression RPAREN .)
-    THEN            reduce using rule 61 (expression -> LPAREN expression RPAREN .)
+    RBRACE          reduce using rule 61 (expression -> LPAREN expression RPAREN .)
     RSQRBRACKET     reduce using rule 61 (expression -> LPAREN expression RPAREN .)
+    LOOP            reduce using rule 61 (expression -> LPAREN expression RPAREN .)
+    THEN            reduce using rule 61 (expression -> LPAREN expression RPAREN .)
     POOL            reduce using rule 61 (expression -> LPAREN expression RPAREN .)
     ELSE            reduce using rule 61 (expression -> LPAREN expression RPAREN .)
     TEL             reduce using rule 61 (expression -> LPAREN expression RPAREN .)
@@ -4634,13 +4733,13 @@ state 143
     AND             reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
     PERIOD          reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
     AT              reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
+    RPAREN          reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
+    COMMA           reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
     RBRACE          reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
     SEMICOLON       reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
+    RSQRBRACKET     reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
     LOOP            reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
     THEN            reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
-    RPAREN          reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
-    RSQRBRACKET     reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
-    COMMA           reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
     POOL            reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
     ELSE            reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
     TEL             reduce using rule 38 (block_expression -> LBRACE block_list RBRACE .)
@@ -4738,12 +4837,12 @@ state 146
     OR              reduce using rule 55 (expression -> expression GTEQ expression .)
     AND             reduce using rule 55 (expression -> expression GTEQ expression .)
     SEMICOLON       reduce using rule 55 (expression -> expression GTEQ expression .)
-    RBRACE          reduce using rule 55 (expression -> expression GTEQ expression .)
-    LOOP            reduce using rule 55 (expression -> expression GTEQ expression .)
     RPAREN          reduce using rule 55 (expression -> expression GTEQ expression .)
     COMMA           reduce using rule 55 (expression -> expression GTEQ expression .)
-    THEN            reduce using rule 55 (expression -> expression GTEQ expression .)
+    RBRACE          reduce using rule 55 (expression -> expression GTEQ expression .)
     RSQRBRACKET     reduce using rule 55 (expression -> expression GTEQ expression .)
+    LOOP            reduce using rule 55 (expression -> expression GTEQ expression .)
+    THEN            reduce using rule 55 (expression -> expression GTEQ expression .)
     POOL            reduce using rule 55 (expression -> expression GTEQ expression .)
     ELSE            reduce using rule 55 (expression -> expression GTEQ expression .)
     TEL             reduce using rule 55 (expression -> expression GTEQ expression .)
@@ -4801,12 +4900,12 @@ state 147
     OR              reduce using rule 56 (expression -> expression EQUAL expression .)
     AND             reduce using rule 56 (expression -> expression EQUAL expression .)
     SEMICOLON       reduce using rule 56 (expression -> expression EQUAL expression .)
-    RBRACE          reduce using rule 56 (expression -> expression EQUAL expression .)
-    LOOP            reduce using rule 56 (expression -> expression EQUAL expression .)
     RPAREN          reduce using rule 56 (expression -> expression EQUAL expression .)
     COMMA           reduce using rule 56 (expression -> expression EQUAL expression .)
-    THEN            reduce using rule 56 (expression -> expression EQUAL expression .)
+    RBRACE          reduce using rule 56 (expression -> expression EQUAL expression .)
     RSQRBRACKET     reduce using rule 56 (expression -> expression EQUAL expression .)
+    LOOP            reduce using rule 56 (expression -> expression EQUAL expression .)
+    THEN            reduce using rule 56 (expression -> expression EQUAL expression .)
     POOL            reduce using rule 56 (expression -> expression EQUAL expression .)
     ELSE            reduce using rule 56 (expression -> expression EQUAL expression .)
     TEL             reduce using rule 56 (expression -> expression EQUAL expression .)
@@ -4866,12 +4965,12 @@ state 148
     OR              reduce using rule 48 (expression -> expression MINUS expression .)
     AND             reduce using rule 48 (expression -> expression MINUS expression .)
     SEMICOLON       reduce using rule 48 (expression -> expression MINUS expression .)
-    RBRACE          reduce using rule 48 (expression -> expression MINUS expression .)
-    LOOP            reduce using rule 48 (expression -> expression MINUS expression .)
     RPAREN          reduce using rule 48 (expression -> expression MINUS expression .)
     COMMA           reduce using rule 48 (expression -> expression MINUS expression .)
-    THEN            reduce using rule 48 (expression -> expression MINUS expression .)
+    RBRACE          reduce using rule 48 (expression -> expression MINUS expression .)
     RSQRBRACKET     reduce using rule 48 (expression -> expression MINUS expression .)
+    LOOP            reduce using rule 48 (expression -> expression MINUS expression .)
+    THEN            reduce using rule 48 (expression -> expression MINUS expression .)
     POOL            reduce using rule 48 (expression -> expression MINUS expression .)
     ELSE            reduce using rule 48 (expression -> expression MINUS expression .)
     TEL             reduce using rule 48 (expression -> expression MINUS expression .)
@@ -4932,12 +5031,12 @@ state 149
     OR              reduce using rule 50 (expression -> expression DIVIDE expression .)
     AND             reduce using rule 50 (expression -> expression DIVIDE expression .)
     SEMICOLON       reduce using rule 50 (expression -> expression DIVIDE expression .)
-    RBRACE          reduce using rule 50 (expression -> expression DIVIDE expression .)
-    LOOP            reduce using rule 50 (expression -> expression DIVIDE expression .)
     RPAREN          reduce using rule 50 (expression -> expression DIVIDE expression .)
     COMMA           reduce using rule 50 (expression -> expression DIVIDE expression .)
-    THEN            reduce using rule 50 (expression -> expression DIVIDE expression .)
+    RBRACE          reduce using rule 50 (expression -> expression DIVIDE expression .)
     RSQRBRACKET     reduce using rule 50 (expression -> expression DIVIDE expression .)
+    LOOP            reduce using rule 50 (expression -> expression DIVIDE expression .)
+    THEN            reduce using rule 50 (expression -> expression DIVIDE expression .)
     POOL            reduce using rule 50 (expression -> expression DIVIDE expression .)
     ELSE            reduce using rule 50 (expression -> expression DIVIDE expression .)
     TEL             reduce using rule 50 (expression -> expression DIVIDE expression .)
@@ -4990,12 +5089,12 @@ state 150
     OR              reduce using rule 52 (expression -> expression LT expression .)
     AND             reduce using rule 52 (expression -> expression LT expression .)
     SEMICOLON       reduce using rule 52 (expression -> expression LT expression .)
-    RBRACE          reduce using rule 52 (expression -> expression LT expression .)
-    LOOP            reduce using rule 52 (expression -> expression LT expression .)
     RPAREN          reduce using rule 52 (expression -> expression LT expression .)
     COMMA           reduce using rule 52 (expression -> expression LT expression .)
-    THEN            reduce using rule 52 (expression -> expression LT expression .)
+    RBRACE          reduce using rule 52 (expression -> expression LT expression .)
     RSQRBRACKET     reduce using rule 52 (expression -> expression LT expression .)
+    LOOP            reduce using rule 52 (expression -> expression LT expression .)
+    THEN            reduce using rule 52 (expression -> expression LT expression .)
     POOL            reduce using rule 52 (expression -> expression LT expression .)
     ELSE            reduce using rule 52 (expression -> expression LT expression .)
     TEL             reduce using rule 52 (expression -> expression LT expression .)
@@ -5055,12 +5154,12 @@ state 151
     OR              reduce using rule 47 (expression -> expression PLUS expression .)
     AND             reduce using rule 47 (expression -> expression PLUS expression .)
     SEMICOLON       reduce using rule 47 (expression -> expression PLUS expression .)
-    RBRACE          reduce using rule 47 (expression -> expression PLUS expression .)
-    LOOP            reduce using rule 47 (expression -> expression PLUS expression .)
     RPAREN          reduce using rule 47 (expression -> expression PLUS expression .)
     COMMA           reduce using rule 47 (expression -> expression PLUS expression .)
-    THEN            reduce using rule 47 (expression -> expression PLUS expression .)
+    RBRACE          reduce using rule 47 (expression -> expression PLUS expression .)
     RSQRBRACKET     reduce using rule 47 (expression -> expression PLUS expression .)
+    LOOP            reduce using rule 47 (expression -> expression PLUS expression .)
+    THEN            reduce using rule 47 (expression -> expression PLUS expression .)
     POOL            reduce using rule 47 (expression -> expression PLUS expression .)
     ELSE            reduce using rule 47 (expression -> expression PLUS expression .)
     TEL             reduce using rule 47 (expression -> expression PLUS expression .)
@@ -5116,12 +5215,12 @@ state 152
     OR              reduce using rule 53 (expression -> expression GT expression .)
     AND             reduce using rule 53 (expression -> expression GT expression .)
     SEMICOLON       reduce using rule 53 (expression -> expression GT expression .)
-    RBRACE          reduce using rule 53 (expression -> expression GT expression .)
-    LOOP            reduce using rule 53 (expression -> expression GT expression .)
     RPAREN          reduce using rule 53 (expression -> expression GT expression .)
     COMMA           reduce using rule 53 (expression -> expression GT expression .)
-    THEN            reduce using rule 53 (expression -> expression GT expression .)
+    RBRACE          reduce using rule 53 (expression -> expression GT expression .)
     RSQRBRACKET     reduce using rule 53 (expression -> expression GT expression .)
+    LOOP            reduce using rule 53 (expression -> expression GT expression .)
+    THEN            reduce using rule 53 (expression -> expression GT expression .)
     POOL            reduce using rule 53 (expression -> expression GT expression .)
     ELSE            reduce using rule 53 (expression -> expression GT expression .)
     TEL             reduce using rule 53 (expression -> expression GT expression .)
@@ -5192,12 +5291,12 @@ state 154
     OR              reduce using rule 49 (expression -> expression TIMES expression .)
     AND             reduce using rule 49 (expression -> expression TIMES expression .)
     SEMICOLON       reduce using rule 49 (expression -> expression TIMES expression .)
-    RBRACE          reduce using rule 49 (expression -> expression TIMES expression .)
-    LOOP            reduce using rule 49 (expression -> expression TIMES expression .)
     RPAREN          reduce using rule 49 (expression -> expression TIMES expression .)
     COMMA           reduce using rule 49 (expression -> expression TIMES expression .)
-    THEN            reduce using rule 49 (expression -> expression TIMES expression .)
+    RBRACE          reduce using rule 49 (expression -> expression TIMES expression .)
     RSQRBRACKET     reduce using rule 49 (expression -> expression TIMES expression .)
+    LOOP            reduce using rule 49 (expression -> expression TIMES expression .)
+    THEN            reduce using rule 49 (expression -> expression TIMES expression .)
     POOL            reduce using rule 49 (expression -> expression TIMES expression .)
     ELSE            reduce using rule 49 (expression -> expression TIMES expression .)
     TEL             reduce using rule 49 (expression -> expression TIMES expression .)
@@ -5253,12 +5352,12 @@ state 156
     OR              reduce using rule 58 (expression -> expression AND expression .)
     AND             reduce using rule 58 (expression -> expression AND expression .)
     SEMICOLON       reduce using rule 58 (expression -> expression AND expression .)
-    RBRACE          reduce using rule 58 (expression -> expression AND expression .)
-    LOOP            reduce using rule 58 (expression -> expression AND expression .)
     RPAREN          reduce using rule 58 (expression -> expression AND expression .)
     COMMA           reduce using rule 58 (expression -> expression AND expression .)
-    THEN            reduce using rule 58 (expression -> expression AND expression .)
+    RBRACE          reduce using rule 58 (expression -> expression AND expression .)
     RSQRBRACKET     reduce using rule 58 (expression -> expression AND expression .)
+    LOOP            reduce using rule 58 (expression -> expression AND expression .)
+    THEN            reduce using rule 58 (expression -> expression AND expression .)
     POOL            reduce using rule 58 (expression -> expression AND expression .)
     ELSE            reduce using rule 58 (expression -> expression AND expression .)
     TEL             reduce using rule 58 (expression -> expression AND expression .)
@@ -5321,12 +5420,12 @@ state 157
     OR              reduce using rule 54 (expression -> expression LTEQ expression .)
     AND             reduce using rule 54 (expression -> expression LTEQ expression .)
     SEMICOLON       reduce using rule 54 (expression -> expression LTEQ expression .)
-    RBRACE          reduce using rule 54 (expression -> expression LTEQ expression .)
-    LOOP            reduce using rule 54 (expression -> expression LTEQ expression .)
     RPAREN          reduce using rule 54 (expression -> expression LTEQ expression .)
     COMMA           reduce using rule 54 (expression -> expression LTEQ expression .)
-    THEN            reduce using rule 54 (expression -> expression LTEQ expression .)
+    RBRACE          reduce using rule 54 (expression -> expression LTEQ expression .)
     RSQRBRACKET     reduce using rule 54 (expression -> expression LTEQ expression .)
+    LOOP            reduce using rule 54 (expression -> expression LTEQ expression .)
+    THEN            reduce using rule 54 (expression -> expression LTEQ expression .)
     POOL            reduce using rule 54 (expression -> expression LTEQ expression .)
     ELSE            reduce using rule 54 (expression -> expression LTEQ expression .)
     TEL             reduce using rule 54 (expression -> expression LTEQ expression .)
@@ -5378,12 +5477,12 @@ state 158
 
     OR              reduce using rule 57 (expression -> expression OR expression .)
     SEMICOLON       reduce using rule 57 (expression -> expression OR expression .)
-    RBRACE          reduce using rule 57 (expression -> expression OR expression .)
-    LOOP            reduce using rule 57 (expression -> expression OR expression .)
     RPAREN          reduce using rule 57 (expression -> expression OR expression .)
     COMMA           reduce using rule 57 (expression -> expression OR expression .)
-    THEN            reduce using rule 57 (expression -> expression OR expression .)
+    RBRACE          reduce using rule 57 (expression -> expression OR expression .)
     RSQRBRACKET     reduce using rule 57 (expression -> expression OR expression .)
+    LOOP            reduce using rule 57 (expression -> expression OR expression .)
+    THEN            reduce using rule 57 (expression -> expression OR expression .)
     POOL            reduce using rule 57 (expression -> expression OR expression .)
     ELSE            reduce using rule 57 (expression -> expression OR expression .)
     TEL             reduce using rule 57 (expression -> expression OR expression .)
@@ -5452,12 +5551,12 @@ state 159
     OR              reduce using rule 51 (expression -> expression MOD expression .)
     AND             reduce using rule 51 (expression -> expression MOD expression .)
     SEMICOLON       reduce using rule 51 (expression -> expression MOD expression .)
-    RBRACE          reduce using rule 51 (expression -> expression MOD expression .)
-    LOOP            reduce using rule 51 (expression -> expression MOD expression .)
     RPAREN          reduce using rule 51 (expression -> expression MOD expression .)
     COMMA           reduce using rule 51 (expression -> expression MOD expression .)
-    THEN            reduce using rule 51 (expression -> expression MOD expression .)
+    RBRACE          reduce using rule 51 (expression -> expression MOD expression .)
     RSQRBRACKET     reduce using rule 51 (expression -> expression MOD expression .)
+    LOOP            reduce using rule 51 (expression -> expression MOD expression .)
+    THEN            reduce using rule 51 (expression -> expression MOD expression .)
     POOL            reduce using rule 51 (expression -> expression MOD expression .)
     ELSE            reduce using rule 51 (expression -> expression MOD expression .)
     TEL             reduce using rule 51 (expression -> expression MOD expression .)
@@ -5585,12 +5684,12 @@ state 163
     PERIOD          reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
     AT              reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
     SEMICOLON       reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
-    RBRACE          reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
-    LOOP            reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
     RPAREN          reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
     COMMA           reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
-    THEN            reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
+    RBRACE          reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
     RSQRBRACKET     reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
+    LOOP            reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
+    THEN            reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
     POOL            reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
     ELSE            reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
     TEL             reduce using rule 64 (expression -> ID LSQRBRACKET expression RSQRBRACKET .)
@@ -5617,12 +5716,12 @@ state 164
     PERIOD          reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
     AT              reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
     SEMICOLON       reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
-    RBRACE          reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
-    LOOP            reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
     RPAREN          reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
     COMMA           reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
-    THEN            reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
+    RBRACE          reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
     RSQRBRACKET     reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
+    LOOP            reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
+    THEN            reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
     POOL            reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
     ELSE            reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
     TEL             reduce using rule 43 (expression -> ID LPAREN argument_list RPAREN .)
@@ -5823,7 +5922,7 @@ state 168
 
     (86) formaldehyde -> formaldehyde COMMA ID . COLON type GETS expression
     (87) formaldehyde -> formaldehyde COMMA ID . COLON type
-    (88) formaldehyde -> formaldehyde COMMA ID . COLON type LSQRBRACKET INTEGER RSQRBRACKET
+    (88) formaldehyde -> formaldehyde COMMA ID . COLON type LSQRBRACKET expression RSQRBRACKET
 
     COLON           shift and go to state 179
 
@@ -5832,7 +5931,7 @@ state 169
 
     (89) formaldehyde -> ID COLON type . GETS expression
     (90) formaldehyde -> ID COLON type .
-    (91) formaldehyde -> ID COLON type . LSQRBRACKET INTEGER RSQRBRACKET
+    (91) formaldehyde -> ID COLON type . LSQRBRACKET expression RSQRBRACKET
 
     GETS            shift and go to state 180
     IN              reduce using rule 90 (formaldehyde -> ID COLON type .)
@@ -5958,6 +6057,7 @@ state 173
 
     (83) while -> WHILE expression LOOP expression POOL .
 
+    RPAREN          reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     PLUS            reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     MINUS           reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     TIMES           reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
@@ -5972,13 +6072,12 @@ state 173
     AND             reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     PERIOD          reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     AT              reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
-    RPAREN          reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
-    COMMA           reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
-    RBRACE          reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     SEMICOLON       reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
+    RBRACE          reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
+    RSQRBRACKET     reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     LOOP            reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     THEN            reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
-    RSQRBRACKET     reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
+    COMMA           reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     POOL            reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     ELSE            reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
     TEL             reduce using rule 83 (while -> WHILE expression LOOP expression POOL .)
@@ -6231,14 +6330,14 @@ state 178
     AND             reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
     PERIOD          reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
     AT              reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
-    RPAREN          reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
-    COMMA           reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
-    LOOP            reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
-    POOL            reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
     RBRACE          reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
     SEMICOLON       reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
-    THEN            reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
     RSQRBRACKET     reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
+    LOOP            reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
+    THEN            reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
+    RPAREN          reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
+    COMMA           reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
+    POOL            reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
     ELSE            reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
     TEL             reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
     FI              reduce using rule 77 (let_expression -> let formaldehyde IN expression TEL .)
@@ -6249,7 +6348,7 @@ state 179
 
     (86) formaldehyde -> formaldehyde COMMA ID COLON . type GETS expression
     (87) formaldehyde -> formaldehyde COMMA ID COLON . type
-    (88) formaldehyde -> formaldehyde COMMA ID COLON . type LSQRBRACKET INTEGER RSQRBRACKET
+    (88) formaldehyde -> formaldehyde COMMA ID COLON . type LSQRBRACKET expression RSQRBRACKET
     (24) type -> . CLASS_TYPE
     (25) type -> . INTEGER_TYPE
     (26) type -> . BOOL_TYPE
@@ -6344,10 +6443,79 @@ state 180
 
 state 181
 
-    (91) formaldehyde -> ID COLON type LSQRBRACKET . INTEGER RSQRBRACKET
+    (91) formaldehyde -> ID COLON type LSQRBRACKET . expression RSQRBRACKET
+    (37) expression -> . block_expression
+    (41) expression -> . ID GETS expression
+    (42) expression -> . ID LSQRBRACKET expression RSQRBRACKET GETS expression
+    (43) expression -> . ID LPAREN argument_list RPAREN
+    (44) expression -> . ID LPAREN RPAREN
+    (47) expression -> . expression PLUS expression
+    (48) expression -> . expression MINUS expression
+    (49) expression -> . expression TIMES expression
+    (50) expression -> . expression DIVIDE expression
+    (51) expression -> . expression MOD expression
+    (52) expression -> . expression LT expression
+    (53) expression -> . expression GT expression
+    (54) expression -> . expression LTEQ expression
+    (55) expression -> . expression GTEQ expression
+    (56) expression -> . expression EQUAL expression
+    (57) expression -> . expression OR expression
+    (58) expression -> . expression AND expression
+    (59) expression -> . NOT expression
+    (60) expression -> . TILDA expression
+    (61) expression -> . LPAREN expression RPAREN
+    (62) expression -> . SELF
+    (63) expression -> . ID
+    (64) expression -> . ID LSQRBRACKET expression RSQRBRACKET
+    (65) expression -> . INTEGER
+    (66) expression -> . STRING
+    (67) expression -> . TRUE
+    (68) expression -> . FALSE
+    (69) expression -> . BREAK
+    (70) expression -> . CONTINUE
+    (71) expression -> . expression PERIOD ID LPAREN argument_list RPAREN
+    (72) expression -> . expression PERIOD ID LPAREN RPAREN
+    (73) expression -> . NEW type
+    (74) expression -> . ISVOID expression
+    (75) expression -> . let_expression
+    (78) expression -> . expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN
+    (79) expression -> . expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN
+    (80) expression -> . if_then_else
+    (82) expression -> . while
+    (84) expression -> . for
+    (38) block_expression -> . LBRACE block_list RBRACE
+    (77) let_expression -> . let formaldehyde IN expression TEL
+    (81) if_then_else -> . IF expression THEN expression ELSE expression FI
+    (83) while -> . WHILE expression LOOP expression POOL
+    (85) for -> . FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL
+    (76) let -> . LET
 
-    INTEGER         shift and go to state 190
+    ID              shift and go to state 73
+    NOT             shift and go to state 90
+    TILDA           shift and go to state 75
+    LPAREN          shift and go to state 80
+    SELF            shift and go to state 86
+    INTEGER         shift and go to state 76
+    STRING          shift and go to state 77
+    TRUE            shift and go to state 71
+    FALSE           shift and go to state 84
+    BREAK           shift and go to state 85
+    CONTINUE        shift and go to state 88
+    NEW             shift and go to state 70
+    ISVOID          shift and go to state 74
+    LBRACE          shift and go to state 83
+    IF              shift and go to state 69
+    WHILE           shift and go to state 68
+    FOR             shift and go to state 78
+    LET             shift and go to state 89
 
+    for                            shift and go to state 72
+    let_expression                 shift and go to state 67
+    while                          shift and go to state 87
+    let                            shift and go to state 79
+    block_expression               shift and go to state 81
+    expression                     shift and go to state 190
+    if_then_else                   shift and go to state 82
 
 state 182
 
@@ -6368,12 +6536,12 @@ state 182
     PERIOD          reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
     AT              reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
     SEMICOLON       reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
-    RBRACE          reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
-    LOOP            reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
     RPAREN          reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
     COMMA           reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
-    THEN            reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
+    RBRACE          reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
     RSQRBRACKET     reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
+    LOOP            reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
+    THEN            reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
     POOL            reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
     ELSE            reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
     TEL             reduce using rule 72 (expression -> expression PERIOD ID LPAREN RPAREN .)
@@ -6456,12 +6624,12 @@ state 186
     (79) expression -> expression . AT CLASS_TYPE PERIOD ID LPAREN RPAREN
 
     SEMICOLON       reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
-    RBRACE          reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
-    LOOP            reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
     RPAREN          reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
     COMMA           reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
-    THEN            reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
+    RBRACE          reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
     RSQRBRACKET     reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
+    LOOP            reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
+    THEN            reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
     POOL            reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
     ELSE            reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
     TEL             reduce using rule 42 (expression -> ID LSQRBRACKET expression RSQRBRACKET GETS expression .)
@@ -6578,7 +6746,7 @@ state 188
 
     (86) formaldehyde -> formaldehyde COMMA ID COLON type . GETS expression
     (87) formaldehyde -> formaldehyde COMMA ID COLON type .
-    (88) formaldehyde -> formaldehyde COMMA ID COLON type . LSQRBRACKET INTEGER RSQRBRACKET
+    (88) formaldehyde -> formaldehyde COMMA ID COLON type . LSQRBRACKET expression RSQRBRACKET
 
     GETS            shift and go to state 196
     IN              reduce using rule 87 (formaldehyde -> formaldehyde COMMA ID COLON type .)
@@ -6626,9 +6794,39 @@ state 189
 
 state 190
 
-    (91) formaldehyde -> ID COLON type LSQRBRACKET INTEGER . RSQRBRACKET
+    (91) formaldehyde -> ID COLON type LSQRBRACKET expression . RSQRBRACKET
+    (47) expression -> expression . PLUS expression
+    (48) expression -> expression . MINUS expression
+    (49) expression -> expression . TIMES expression
+    (50) expression -> expression . DIVIDE expression
+    (51) expression -> expression . MOD expression
+    (52) expression -> expression . LT expression
+    (53) expression -> expression . GT expression
+    (54) expression -> expression . LTEQ expression
+    (55) expression -> expression . GTEQ expression
+    (56) expression -> expression . EQUAL expression
+    (57) expression -> expression . OR expression
+    (58) expression -> expression . AND expression
+    (71) expression -> expression . PERIOD ID LPAREN argument_list RPAREN
+    (72) expression -> expression . PERIOD ID LPAREN RPAREN
+    (78) expression -> expression . AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN
+    (79) expression -> expression . AT CLASS_TYPE PERIOD ID LPAREN RPAREN
 
     RSQRBRACKET     shift and go to state 197
+    PLUS            shift and go to state 118
+    MINUS           shift and go to state 115
+    TIMES           shift and go to state 122
+    DIVIDE          shift and go to state 116
+    MOD             shift and go to state 127
+    LT              shift and go to state 117
+    GT              shift and go to state 119
+    LTEQ            shift and go to state 125
+    GTEQ            shift and go to state 113
+    EQUAL           shift and go to state 114
+    OR              shift and go to state 126
+    AND             shift and go to state 124
+    PERIOD          shift and go to state 121
+    AT              shift and go to state 123
 
 
 state 191
@@ -6650,12 +6848,12 @@ state 191
     PERIOD          reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
     AT              reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
     SEMICOLON       reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
-    RBRACE          reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
-    LOOP            reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
     RPAREN          reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
     COMMA           reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
-    THEN            reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
+    RBRACE          reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
     RSQRBRACKET     reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
+    LOOP            reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
+    THEN            reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
     POOL            reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
     ELSE            reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
     TEL             reduce using rule 71 (expression -> expression PERIOD ID LPAREN argument_list RPAREN .)
@@ -6748,6 +6946,7 @@ state 193
 
     (81) if_then_else -> IF expression THEN expression ELSE expression FI .
 
+    THEN            reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     PLUS            reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     MINUS           reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     TIMES           reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
@@ -6762,18 +6961,17 @@ state 193
     AND             reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     PERIOD          reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     AT              reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
-    IN              reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
-    COMMA           reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
-    RBRACE          reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     SEMICOLON       reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
-    LOOP            reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
-    THEN            reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
-    RPAREN          reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
+    RBRACE          reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     RSQRBRACKET     reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
+    LOOP            reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
+    RPAREN          reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
+    COMMA           reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     POOL            reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     ELSE            reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     TEL             reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
     FI              reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
+    IN              reduce using rule 81 (if_then_else -> IF expression THEN expression ELSE expression FI .)
 
 
 state 194
@@ -6815,10 +7013,79 @@ state 194
 
 state 195
 
-    (88) formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET . INTEGER RSQRBRACKET
+    (88) formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET . expression RSQRBRACKET
+    (37) expression -> . block_expression
+    (41) expression -> . ID GETS expression
+    (42) expression -> . ID LSQRBRACKET expression RSQRBRACKET GETS expression
+    (43) expression -> . ID LPAREN argument_list RPAREN
+    (44) expression -> . ID LPAREN RPAREN
+    (47) expression -> . expression PLUS expression
+    (48) expression -> . expression MINUS expression
+    (49) expression -> . expression TIMES expression
+    (50) expression -> . expression DIVIDE expression
+    (51) expression -> . expression MOD expression
+    (52) expression -> . expression LT expression
+    (53) expression -> . expression GT expression
+    (54) expression -> . expression LTEQ expression
+    (55) expression -> . expression GTEQ expression
+    (56) expression -> . expression EQUAL expression
+    (57) expression -> . expression OR expression
+    (58) expression -> . expression AND expression
+    (59) expression -> . NOT expression
+    (60) expression -> . TILDA expression
+    (61) expression -> . LPAREN expression RPAREN
+    (62) expression -> . SELF
+    (63) expression -> . ID
+    (64) expression -> . ID LSQRBRACKET expression RSQRBRACKET
+    (65) expression -> . INTEGER
+    (66) expression -> . STRING
+    (67) expression -> . TRUE
+    (68) expression -> . FALSE
+    (69) expression -> . BREAK
+    (70) expression -> . CONTINUE
+    (71) expression -> . expression PERIOD ID LPAREN argument_list RPAREN
+    (72) expression -> . expression PERIOD ID LPAREN RPAREN
+    (73) expression -> . NEW type
+    (74) expression -> . ISVOID expression
+    (75) expression -> . let_expression
+    (78) expression -> . expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN
+    (79) expression -> . expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN
+    (80) expression -> . if_then_else
+    (82) expression -> . while
+    (84) expression -> . for
+    (38) block_expression -> . LBRACE block_list RBRACE
+    (77) let_expression -> . let formaldehyde IN expression TEL
+    (81) if_then_else -> . IF expression THEN expression ELSE expression FI
+    (83) while -> . WHILE expression LOOP expression POOL
+    (85) for -> . FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL
+    (76) let -> . LET
 
-    INTEGER         shift and go to state 201
+    ID              shift and go to state 73
+    NOT             shift and go to state 90
+    TILDA           shift and go to state 75
+    LPAREN          shift and go to state 80
+    SELF            shift and go to state 86
+    INTEGER         shift and go to state 76
+    STRING          shift and go to state 77
+    TRUE            shift and go to state 71
+    FALSE           shift and go to state 84
+    BREAK           shift and go to state 85
+    CONTINUE        shift and go to state 88
+    NEW             shift and go to state 70
+    ISVOID          shift and go to state 74
+    LBRACE          shift and go to state 83
+    IF              shift and go to state 69
+    WHILE           shift and go to state 68
+    FOR             shift and go to state 78
+    LET             shift and go to state 89
 
+    for                            shift and go to state 72
+    expression                     shift and go to state 201
+    let_expression                 shift and go to state 67
+    while                          shift and go to state 87
+    block_expression               shift and go to state 81
+    let                            shift and go to state 79
+    if_then_else                   shift and go to state 82
 
 state 196
 
@@ -6898,10 +7165,10 @@ state 196
 
 state 197
 
-    (91) formaldehyde -> ID COLON type LSQRBRACKET INTEGER RSQRBRACKET .
+    (91) formaldehyde -> ID COLON type LSQRBRACKET expression RSQRBRACKET .
 
-    IN              reduce using rule 91 (formaldehyde -> ID COLON type LSQRBRACKET INTEGER RSQRBRACKET .)
-    COMMA           reduce using rule 91 (formaldehyde -> ID COLON type LSQRBRACKET INTEGER RSQRBRACKET .)
+    IN              reduce using rule 91 (formaldehyde -> ID COLON type LSQRBRACKET expression RSQRBRACKET .)
+    COMMA           reduce using rule 91 (formaldehyde -> ID COLON type LSQRBRACKET expression RSQRBRACKET .)
 
 
 state 198
@@ -6923,12 +7190,12 @@ state 198
     PERIOD          reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
     AT              reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
     SEMICOLON       reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
-    RBRACE          reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
-    LOOP            reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
     RPAREN          reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
     COMMA           reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
-    THEN            reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
+    RBRACE          reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
     RSQRBRACKET     reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
+    LOOP            reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
+    THEN            reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
     POOL            reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
     ELSE            reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
     TEL             reduce using rule 79 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN .)
@@ -6954,9 +7221,39 @@ state 200
 
 state 201
 
-    (88) formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET INTEGER . RSQRBRACKET
+    (88) formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET expression . RSQRBRACKET
+    (47) expression -> expression . PLUS expression
+    (48) expression -> expression . MINUS expression
+    (49) expression -> expression . TIMES expression
+    (50) expression -> expression . DIVIDE expression
+    (51) expression -> expression . MOD expression
+    (52) expression -> expression . LT expression
+    (53) expression -> expression . GT expression
+    (54) expression -> expression . LTEQ expression
+    (55) expression -> expression . GTEQ expression
+    (56) expression -> expression . EQUAL expression
+    (57) expression -> expression . OR expression
+    (58) expression -> expression . AND expression
+    (71) expression -> expression . PERIOD ID LPAREN argument_list RPAREN
+    (72) expression -> expression . PERIOD ID LPAREN RPAREN
+    (78) expression -> expression . AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN
+    (79) expression -> expression . AT CLASS_TYPE PERIOD ID LPAREN RPAREN
 
     RSQRBRACKET     shift and go to state 205
+    PLUS            shift and go to state 118
+    MINUS           shift and go to state 115
+    TIMES           shift and go to state 122
+    DIVIDE          shift and go to state 116
+    MOD             shift and go to state 127
+    LT              shift and go to state 117
+    GT              shift and go to state 119
+    LTEQ            shift and go to state 125
+    GTEQ            shift and go to state 113
+    EQUAL           shift and go to state 114
+    OR              shift and go to state 126
+    AND             shift and go to state 124
+    PERIOD          shift and go to state 121
+    AT              shift and go to state 123
 
 
 state 202
@@ -7016,12 +7313,12 @@ state 203
     PERIOD          reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
     AT              reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
     SEMICOLON       reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
-    RBRACE          reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
-    LOOP            reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
     RPAREN          reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
     COMMA           reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
-    THEN            reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
+    RBRACE          reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
     RSQRBRACKET     reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
+    LOOP            reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
+    THEN            reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
     POOL            reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
     ELSE            reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
     TEL             reduce using rule 78 (expression -> expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN .)
@@ -7107,10 +7404,10 @@ state 204
 
 state 205
 
-    (88) formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET INTEGER RSQRBRACKET .
+    (88) formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET .
 
-    IN              reduce using rule 88 (formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET INTEGER RSQRBRACKET .)
-    COMMA           reduce using rule 88 (formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET INTEGER RSQRBRACKET .)
+    IN              reduce using rule 88 (formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET .)
+    COMMA           reduce using rule 88 (formaldehyde -> formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET .)
 
 
 state 206
@@ -7170,13 +7467,13 @@ state 207
     AT              reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     RPAREN          reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     COMMA           reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
+    RSQRBRACKET     reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
+    ELSE            reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     RBRACE          reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     SEMICOLON       reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     LOOP            reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     THEN            reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
-    RSQRBRACKET     reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     POOL            reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
-    ELSE            reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     TEL             reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     FI              reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)
     IN              reduce using rule 85 (for -> FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL .)

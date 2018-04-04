@@ -461,7 +461,7 @@ def p_formal(p):
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
 def p_formal_arr(p):
-  'formal : ID COLON type LSQRBRACKET INTEGER RSQRBRACKET'
+  'formal : ID COLON type LSQRBRACKET expression RSQRBRACKET'
   rule.append(33)
 
   p[0]=TREE.Formal(code=[])
@@ -470,7 +470,7 @@ def p_formal_arr(p):
     # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
-  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5]), isArray =False)
+  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5].place), isArray =False)
 
 
 #--------------------------------------------  Not DONE ----------------------------------------------
@@ -525,7 +525,9 @@ def p_expression_assign_arr(p):
   rule.append(39)
   var = current_symbol_table[0].getVariable(p[1])
 
-  code = ['INDEX_ASSIGN_L,'+p[1]+','+p[3].place+','+p[6].place]
+  code = p[6].code
+  code.extend(p[3].code)
+  code.append('INDEX_ASSIGN_L,'+p[1]+','+p[3].place+','+p[6].place)
   
   p[0] = TREE.Expression(code=code,place=p[6].place, datatype='Array')
 
@@ -1058,7 +1060,7 @@ def p_formaldehyde_many(p):
 
 
 def p_formaldehyde_arr_many(p):
-  'formaldehyde : formaldehyde COMMA ID COLON type LSQRBRACKET INTEGER RSQRBRACKET'
+  'formaldehyde : formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET'
   # rule.append(33)
 
   p[0]=TREE.Formal(code=[])
@@ -1068,7 +1070,7 @@ def p_formaldehyde_arr_many(p):
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[3],datatype='Array',size=4*int(p[7]), isArray =True)
+  current_symbol_table[0].enter(name=p[3],datatype='Array',size=p[7].place, isArray =True)
 
 
 def p_formaldehyde_with_assign(p):
@@ -1100,7 +1102,7 @@ def p_formaldehyde(p):
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
 def p_formaldehyde_arr(p):
-  'formaldehyde : ID COLON type LSQRBRACKET INTEGER RSQRBRACKET'
+  'formaldehyde : ID COLON type LSQRBRACKET expression RSQRBRACKET'
   # rule.append(33)
 
   p[0]=TREE.Formal(code=[])
@@ -1134,12 +1136,12 @@ input_file = sys.argv[1]
 with open(input_file) as file:
     data = file.read()
 parser.parse(data)
-print(rule)
+# print(rule)
 
 
-for s in SymbolTables:
-  print("===========")
-  s.printsymtab()
-print "*****class dictionary*****"
-for x in ClassDict:
-	print ClassDict[x].scope_name
+# for s in SymbolTables:
+#   print("===========")
+#   s.printsymtab()
+# print "*****class dictionary*****"
+# for x in ClassDict:
+# 	print ClassDict[x].scope_name
