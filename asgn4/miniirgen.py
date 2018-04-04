@@ -140,7 +140,11 @@ def p_class_header_with_inheritance(p):
 def p_class_header(p):
   'class_header : CLASS CLASS_TYPE'
 
-  code=["Class header code here"]
+  if(p[2]=='Main'):
+    pass
+    code = ['FUNC_LABEL,THE_MAIN_CLASS']
+  else:
+    code=["Class header code here without inheritance"]
   p[0] = TREE.ClassHeader(code=code)
 
   new_sym_tab = Symtab(parent=None, symtab_type="CLASS", scope_name=p[2])
@@ -522,6 +526,7 @@ def p_expression_assign_arr(p):
   var = current_symbol_table[0].getVariable(p[1])
 
   code = ['INDEX_ASSIGN_L,'+p[1]+','+p[3].place+','+p[6].place]
+  
   p[0] = TREE.Expression(code=code,place=p[6].place, datatype='Array')
 
 def p_expression_function_call_with_arguments_2(p):
@@ -851,6 +856,7 @@ def p_expression_function_call_with_arguments(p):
   code.extend(p[5].code)
   # print(".................................", p[1].place)
   code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
+  print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t)
 
@@ -863,6 +869,7 @@ def p_expression_function_call(p):
   
   code = p[1].code
   code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
+  print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
 
