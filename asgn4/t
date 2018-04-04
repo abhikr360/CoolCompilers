@@ -1,38 +1,265 @@
-('----', [], '1', <tree.Expression instance at 0x7f3949d8e128>)
-('----', [], '0', <tree.Expression instance at 0x7f3949d8cfc8>)
-('CODE : ', [], '0', <tree.Expression instance at 0x7f3949d8cfc8>)
-================
-<tree.Expression instance at 0x7f3949d8ca70>
-================
-('----', [], '10', <tree.Expression instance at 0x7f3949d8cc68>)
-@@@@@@@@
-[]
-@@@@@@@
-('----', [], '1', <tree.Expression instance at 0x7f3949d8cfc8>)
-('CODE : ', ['ADD,t.2,i,1'], 't.2', <tree.Expression instance at 0x7f3949d91488>)
-================
-<tree.Expression instance at 0x7f3949d8e368>
-================
-('CODE : ', ['ADD,t.3,b,c'], 't.3', <tree.Expression instance at 0x7f3949d91248>)
-================
-<tree.Expression instance at 0x7f3949d8ccb0>
-================
-ASSIGN,i,1
-FUNC_LABEL,main
+FUNC_CALL,THE_MAIN_CLASS,t.40
+EXIT
+FUNC_LABEL,THE_MAIN_CLASS
+FUNC_LABEL,Main.merge
+POP_STACK,arr
+POP_STACK,l
+POP_STACK,m
+POP_STACK,r
+SUB,t.1,m,l
+ADD,t.2,t.1,1
+ASSIGN,n1,t.2
+SUB,t.3,r,m
+ASSIGN,n2,t.3
 ASSIGN,i,0
 LABEL,label.3
-IFGOTO,LESS_THAN,i,10,label.1
-ASSIGN,t.1,0
+IFGOTO,LESS_THAN,i,n1,label.1
+ASSIGN,t.4,0
 JUMP,label.2
 LABEL,label.1
-ASSIGN,t.1,1
+ASSIGN,t.4,1
 LABEL,label.2
-IFGOTO,EQUALS,t.1,0,label.4
-ADD,t.3,b,c
-ASSIGN,a,t.3
-ADD,t.2,i,1
-ASSIGN,i,t.2
+IFGOTO,EQUALS,t.4,0,label.4
+INDEX_ASSIGN_L,l,i,t.7
+ADD,t.5,i,1
+ASSIGN,i,t.5
 JUMP,label.3
 LABEL,label.4
+ASSIGN,j,0
+LABEL,label.7
+IFGOTO,LESS_THAN,j,n2,label.5
+ASSIGN,t.8,0
+JUMP,label.6
+LABEL,label.5
+ASSIGN,t.8,1
+LABEL,label.6
+IFGOTO,EQUALS,t.8,0,label.8
+INDEX_ASSIGN_L,r,j,t.12
+ADD,t.9,j,1
+ASSIGN,j,t.9
+JUMP,label.7
+LABEL,label.8
+ASSIGN,i,0
+ASSIGN,j,0
+ASSIGN,k,l
+LABEL,label.17
+IFGOTO,LESS_THAN,i,n1,label.9
+ASSIGN,t.13,0
+JUMP,label.10
+LABEL,label.9
+ASSIGN,t.13,1
+LABEL,label.10
+IFGOTO,LESS_THAN,j,n2,label.11
+ASSIGN,t.14,0
+JUMP,label.12
+LABEL,label.11
+ASSIGN,t.14,1
+LABEL,label.12
+MUL,t.15,t.13,t.14
+IFGOTO,EQUALS,t.15,0,label.18
+INDEX_ASSIGN_R,t.16,l,i
+INDEX_ASSIGN_R,t.17,r,j
+IFGOTO,LESS_THAN_EQUALS,t.16,t.17,label.13
+ASSIGN,t.18,0
+JUMP,label.14
+LABEL,label.13
+ASSIGN,t.18,1
+LABEL,label.14
+IFGOTO,GREATER_THAN,t.18,0,label.15
+INDEX_ASSIGN_L,arr,k,t.21
+ADD,t.22,j,1
+ASSIGN,j,t.22
+JUMP,label.16
+LABEL,label.15
+INDEX_ASSIGN_L,arr,k,t.19
+ADD,t.20,i,1
+ASSIGN,i,t.20
+LABEL,label.16
+ADD,t.23,k,1
+ASSIGN,k,t.23
+JUMP,label.17
+LABEL,label.18
+LABEL,label.21
+IFGOTO,LESS_THAN,i,n1,label.19
+ASSIGN,t.24,0
+JUMP,label.20
+LABEL,label.19
+ASSIGN,t.24,1
+LABEL,label.20
+IFGOTO,EQUALS,t.24,0,label.22
+INDEX_ASSIGN_L,arr,k,t.25
+ADD,t.26,i,1
+ASSIGN,i,t.26
+ADD,t.27,k,1
+ASSIGN,k,t.27
+JUMP,label.21
+LABEL,label.22
+LABEL,label.25
+IFGOTO,LESS_THAN,j,n2,label.23
+ASSIGN,t.28,0
+JUMP,label.24
+LABEL,label.23
+ASSIGN,t.28,1
+LABEL,label.24
+IFGOTO,EQUALS,t.28,0,label.26
+INDEX_ASSIGN_L,arr,k,t.29
+ADD,t.30,j,1
+ASSIGN,j,t.30
+ADD,t.31,k,1
+ASSIGN,k,t.31
+JUMP,label.25
+LABEL,label.26
 FUNC_RETURN
-[22, 62, 31, 18, 12, 26, 62, 38, 60, 62, 49, 60, 62, 44, 38, 60, 60, 44, 38, 81, 80, 16, 11, 7, 6, 2, 0]
+FUNC_LABEL,Main.sort
+POP_STACK,arr
+POP_STACK,l
+POP_STACK,r
+IFGOTO,LESS_THAN,l,r,label.27
+ASSIGN,t.32,0
+JUMP,label.28
+LABEL,label.27
+ASSIGN,t.32,1
+LABEL,label.28
+IFGOTO,GREATER_THAN,t.32,0,label.29
+JUMP,label.30
+LABEL,label.29
+ADD,t.33,l,r
+DIV,t.34,t.33,2
+ASSIGN,m,t.34
+FUNC_PARAM,m
+FUNC_PARAM,l
+FUNC_PARAM,arr
+FUNC_CALL,sort
+FUNC_PARAM,r
+FUNC_PARAM,t.35
+FUNC_PARAM,arr
+FUNC_CALL,sort
+FUNC_PARAM,r
+FUNC_PARAM,m
+FUNC_PARAM,l
+FUNC_PARAM,arr
+FUNC_CALL,merge
+LABEL,label.30
+FUNC_RETURN
+FUNC_LABEL,Main.out_int
+POP_STACK,a
+FUNC_RETURN
+FUNC_LABEL,Main.out_string
+POP_STACK,a
+FUNC_RETURN
+FUNC_LABEL,Main.main
+INDEX_ASSIGN_L,arr,0,3
+INDEX_ASSIGN_L,arr,1,1
+INDEX_ASSIGN_L,arr,2,2
+INDEX_ASSIGN_L,arr,3,t.36
+INDEX_ASSIGN_L,arr,4,0
+FUNC_PARAM,5
+FUNC_PARAM,0
+FUNC_PARAM,arr
+FUNC_CALL,sort
+ASSIGN,i,0
+LABEL,label.33
+IFGOTO,LESS_THAN,i,5,label.31
+ASSIGN,t.37,0
+JUMP,label.32
+LABEL,label.31
+ASSIGN,t.37,1
+LABEL,label.32
+IFGOTO,EQUALS,t.37,0,label.34
+FUNC_PARAM,t.39
+FUNC_CALL,out_int
+FUNC_PARAM,
+
+FUNC_CALL,out_string
+ADD,t.38,i,1
+ASSIGN,i,t.38
+JUMP,label.33
+LABEL,label.34
+FUNC_RETURN
+[22, 33, 18, 12, 22, 22, 30, 28, 22, 29, 27, 22, 29, 27, 22, 29, 27, 22, 22, 60, 60, 45, 62, 44, 38, 37, 60, 60, 45, 38, 36, 22, 22, 22, 22, 22, 62, 38, 60, 60, 49, 60, 62, 44, 38, 60, 60, 60, 44, 61, 39, 81, 80, 37, 62, 38, 60, 60, 49, 60, 62, 44, 38, 60, 60, 62, 44, 60, 44, 61, 39, 81, 80, 36, 62, 38, 36, 62, 38, 36, 60, 38, 36, 60, 60, 49, 60, 60, 49, 55, 58, 60, 61, 60, 61, 51, 58, 60, 60, 61, 39, 37, 60, 62, 44, 38, 36, 35, 34, 60, 60, 61, 39, 37, 60, 62, 44, 38, 36, 35, 34, 77, 76, 37, 60, 62, 44, 38, 36, 35, 34, 79, 78, 36, 60, 60, 49, 58, 60, 60, 61, 39, 37, 60, 62, 44, 38, 36, 60, 62, 44, 38, 36, 35, 34, 79, 78, 36, 60, 60, 49, 58, 60, 60, 61, 39, 37, 60, 62, 44, 38, 36, 60, 62, 44, 38, 36, 35, 34, 79, 78, 36, 35, 34, 73, 72, 36, 35, 34, 73, 72, 11, 22, 22, 30, 28, 22, 29, 27, 22, 29, 27, 60, 60, 49, 58, 22, 60, 60, 44, 58, 62, 47, 38, 37, 60, 42, 60, 43, 60, 43, 40, 36, 60, 42, 60, 62, 44, 43, 60, 43, 40, 36, 60, 42, 60, 43, 60, 43, 60, 43, 40, 36, 35, 34, 73, 72, 62, 77, 76, 11, 22, 22, 29, 28, 62, 11, 22, 22, 29, 28, 62, 11, 22, 62, 62, 39, 37, 62, 62, 39, 36, 62, 62, 39, 36, 62, 62, 57, 39, 36, 62, 62, 39, 36, 60, 42, 62, 43, 62, 43, 40, 36, 22, 62, 38, 60, 62, 49, 60, 62, 44, 38, 60, 61, 42, 40, 37, 63, 42, 40, 36, 35, 34, 81, 80, 73, 72, 36, 35, 34, 11, 6, 2, 0]
+===========
+Symbol Table :  merge
+Parent :  Main
+('arr', 'Int', 4000)
+('l', 'Int', 4)
+('m', 'Int', 4)
+('r', 'Int', 4)
+===========
+Symbol Table :  LET_1
+Parent :  merge
+('n1', 'Int', 4)
+('n2', 'Int', 4)
+('t.1', 'Int', 4)
+('t.2', 'Int', 4)
+('t.3', 'Int', 4)
+===========
+Symbol Table :  LET_2
+Parent :  LET_1
+('l', 'Array', 20)
+('r', 'Array', 20)
+('i', 'Int', 4)
+('j', 'Int', 4)
+('k', 'Int', 4)
+('t.4', 'Int', 4)
+('t.5', 'Int', 4)
+('t.6', 'Int', 4)
+('t.7', 'Int', 4)
+('t.8', 'Int', 4)
+('t.9', 'Int', 4)
+('t.10', 'Int', 4)
+('t.11', 'Int', 4)
+('t.12', 'Int', 4)
+('t.13', 'Int', 4)
+('t.14', 'Int', 4)
+('t.15', 'Int', 4)
+('t.16', 'Int', 4)
+('t.17', 'Int', 4)
+('t.18', 'Int', 4)
+('t.19', 'Int', 4)
+('t.20', 'Int', 4)
+('t.21', 'Int', 4)
+('t.22', 'Int', 4)
+('t.23', 'Int', 4)
+('t.24', 'Int', 4)
+('t.25', 'Int', 4)
+('t.26', 'Int', 4)
+('t.27', 'Int', 4)
+('t.28', 'Int', 4)
+('t.29', 'Int', 4)
+('t.30', 'Int', 4)
+('t.31', 'Int', 4)
+===========
+Symbol Table :  sort
+Parent :  Main
+('arr', 'Int', 4000)
+('l', 'Int', 4)
+('r', 'Int', 4)
+('t.32', 'Int', 4)
+===========
+Symbol Table :  LET_3
+Parent :  sort
+('m', 'Int', 4)
+('t.33', 'Int', 4)
+('t.34', 'Int', 4)
+('t.35', 'Int', 4)
+===========
+Symbol Table :  out_int
+Parent :  Main
+('a', 'Int', 4)
+===========
+Symbol Table :  out_string
+Parent :  Main
+('a', 'Int', 4)
+===========
+Symbol Table :  main
+Parent :  Main
+('t.36', 'Int', 4)
+===========
+Symbol Table :  LET_4
+Parent :  main
+('i', 'Int', 4)
+('t.37', 'Int', 4)
+('t.38', 'Int', 4)
+('t.39', 'Int', 4)
+*****class dictionary*****
+Main
