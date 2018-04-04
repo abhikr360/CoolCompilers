@@ -25,9 +25,9 @@ class Main inherits IO {
 		i : Int[2];
 		b : String <- "hello word";
 		a : Chinese;
-		def main2 : Object () {
+		def public main2 : Object (f[] : Int, b : String) {
 			{
-				a.main();
+				a.main(b,f);
 				let b : Int , c : Int[5] , d : String in 
 				{
 					let c : Int in 
@@ -37,7 +37,7 @@ class Main inherits IO {
 					}
 					tel;
 						b <- b+c;
-						for (i<-0;i<18 and i>20 ; i<- i+1 ) loop
+						for (i<-0;i>18 and i>20 ; i<- i+1 ) loop
 							FALSE
 						pool;
 

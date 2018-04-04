@@ -858,7 +858,7 @@ def p_expression_function_call_with_arguments(p):
   code.extend(p[5].code)
   # print(".................................", p[1].place)
   code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
-  print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
+  # print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t)
 
@@ -871,7 +871,7 @@ def p_expression_function_call(p):
   
   code = p[1].code
   code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
-  print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
+  # print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
 
