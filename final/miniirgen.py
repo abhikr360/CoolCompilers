@@ -28,14 +28,6 @@ ClassDict = {}
 
 '''
      TO BE DONE
-
-
-# Go over all the rules once and write code wherever necessary
-# Array --
-# SymbolTable --
-# SCOPE --
-# DATATYPE --
-
 '''
 
 tempCount=[0]
@@ -112,6 +104,7 @@ def p_classes(p):
 
 def p_class_header_body(p):
   'class : class_header class_body'
+
 
   code = p[1].code
   code.extend(p[2].code)
@@ -732,10 +725,28 @@ def p_expression_or(p):
   'expression : expression OR expression'
   rule.append(54)
 
+  # t = newtemp()
+  # code = p[1].code
+  # code.extend(p[3].code)
+  # code.append('ADD,' + t + ',' + p[1].place + ',' + p[3].place)
+
   t = newtemp()
+  l1 = newjump()
+  l2 = newjump()
+  l3 = newjump()
+
   code = p[1].code
+  code.append('IFGOTO,EQUALS,' + p[1].place + ',0,' + l1)
+  code.append('ASSIGN,'+t+',1')
+  code.append('JUMP,'+l3)
+  code.append('LABEL,' + l1)
   code.extend(p[3].code)
-  code.append('ADD,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('IFGOTO,EQUALS,' + p[3].place + ',0,' + l2)
+  code.append('ASSIGN,'+t+',1')
+  code.append('JUMP,'+l3)
+  code.append('LABEL,' + l2)
+  code.append('ASSIGN,' + t + ',0')
+  code.append('LABEL,' + l3)
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
@@ -744,9 +755,22 @@ def p_expression_and(p):
   rule.append(55)
 
   t = newtemp()
+  l1 = newjump()
+  l2 = newjump()
+  l3 = newjump()
+
   code = p[1].code
+  code.append('IFGOTO,GREATER_THAN,' + p[1].place + ',0,' + l1)
+  code.append('ASSIGN,'+t+',0')
+  code.append('JUMP,'+l3)
+  code.append('LABEL,' + l1)
   code.extend(p[3].code)
-  code.append('MUL,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('IFGOTO,GREATER_THAN,' + p[3].place + ',0,' + l2)
+  code.append('ASSIGN,'+t+',0')
+  code.append('JUMP,'+l3)
+  code.append('LABEL,' + l2)
+  code.append('ASSIGN,' + t + ',1')
+  code.append('LABEL,' + l3)
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
