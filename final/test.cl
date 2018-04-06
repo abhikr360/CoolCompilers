@@ -1,11 +1,21 @@
 class Chinese inherits IO {
-	i : Int[2];
+	i : Int[3];
 	b : Int <- 5;
+	c : String;
    def  main : SELF_TYPE () {
    	   		
-   	   	for(i<-0;i<10;i<-i+1)loop
-			i<-i+i
-		pool    
+   	   	(*for(i<-0;i<10;i<-i+1)loop
+   	   	    			i<-i+i
+   	   	    		pool*)
+
+   	   	{
+   	   		b <- ~c;
+   	   		i[1] <- b+b;
+   	   		i[0] <- b;
+   	   		b <- 55;
+   	   		b <- b/3;
+   	   		i[2] <- b+b;
+   	   	}    
 
    	};
    	def out_string : String () {
@@ -19,7 +29,7 @@ class Chinese inherits IO {
 };
 
 
-
+(*
 class Main inherits IO {
 	
 		i : Int[2];
@@ -46,4 +56,4 @@ class Main inherits IO {
 			}
 		};
 
-};
+};*)

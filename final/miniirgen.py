@@ -448,7 +448,7 @@ def p_formal(p):
   else:
     sys.exit('No object found named ' + p[3].place)
   # quit()
-
+  
   current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
 
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
@@ -463,7 +463,7 @@ def p_formal_arr(p):
     # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
-  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4*int(p[5].place), isArray =False)
+  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
 
 
 #--------------------------------------------  Not DONE ----------------------------------------------
@@ -502,7 +502,9 @@ def p_expression_assign(p):
   'expression : ID GETS expression'
   rule.append(38)
   var = current_symbol_table[0].getVariable(p[1])
-
+  # print "datatype : ",var.datatype, p[3].datatype
+  if(var.datatype <> p[3].datatype):
+    sys.exit("Type Check Error "+var.name+" is assigned "+p[3].datatype)
   code = p[3].code
   # print("CODE : ", code, p[3].place, p[3])
   s = 'ASSIGN,' + p[1] +',' + p[3].place
@@ -517,7 +519,9 @@ def p_expression_assign_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET GETS expression'
   rule.append(39)
   var = current_symbol_table[0].getVariable(p[1])
-
+  # print "datatype : ",var.datatype, p[6].datatype,var.isArray,var.name
+  if(var.datatype <> p[3].datatype and var.isArray):
+    sys.exit("Type Check Error "+var.name+" is assigned "+p[3].datatype)
   code = p[6].code
   code.extend(p[3].code)
   code.append('INDEX_ASSIGN_L,'+p[1]+','+p[3].place+','+p[6].place)
@@ -567,6 +571,9 @@ def p_expression_plus(p):
   'expression : expression PLUS expression'
   rule.append(44)
 
+  # print "dtastype plus : ",p[1].datatype,p[3].datatype,p[1].place ,p[3].place 
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
+    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are getting added")
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
@@ -581,6 +588,9 @@ def p_expression_minus(p):
   'expression : expression MINUS expression'
   rule.append(45)
 
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
+    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are getting subtracted")
+
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
@@ -591,6 +601,9 @@ def p_expression_minus(p):
 def p_expression_times(p):
   'expression : expression TIMES expression'
   rule.append(46)
+
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
+    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are getting multiplied")
 
   t = newtemp()
   code = p[1].code
@@ -603,6 +616,9 @@ def p_expression_divide(p):
   'expression : expression DIVIDE expression'
   rule.append(47)
 
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
+    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are getting divided")
+
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
@@ -613,6 +629,9 @@ def p_expression_divide(p):
 def p_expression_mod(p):
   'expression : expression MOD expression'
   rule.append(48)
+
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
+    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are using in remainder function")
 
   t = newtemp()
   code = p[1].code
@@ -625,6 +644,9 @@ def p_expression_lt(p):
   'expression : expression LT expression'
   rule.append(49)
 
+  print "Bool Expr : ",p[1].datatype,p[3].datatype
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
   t = newtemp()
   j_if = newjump()
   j_fi = newjump()
@@ -647,6 +669,8 @@ def p_expression_lt(p):
 def p_expression_gt(p):
   'expression : expression GT expression'
   rule.append(50)
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
 
   t = newtemp()
   j_if = newjump()
@@ -667,6 +691,8 @@ def p_expression_gt(p):
 def p_expression_lteq(p):
   'expression : expression LTEQ expression'
   rule.append(51)
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
 
   t = newtemp()
   j_if = newjump()
@@ -686,6 +712,8 @@ def p_expression_lteq(p):
 def p_expression_gteq(p):
   'expression : expression GTEQ expression'
   rule.append(52)
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
 
   t = newtemp()
   j_if = newjump()
@@ -705,6 +733,9 @@ def p_expression_gteq(p):
 def p_expression_equal(p):
   'expression : expression EQUAL expression'
   rule.append(53)
+  
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
 
   t = newtemp()
   j_if = newjump()
@@ -724,6 +755,10 @@ def p_expression_equal(p):
 def p_expression_or(p):
   'expression : expression OR expression'
   rule.append(54)
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
+  
+
 
   # t = newtemp()
   # code = p[1].code
@@ -753,6 +788,8 @@ def p_expression_or(p):
 def p_expression_and(p):
   'expression : expression AND expression'
   rule.append(55)
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
 
   t = newtemp()
   l1 = newjump()
@@ -777,6 +814,8 @@ def p_expression_and(p):
 def p_expression_not(p):
   'expression : NOT expression'
   rule.append(56)
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
 
   t = newtemp()
   j_if = newjump()
@@ -795,12 +834,15 @@ def p_expression_not(p):
 def p_expression_tilda(p):
   'expression : TILDA expression'
   rule.append(57)
+  # print "Var Tilda : ",p[2].place,p[2].datatype
+  if(p[2].datatype <> 'Int'):
+    sys.exit("TYPE Check Error : "+p[2].place+" is not Int Type")
 
   t = newtemp()
   code = p[2].code
   code.append('SUB,' + t + ',0,' + p[2].place)
 
-  p[0] = TREE.Expression(place = t, code = code, datatype = p[2].datatype)
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[2].datatype,isArray=False)
 
 def p_expression_paren(p):
   'expression : LPAREN expression RPAREN'
@@ -809,7 +851,7 @@ def p_expression_paren(p):
   t = p[2].place
   code = p[2].code
 
-  p[0] = TREE.Expression(place = t, code = code, datatype = p[2].datatype)
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[2].datatype,isArray=p[2].isArray)
 
 
 # ---------------------------------------------------------------------------
@@ -817,7 +859,7 @@ def p_expression_self(p):
   'expression : SELF'
   rule.append(59)
 
-  p[0] = TREE.Expression(code = ['SELF'])
+  p[0] = TREE.Expression(code = ['SELF'],place='SELF_TYPE',datatype='SELF_TYPE',isArray=False)
 # ---------------------------------------------------------------------------
 
 
@@ -828,7 +870,7 @@ def p_expression_id(p):
 
   t = p[1]
 
-  p[0] = TREE.Expression(place = t, code=[])
+  p[0] = TREE.Expression(place = t, code=[],datatype=var.datatype,isArray=var.isArray)
 
 def p_expression_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET'
@@ -839,40 +881,40 @@ def p_expression_arr(p):
   code = p[3].code
   code.append('INDEX_ASSIGN_R,' + t + ',' + p[1] + ',' + p[3].place)
 
-  p[0] = TREE.Expression(place = t, code = code, datatype='Array')
+  p[0] = TREE.Expression(place = t, code = code, datatype=var.datatype,isArray=var.isArray)
 
 
 def p_expression_integer(p):
   'expression : INTEGER'
   rule.append(62)
 
-  p[0] = TREE.Expression(code=[], place=str(p[1]), datatype='Int')
+  p[0] = TREE.Expression(code=[], place=str(p[1]), datatype='Int',isArray=False)
   # print("----", p[0].code, p[0].place,p[0])
 
 def p_expression_string(p):
   'expression : STRING'
   rule.append(63)
-  p[0] = TREE.Expression(place=p[1], datatype='String', code=[])
+  p[0] = TREE.Expression(place=p[1], datatype='String', code=[],isArray=False)
 
 def p_expression_true(p):
   'expression : TRUE'
   rule.append(64)
-  p[0] = TREE.Expression(place='1', code=[])
+  p[0] = TREE.Expression(place='1', code=[],datatype='Bool',isArray=False)
 
 def p_expression_false(p):
   'expression : FALSE'
   rule.append(65)
-  p[0] = TREE.Expression(place='0', code=[])
+  p[0] = TREE.Expression(place='0', code=[],datatype='Bool',isArray=False)
 
 def p_expression_break(p):
   'expression : BREAK'
   rule.append(66)
-  p[0] = TREE.Expression(code=['BREAK'])
+  p[0] = TREE.Expression(place=None,code=['BREAK'],datatype=None,isArray=False)
 
 def p_expression_continue(p):
   'expression : CONTINUE'
   rule.append(67)
-  p[0] = TREE.Expression(code=['CONTINUE'])
+  p[0] = TREE.Expression(code=['CONTINUE'],datatype=None,isArray=False,place=None)
 
 def p_expression_function_call_with_arguments(p):
   'expression : expression PERIOD ID LPAREN argument_list RPAREN'
@@ -884,7 +926,7 @@ def p_expression_function_call_with_arguments(p):
   code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
   # print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
-  p[0] = TREE.Expression(code=code,place=t)
+  p[0] = TREE.Expression(code=code,place=t,datatype=datatype,isArray=False)
 
 def p_expression_function_call(p):
   'expression : expression PERIOD ID LPAREN RPAREN'
@@ -897,7 +939,7 @@ def p_expression_function_call(p):
   code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
   # print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
-  p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
+  p[0] = TREE.Expression(code=code,place=t, datatype=datatype,isArray=False)
 
 def p_expression_new(p):
   'expression : NEW type'

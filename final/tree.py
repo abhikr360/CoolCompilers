@@ -1,10 +1,11 @@
 # f = open('symtab.txt', 'wb')
 class Expression:
 	"""docstring for Expression"""
-	def __init__(self, code=[], place='', datatype='Int'):
+	def __init__(self, code=[], place='', datatype='Int', isArray=False):
 		self.code = code
 		self.place = place
 		self.datatype = datatype
+		self.isArray = isArray
 
 class ArgumentList:
 	"""docstring for ArgumentList"""
