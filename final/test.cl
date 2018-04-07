@@ -9,7 +9,7 @@ class Chinese inherits IO {
    	   	    		pool*)
 
    	   	{
-   	   		b <- ~c;
+   	   		b <- ~b;
    	   		i[1] <- b+b;
    	   		i[0] <- b;
    	   		b <- 55;
@@ -19,10 +19,10 @@ class Chinese inherits IO {
 
    	};
    	def out_string : String () {
-   		"asasasasa"
+   		c<-"asasasasa"
    	};
    	def out_string_second : String () {
-   		"asasasasa"
+   		c<-"asasasasa"
    	};
 			
 

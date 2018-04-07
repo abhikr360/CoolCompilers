@@ -91,15 +91,17 @@ class For:
 
 class BlockExpression:
 	"""docstring for BlockExpression"""
-	def __init__(self, code,datatype='Int'):
+	def __init__(self, code,datatype='Int',place=''):
 		self.code=code
 		self.datatype=datatype
+		self.place=place
 
 class BlockList:
 	"""docstring for BlockExpression"""
-	def __init__(self, code,datatype='Int'):
+	def __init__(self, code,datatype='Int',place=''):
 		self.code=code
 		self.datatype=datatype
+		self.place=place
 
 class Formal:
 	"""docstring for Formal"""

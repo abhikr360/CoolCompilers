@@ -26,6 +26,8 @@ SymbolTables = []
 current_symbol_table = [Symtab(parent=None, symtab_type='class', scope_name='GLOBAL')]  #not a list only one symboltable
 ClassDict = {}
 
+basicDataType = ['Int','String','Bool']
+
 '''
      TO BE DONE
 '''
@@ -398,7 +400,7 @@ def p_formal_parameter(p):
   rule.append(29)
 
   p[0] = TREE.FormalParameter(code=[], place=p[1], datatype=p[3])
-  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+  if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -411,7 +413,7 @@ def p_formal_parameter_arr(p):
   rule.append(30)
 
   p[0] = TREE.FormalParameter(code=[], place=p[1], datatype='Array')
-  if p[5].place in ClassDict or p[5].place in ['Int','String']:
+  if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -428,7 +430,7 @@ def p_formal_with_assign(p):
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
   p[0]=TREE.Formal(code=code)
 
-  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+  if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -442,7 +444,7 @@ def p_formal(p):
   p[0]=TREE.Formal(code=[])
 
   # print "type in formal " + p[3].place
-  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+  if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -458,7 +460,7 @@ def p_formal_arr(p):
   rule.append(33)
 
   p[0]=TREE.Formal(code=[])
-  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+  if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -473,7 +475,7 @@ def p_expression_block_expression(p):
   'expression : block_expression'
   rule.append(34)
 
-  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype) 
+  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype,place=p[1].place) 
 
 
 
@@ -481,21 +483,21 @@ def p_block_expression(p):
   'block_expression : LBRACE block_list RBRACE'
   rule.append(35)
 
-  p[0] = TREE.BlockExpression(code=p[2].code, datatype=p[2].datatype)
+  p[0] = TREE.BlockExpression(code=p[2].code, datatype=p[2].datatype,place=p[2].place)
 
 def p_block_list_many(p):
   'block_list : block_list expression SEMICOLON'
   rule.append(36)
   code = p[1].code
   code.extend(p[2].code)
-  p[0] = TREE.BlockList(code=code, datatype=p[2].datatype)
+  p[0] = TREE.BlockList(code=code, datatype=p[2].datatype,place=p[2].place)
 
 def p_block_list(p):
   'block_list : expression SEMICOLON'
   rule.append(37)
 
   
-  p[0] = TREE.BlockList(code=p[1].code,datatype=p[1].datatype)
+  p[0] = TREE.BlockList(code=p[1].code,datatype=p[1].datatype,place=p[1].place)
 
 
 def p_expression_assign(p):
@@ -509,7 +511,7 @@ def p_expression_assign(p):
   # print("CODE : ", code, p[3].place, p[3])
   s = 'ASSIGN,' + p[1] +',' + p[3].place
   code.append(s)
-  p[0] = TREE.Expression(code=code, datatype=p[3].datatype)
+  p[0] = TREE.Expression(code=code, datatype=p[3].datatype,place=p[3].place)
   # print("================")
   # print(p[0])
 
@@ -1055,14 +1057,14 @@ def p_while(p):
     elif(code[i]=='CONTINUE'):
       code[i]=_loop
 
-  p[0] = TREE.While(code=code, datatype=p[4].datatype)
+  p[0] = TREE.While(code=code, datatype=p[4].datatype,place = p[4].place)
 
 
 def p_expression_for(p):
   'expression : for'
   rule.append(80)
 
-  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype)
+  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype,place=p[1].place)
 
 def p_for(p):
   'for : FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL'
@@ -1091,7 +1093,7 @@ def p_for(p):
       code[i]='JUMP,'+_loop
 
   # print "agsdiagsdia"
-  p[0] = TREE.For(code=code, datatype=p[10].datatype)
+  p[0] = TREE.For(code=code, datatype=p[10].datatype,place=p[10].place)
 
 
 def p_formaldehyde_with_assign_many(p):
@@ -1101,7 +1103,7 @@ def p_formaldehyde_with_assign_many(p):
   code = p[1].code
   code.append('ASSIGN,%s,%s'%(p[3], p[7].place))
 
-  if p[5].place in ClassDict or p[5].place in ['Int','String']:
+  if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -1118,7 +1120,7 @@ def p_formaldehyde_many(p):
   p[0]=TREE.Formal(code=[])
   # print p[3]
   # quit()
-  if p[5].place in ClassDict or p[5].place in ['Int','String']:
+  if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -1132,13 +1134,13 @@ def p_formaldehyde_arr_many(p):
   # rule.append(33)
 
   p[0]=TREE.Formal(code=[])
-  if p[5].place in ClassDict or p[5].place in ['Int','String']:
+  if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[3],datatype='Array',size=4000, isArray =True)
+  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4000, isArray =True)
 
 
 def p_formaldehyde_with_assign(p):
@@ -1148,7 +1150,7 @@ def p_formaldehyde_with_assign(p):
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
   p[0]=TREE.Formal(code=code)
-  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+  if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -1161,7 +1163,7 @@ def p_formaldehyde(p):
   # rule.append(32)
   p[0]=TREE.Formal(code=[])
   current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4, isArray =False)
-  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+  if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
@@ -1174,13 +1176,13 @@ def p_formaldehyde_arr(p):
   # rule.append(33)
 
   p[0]=TREE.Formal(code=[])
-  if p[3].place in ClassDict or p[3].place in ['Int','String']:
+  if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[1],datatype='Array',size=4000, isArray =True)
+  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4000, isArray =True)
 
 
 def p_error(p):
