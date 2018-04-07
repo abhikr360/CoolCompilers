@@ -475,7 +475,7 @@ def p_expression_block_expression(p):
   'expression : block_expression'
   rule.append(34)
 
-  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype,place=p[1].place) 
+  p[0] = TREE.Expression(code=p[1].code, datatype='block',place=p[1].place) 
 
 
 
@@ -522,13 +522,18 @@ def p_expression_assign_arr(p):
   rule.append(39)
   var = current_symbol_table[0].getVariable(p[1])
   # print "datatype : ",var.datatype, p[6].datatype,var.isArray,var.name
-  if(var.datatype <> p[3].datatype and var.isArray):
+  # quit()
+
+  if(p[3].datatype <> 'Int'):
+    sys.exit('Array index should be ineteger not '+p[3].datatype)
+
+  if(var.datatype <> p[6].datatype and var.isArray):
     sys.exit("Type Check Error "+var.name+" is assigned "+p[3].datatype)
   code = p[6].code
   code.extend(p[3].code)
   code.append('INDEX_ASSIGN_L,'+p[1]+','+p[3].place+','+p[6].place)
   
-  p[0] = TREE.Expression(code=code,place=p[6].place, datatype='Array')
+  p[0] = TREE.Expression(code=code,place=p[6].place, datatype=p[6].datatype)
 
 def p_expression_function_call_with_arguments_2(p):
   'expression : ID LPAREN argument_list RPAREN'
@@ -573,9 +578,14 @@ def p_expression_plus(p):
   'expression : expression PLUS expression'
   rule.append(44)
 
-  # print "dtastype plus : ",p[1].datatype,p[3].datatype,p[1].place ,p[3].place 
-  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
-    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are getting added")
+  # print "dtastype plus : ",p[1].datatype,p[3].datatype,p[1].place ,p[3].place
+  # quit() 
+  # if(p[1].isArray):
+  #   sys.exit("Type Check Error : "+p[1].place + " is Array and getting added" )
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int' ):
+    sys.exit("Type Check Error : "+p[1].datatype+" and "+p[3].datatype+" are getting added in "+p[1].place+" "+p[3].place)
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
@@ -590,9 +600,10 @@ def p_expression_minus(p):
   'expression : expression MINUS expression'
   rule.append(45)
 
-  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
-    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are getting subtracted")
-
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int' ):
+    sys.exit("Type Check Error : "+p[1].datatype+" and "+p[3].datatype+" are getting subtracted in "+p[1].place+" "+p[3].place)
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
@@ -605,8 +616,9 @@ def p_expression_times(p):
   rule.append(46)
 
   if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
-    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are getting multiplied")
-
+    sys.exit("Type Check Error : "+p[1].datatype+" and "+p[3].datatype+" are getting multiplied in "+p[1].place+" "+p[3].place)
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
@@ -619,8 +631,9 @@ def p_expression_divide(p):
   rule.append(47)
 
   if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
-    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are getting divided")
-
+    sys.exit("Type Check Error : "+p[1].datatype+" and "+p[3].datatype+" are getting divide in "+p[1].place+" "+p[3].place)
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
@@ -633,8 +646,9 @@ def p_expression_mod(p):
   rule.append(48)
 
   if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
-    sys.exit("Type Check Error : "+p[1].place+" and "+p[3].place+" are using in remainder function")
-
+    sys.exit("Type Check Error : "+p[1].datatype+" and "+p[3].datatype+" are getting modulus in "+p[1].place+" "+p[3].place)
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
@@ -646,9 +660,11 @@ def p_expression_lt(p):
   'expression : expression LT expression'
   rule.append(49)
 
-  print "Bool Expr : ",p[1].datatype,p[3].datatype
-  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
-    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
+  # print "Bool Expr : ",p[1].datatype,p[3].datatype
+  if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool'] ):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Int or Bool Type")
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
   t = newtemp()
   j_if = newjump()
   j_fi = newjump()
@@ -666,14 +682,16 @@ def p_expression_lt(p):
   code.append("ASSIGN," + t + ',1')
   code.append("LABEL," + j_fi)
 
-  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
 def p_expression_gt(p):
   'expression : expression GT expression'
   rule.append(50)
-  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+  if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool']):
     sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
 
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
   t = newtemp()
   j_if = newjump()
   j_fi = newjump()
@@ -687,14 +705,16 @@ def p_expression_gt(p):
   code.append("ASSIGN," + t + ',1')
   code.append("LABEL," + j_fi)
 
-  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
 
 def p_expression_lteq(p):
   'expression : expression LTEQ expression'
   rule.append(51)
-  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+  if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool']):
     sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
 
   t = newtemp()
   j_if = newjump()
@@ -709,13 +729,16 @@ def p_expression_lteq(p):
   code.append("ASSIGN," + t + ',1')
   code.append("LABEL," + j_fi)
 
-  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
 def p_expression_gteq(p):
   'expression : expression GTEQ expression'
   rule.append(52)
-  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+  if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool']):
     sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
+
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
 
   t = newtemp()
   j_if = newjump()
@@ -730,15 +753,17 @@ def p_expression_gteq(p):
   code.append("ASSIGN," + t + ',1')
   code.append("LABEL," + j_fi)
 
-  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
 def p_expression_equal(p):
   'expression : expression EQUAL expression'
   rule.append(53)
   
-  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
+  if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool']):
     sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
 
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
   t = newtemp()
   j_if = newjump()
   j_fi = newjump()
@@ -752,7 +777,7 @@ def p_expression_equal(p):
   code.append("ASSIGN," + t + ',1')
   code.append("LABEL," + j_fi)
 
-  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
+  p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
 def p_expression_or(p):
   'expression : expression OR expression'
@@ -831,7 +856,7 @@ def p_expression_not(p):
   code.append("ASSIGN," + t + ',1')
   code.append("LABEL," + j_fi)
 
-  p[0] = TREE.Expression(code = code, place = t, datatype = 'Int')
+  p[0] = TREE.Expression(code = code, place = t, datatype = p[2].datatype)
 
 def p_expression_tilda(p):
   'expression : TILDA expression'
@@ -883,7 +908,7 @@ def p_expression_arr(p):
   code = p[3].code
   code.append('INDEX_ASSIGN_R,' + t + ',' + p[1] + ',' + p[3].place)
 
-  p[0] = TREE.Expression(place = t, code = code, datatype=var.datatype,isArray=var.isArray)
+  p[0] = TREE.Expression(place = t, code = code, datatype=var.datatype,isArray=False)
 
 
 def p_expression_integer(p):
@@ -911,12 +936,12 @@ def p_expression_false(p):
 def p_expression_break(p):
   'expression : BREAK'
   rule.append(66)
-  p[0] = TREE.Expression(place=None,code=['BREAK'],datatype=None,isArray=False)
+  p[0] = TREE.Expression(place=None,code=['BREAK'],datatype='break',isArray=False)
 
 def p_expression_continue(p):
   'expression : CONTINUE'
   rule.append(67)
-  p[0] = TREE.Expression(code=['CONTINUE'],datatype=None,isArray=False,place=None)
+  p[0] = TREE.Expression(code=['CONTINUE'],datatype='continue',isArray=False,place=None)
 
 def p_expression_function_call_with_arguments(p):
   'expression : expression PERIOD ID LPAREN argument_list RPAREN'
@@ -956,12 +981,12 @@ def p_expression_isvoid(p):
   rule.append(71)
   t=newtemp()
   code = ['FUNC_CALL,isvoid,'+t]
-  p[0] = TREE.Expression(code=code,place=t, datatype=p[2].datatype)
+  p[0] = TREE.Expression(code=code,place=t, datatype='isvoid')
 
 def p_expression_let_expression(p):
   'expression : let_expression'
   rule.append(72)
-  p[0] = TREE.Expression(code = p[1].code, datatype=p[1].datatype)
+  p[0] = TREE.Expression(code = p[1].code, datatype='let')
 
 
 def p_let_to_let(p):
@@ -1013,7 +1038,7 @@ def p_expression_if_then_else(p):
   'expression : if_then_else'
   rule.append(76)
 
-  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype)
+  p[0] = TREE.Expression(code=p[1].code, datatype='if_then_else')
 
 def p_if_then_else(p):
   'if_then_else : IF expression THEN expression ELSE expression FI'
@@ -1035,7 +1060,7 @@ def p_expression_while(p):
   'expression : while'
   rule.append(78)
 
-  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype)
+  p[0] = TREE.Expression(code=p[1].code, datatype='while')
 
 
 def p_while(p):
@@ -1057,14 +1082,14 @@ def p_while(p):
     elif(code[i]=='CONTINUE'):
       code[i]=_loop
 
-  p[0] = TREE.While(code=code, datatype=p[4].datatype,place = p[4].place)
+  p[0] = TREE.While(code=code, datatype=p[4].datatype)
 
 
 def p_expression_for(p):
   'expression : for'
   rule.append(80)
 
-  p[0] = TREE.Expression(code=p[1].code, datatype=p[1].datatype,place=p[1].place)
+  p[0] = TREE.Expression(code=p[1].code, datatype='for')
 
 def p_for(p):
   'for : FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN LOOP expression POOL'
@@ -1093,7 +1118,7 @@ def p_for(p):
       code[i]='JUMP,'+_loop
 
   # print "agsdiagsdia"
-  p[0] = TREE.For(code=code, datatype=p[10].datatype,place=p[10].place)
+  p[0] = TREE.For(code=code, datatype=p[10].datatype)
 
 
 def p_formaldehyde_with_assign_many(p):
