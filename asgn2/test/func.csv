@@ -1,0 +1,17 @@
+1,ASSIGN,n,3
+2,FUNC_START
+3,FUNC_PARAM,n
+4,FUNC_CALL,factorial,ans
+5,PRINT_INT,ans
+6,EXIT
+7,FUNC_LABEL,factorial
+8,POP_STACK,factorial.n
+9,IFGOTO,LESS_THAN_EQUALS,factorial.n,1,base
+10,SUB,factorial.temp,factorial.n,1
+11,FUNC_START
+12,FUNC_PARAM,factorial.temp
+13,FUNC_CALL,factorial,factorial.res
+14,MUL,factorial.res,factorial.n,factorial.temp
+15,FUNC_RETURN,factorial.temp
+16,LABEL,base
+17,FUNC_RETURN,0

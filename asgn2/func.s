@@ -1,3 +1,6 @@
+#*******************givenrehister for ans t5 
+#*******************givenrehister for factorial.n t5 
+#*******************givenrehister for factorial.n t5 
 .data
 space: .asciiz " "
 n : .word 0
@@ -7,7 +10,7 @@ factorial.n : .word 0
 factorial.res : .word 0
 .text
 main:
-move $sp, $fp
+move $fp, $sp
 lw $t5,n
 li $t5, 3
 
@@ -20,6 +23,7 @@ addiu $sp, $sp, -4
 lw $t5, ($sp)
 
 jal factorial
+
 lw $ra, ($sp)
 addiu $sp, $sp, 4
 lw $fp, ($sp)
@@ -112,3 +116,4 @@ la $a0, space
 li $v0, 4
 syscall
 jr $ra
+
