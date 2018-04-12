@@ -14,9 +14,10 @@ class ArgumentList:
 
 class FunctionCall:
 	"""docstring for FunctionCall"""
-	def __init__(self, code,datatype='Int'):
+	def __init__(self, code,datatype='Int',place=None):
 		self.code = code
 		self.datatype = datatype
+		self.place = place
 
 class Feature:
 	"""docstring for Feature"""
