@@ -111,8 +111,9 @@ class Formal:
 		
 class FormalParameterList(object):
 	"""docstring for FormalParameterList"""
-	def __init__(self, code):
+	def __init__(self, code,nargs=0):
 		self.code = code
+		self.nargs = nargs
 		# self.symtab = symtab
 
 

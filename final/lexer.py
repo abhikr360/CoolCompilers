@@ -28,6 +28,7 @@ tokens = (
    'RBRACE',
    'PERIOD',
    'DEF',
+   'RETURN',
    #'MAIN',
    'OBJECT',
 
@@ -114,7 +115,8 @@ reserved = {
   'FALSE' : 'FALSE',
   'SELF_TYPE' : 'SELF_TYPE',
   'CLASS_TYPE' : 'CLASS_TYPE',
-  'def' : 'DEF'
+  'def' : 'DEF',
+  'return' : 'RETURN'
 
 }
 

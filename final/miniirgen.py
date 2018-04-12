@@ -59,8 +59,8 @@ def p_start(p):
 
   p[0]=TREE.Start(code=p[1].code)
   t = newtemp()
-  print "GOTO,CLASS.Main,"+t
-  print "EXIT"
+  print "1,GOTO,CLASS.Main,"+t
+  print "2,EXIT"
   i=3
   f=open(sys.argv[2], 'wb')
   f.write("1,GOTO,CLASS.Main,"+t + '\n')
@@ -238,7 +238,7 @@ def p_feature_header_with_modifier(p):
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[3])
   # current_symbol_table[0].methods.append(new_sym_tab)
-  current_symbol_table[0].enter_method(p[3],p[5],current_symbol_table[0].scope_name)
+  current_symbol_table[0].enter_method(p[3],p[5].pla,current_symbol_table[0].scope_name)
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
 
@@ -248,7 +248,7 @@ def p_feature_header(p):
   p[0] = TREE.FeatureHeader(code=code, datatype=p[4].place)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[2])
-  current_symbol_table[0].enter_method(p[2],p[4],current_symbol_table[0].scope_name)
+  current_symbol_table[0].enter_method(p[2],p[4].place,current_symbol_table[0].scope_name)
   # current_symbol_table[0].methods.append(new_sym_tab,p[4])
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
@@ -257,6 +257,9 @@ def p_feature_body_with_formal_parameter_list(p):
   'feature_body : LPAREN formal_parameter_list RPAREN LBRACE expression RBRACE'
   code = p[2].code
   code.extend(p[5].code)
+  # print p[2].nargs
+  for i in range(p[2].nargs):
+  	code.append('POP_STACK')
   code.append('FUNC_RETURN')
   p[0]=TREE.FeatureBody(code=code)
 
@@ -391,16 +394,16 @@ def p_formal_parameter_list_many(p):
   rule.append(27)
 
   code = p[1].code
-  code.append('POP_STACK,' + p[3].place)
-  p[0] = TREE.FormalParameterList(code=code)
+  code.append('READ_STACK,' + p[3].place)
+  p[0] = TREE.FormalParameterList(code=code,nargs=p[1].nargs+1)
 
 
 def p_formal_parameter_list(p):
   'formal_parameter_list : formal_parameter'
   rule.append(28)
 
-  code = ['POP_STACK,' + p[1].place]
-  p[0] = TREE.FormalParameterList(code=code)
+  code = ['READ_STACK,' + p[1].place]
+  p[0] = TREE.FormalParameterList(code=code,nargs=1)
 
 
 
@@ -555,7 +558,7 @@ def p_expression_function_call_with_arguments_2(p):
   met = current_symbol_table[0].getMethod(p[1])
   
   code = p[3].code
-  code.append('FUNC_CALL,'+met.parent_name + '.' + p[1])
+  code.append('FUNC_CALL,'+met.parent_class + '.' + p[1])
   datatype = met.datatype
   p[0]=TREE.FunctionCall(code=code, datatype=datatype)
 
@@ -566,7 +569,7 @@ def p_expression_function_call_2(p):
   met = current_symbol_table[0].getMethod(p[1])
 
   t=newtemp()
-  print current_symbol_table[0].parent.scope_name
+  # print current_symbol_table[0].parent.scope_name
   code = ['FUNC_CALL,'+met.parent_class +'.'+p[1]+','+t]
   # quit()
   # code = ['FUNC_CALL,'+current_symbol_table[0].getMethod(p[1]).name+'.'+p[1]+','+t]
@@ -577,13 +580,21 @@ def p_expression_function_call_2(p):
 def p_argument_list(p):
   'argument_list : expression'
   rule.append(42)
+  # var = current_symbol_table[0].getVariable(p[1].place)
 
-  code = ['FUNC_PARAM,{}'.format(p[1].place)]
+  print p[1].place
+  changed_name = p[1].place
+  # if var <> None :
+  # 	changed_name = var.parent_scope_name + '.' + p[1].place
+
+  code = ['FUNC_PARAM,{}'.format(changed_name)]
   p[0]=TREE.ArgumentList(code=code)
 
 def p_argument_list_many(p):
   'argument_list : argument_list COMMA expression'
   rule.append(43)
+  print p[3].place
+  var = current_symbol_table[0].getVariable(p[3].place)
 
   code = []
   code.append('FUNC_PARAM,{}'.format(p[3].place))
@@ -956,6 +967,15 @@ def p_expression_continue(p):
   rule.append(67)
   p[0] = TREE.Expression(code=['CONTINUE'],datatype='continue',isArray=False,place=None)
 
+def p_expression_return(p):
+  'expression : RETURN expression SEMICOLON'
+  rule.append(67)
+  func = [x.strip() for x in current_symbol_table[0].scope_name.split('.')][1]
+  if current_symbol_table[0].getMethod(func).datatype <> p[2].datatype:
+  	sys.exit("return type doesnot match for fucntion "+ func)
+  p[0] = TREE.Expression(code=['RETURN,'+p[2].place],datatype='continue',isArray=False,place=None)
+
+
 def p_expression_function_call_with_arguments(p):
   'expression : expression PERIOD ID LPAREN argument_list RPAREN'
   rule.append(68)
@@ -1258,4 +1278,4 @@ parser.parse(data)
 # for x in ClassDict:
 # 	print ClassDict[x].scope_name
 
-main(SymbolTables)
+# main(SymbolTables)

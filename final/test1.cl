@@ -12,9 +12,9 @@
 class Main inherits IO {
 	
 		i : Int[2];
-		b : String;
+		b : Int;
 		
-		def main : SELF_TYPE (a : Int, b : Int) {
+		def main : SELF_TYPE (a : Int) {
 			{
 				b <- 2;
 				let c : Int <- 0 in 
@@ -26,6 +26,14 @@ class Main inherits IO {
 					tel
 				tel;
 			}
+		};
+		def do : Int (a : Int,b :Int) {
+			let s : Int,c : Int in
+					let p : Int in
+						return 5;
+					tel
+				tel
+
 		};		
 
 };
