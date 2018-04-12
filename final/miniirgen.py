@@ -580,9 +580,9 @@ def p_expression_function_call_2(p):
 def p_argument_list(p):
   'argument_list : expression'
   rule.append(42)
+  
   var = current_symbol_table[0].getVariable(p[1].place)
 
-  print p[1].place
   changed_name = p[1].place
   if var <> None :
   	changed_name = var.parent_scope_name + '.' + p[1].place
@@ -595,9 +595,12 @@ def p_argument_list_many(p):
   rule.append(43)
   print p[3].place
   var = current_symbol_table[0].getVariable(p[3].place)
+  changed_name = p[3].place
+  if var <> None :
+  	changed_name = var.parent_scope_name + '.' + p[3].place
 
   code = []
-  code.append('FUNC_PARAM,{}'.format(p[3].place))
+  code.append('FUNC_PARAM,{}'.format(changed_name))
   code.extend(p[1].code)
 
   p[0]=TREE.ArgumentList(code=code)
@@ -921,7 +924,7 @@ def p_expression_id(p):
 
   t = p[1]
 
-  p[0] = TREE.Expression(place = var.parent_scope_name + '.' + t, code=[],datatype=var.datatype,isArray=var.isArray)
+  p[0] = TREE.Expression(place = t, code=[],datatype=var.datatype,isArray=var.isArray)
 
 def p_expression_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET'

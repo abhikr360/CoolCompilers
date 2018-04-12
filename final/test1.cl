@@ -30,7 +30,7 @@ class Main inherits IO {
 		def do : Int (a : Int,b :Int) {
 			let s : Int,c : Int in
 					let p : Int in
-						return 5;
+						main(a,b) 
 					tel
 				tel
 
