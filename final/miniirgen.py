@@ -5,6 +5,8 @@ import sys
 from lexer import tokens
 import tree as TREE
 from symtab import *
+from codegen import main
+
 
 precedence = (
         ('right', 'GETS'),
@@ -23,11 +25,10 @@ precedence = (
 rule = []
 
 SymbolTables = []
-current_symbol_table = [Symtab(parent=None, symtab_type='class', scope_name='GLOBAL')]  #not a list only one symboltable
+current_symbol_table = [Symtab(parent=None, symtab_type='CLASS', scope_name='GLOBAL')]  #not a list only one symboltable
 ClassDict = {}
 
 basicDataType = ['Int','String','Bool']
-
 '''
      TO BE DONE
 '''
@@ -37,6 +38,7 @@ def newtemp():
   tempCount[0] += 1
   temp_name = 't.' + str(tempCount[0])
   current_symbol_table[0].enter(name = temp_name)
+  
   return temp_name
 
 jumpCount = [0]
@@ -57,10 +59,17 @@ def p_start(p):
 
   p[0]=TREE.Start(code=p[1].code)
   t = newtemp()
-  print "FUNC_CALL,THE_MAIN_CLASS,"+t
+  print "GOTO,CLASS.Main,"+t
   print "EXIT"
+  i=3
+  f=open(sys.argv[2], 'wb')
+  f.write("1,GOTO,CLASS.Main,"+t + '\n')
+  f.write("2,EXIT\n")
   for a in p[0].code:
-    print(a)
+    print(str(i) + ',' + a)
+    f.write(str(i) + ',' + a + '\n')
+    i+=1
+  f.close()
 
 def p_program_with_imports(p):
   'program : imports classes'
@@ -123,11 +132,12 @@ def p_class_header_with_inheritance(p):
   current_symbol_table[0] = new_sym_tab
 
 
-  if(p[2]=='Main'):
-    pass
-    code = ['FUNC_LABEL,THE_MAIN_CLASS']
-  else:
-    code=["Class header code here with inheritance"]
+  code = ['LABEL,CLASS.'+p[2]]
+  # if(p[2]=='Main'):
+  #   pass
+  # else:
+  #   code=["Class header code here with inheritance"]
+
 
   p[0] = TREE.ClassHeader(code=code)
 
@@ -135,11 +145,11 @@ def p_class_header_with_inheritance(p):
 def p_class_header(p):
   'class_header : CLASS CLASS_TYPE'
 
-  if(p[2]=='Main'):
-    pass
-    code = ['FUNC_LABEL,THE_MAIN_CLASS']
-  else:
-    code=["Class header code here without inheritance"]
+  code = ['LABEL,CLASS.' + p[2]]
+  # if(p[2]=='Main'):
+  #   pass
+  # else:
+  #   code=["Class header code here without inheritance"]
   p[0] = TREE.ClassHeader(code=code)
 
   new_sym_tab = Symtab(parent=None, symtab_type="CLASS", scope_name=p[2])
@@ -226,9 +236,9 @@ def p_feature_header_with_modifier(p):
   code = ['FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3]]
   p[0] = TREE.FeatureHeader(code=code, datatype=p[5].place)
 
-  new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=p[3])
+  new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[3])
   # current_symbol_table[0].methods.append(new_sym_tab)
-  current_symbol_table[0].enter_method(p[3],p[5])
+  current_symbol_table[0].enter_method(p[3],p[5],current_symbol_table[0].scope_name)
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
 
@@ -237,8 +247,8 @@ def p_feature_header(p):
   code = ['FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[2]]
   p[0] = TREE.FeatureHeader(code=code, datatype=p[4].place)
 
-  new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=p[2])
-  current_symbol_table[0].enter_method(p[2],p[4])
+  new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[2])
+  current_symbol_table[0].enter_method(p[2],p[4],current_symbol_table[0].scope_name)
   # current_symbol_table[0].methods.append(new_sym_tab,p[4])
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
@@ -427,6 +437,7 @@ def p_formal_with_assign(p):
   'formal : ID COLON type GETS expression'
   rule.append(31)
 
+
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
   p[0]=TREE.Formal(code=code)
 
@@ -505,11 +516,14 @@ def p_expression_assign(p):
   rule.append(38)
   var = current_symbol_table[0].getVariable(p[1])
   # print "datatype : ",var.datatype, p[3].datatype
-  if(var.datatype <> p[3].datatype):
+  # print current_symbol_table[0].scope_name,p[1],var.parent_table.scope_name
+  # quit()
+  # p[1] = TREE.Id(place = var.parent_table.scope_name + '.' + p[1] )
+  if(var.datatype <> p[3].datatype and (var.datatype <> 'Int' and p[3].datatype <> 'Bool')):
     sys.exit("Type Check Error "+var.name+" is assigned "+p[3].datatype)
   code = p[3].code
   # print("CODE : ", code, p[3].place, p[3])
-  s = 'ASSIGN,' + p[1] +',' + p[3].place
+  s = 'ASSIGN,' + var.parent_scope_name + '.' + p[1] +',' + p[3].place
   code.append(s)
   p[0] = TREE.Expression(code=code, datatype=p[3].datatype,place=p[3].place)
   # print("================")
@@ -531,7 +545,7 @@ def p_expression_assign_arr(p):
     sys.exit("Type Check Error "+var.name+" is assigned "+p[3].datatype)
   code = p[6].code
   code.extend(p[3].code)
-  code.append('INDEX_ASSIGN_L,'+p[1]+','+p[3].place+','+p[6].place)
+  code.append('INDEX_ASSIGN_L,'+var.parent_scope_name +'.'+ p[1]+','+p[3].place+','+p[6].place)
   
   p[0] = TREE.Expression(code=code,place=p[6].place, datatype=p[6].datatype)
 
@@ -541,7 +555,7 @@ def p_expression_function_call_with_arguments_2(p):
   met = current_symbol_table[0].getMethod(p[1])
   
   code = p[3].code
-  code.append('FUNC_CALL,'+p[1])
+  code.append('FUNC_CALL,'+met.parent_name + '.' + p[1])
   datatype = met.datatype
   p[0]=TREE.FunctionCall(code=code, datatype=datatype)
 
@@ -552,7 +566,10 @@ def p_expression_function_call_2(p):
   met = current_symbol_table[0].getMethod(p[1])
 
   t=newtemp()
-  code = ['FUNC_CALL,'+p[1]+','+t]
+  print current_symbol_table[0].parent.scope_name
+  code = ['FUNC_CALL,'+met.parent_class +'.'+p[1]+','+t]
+  # quit()
+  # code = ['FUNC_CALL,'+current_symbol_table[0].getMethod(p[1]).name+'.'+p[1]+','+t]
   datatype = met.datatype
   p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
 
@@ -666,21 +683,19 @@ def p_expression_lt(p):
   if(p[1].isArray or p[3].isArray):
     sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
   t = newtemp()
-  j_if = newjump()
-  j_fi = newjump()
-  # print("@@@@@@@@")
-  # print(p[3].code)
-  # print("@@@@@@@")
+  # j_if = newjump()
+  # j_fi = newjump()
+ 
   code = p[1].code
   code.extend(p[3].code)
-  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
 
-  code.append("IFGOTO,LESS_THAN," + p[1].place + ',' + p[3].place + ',' + j_if)
-  code.append("ASSIGN," + t + ',0')
-  code.append("JUMP," + j_fi)
-  code.append("LABEL,"+j_if)
-  code.append("ASSIGN," + t + ',1')
-  code.append("LABEL," + j_fi)
+  # code.append("IFGOTO,LESS_THAN," + p[1].place + ',' + p[3].place + ',' + j_if)
+  # code.append("ASSIGN," + t + ',0')
+  # code.append("GOTO," + j_fi)
+  # code.append("LABEL,"+j_if)
+  # code.append("ASSIGN," + t + ',1')
+  # code.append("LABEL," + j_fi)
 
   p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
@@ -697,13 +712,14 @@ def p_expression_gt(p):
   j_fi = newjump()
   code = p[1].code
   code.extend(p[3].code)
-  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
-  code.append("IFGOTO,GREATER_THAN," + p[1].place + ',' + p[3].place + ',' + j_if)
-  code.append("ASSIGN," + t + ',0')
-  code.append("JUMP," + j_fi)
-  code.append("LABEL,"+j_if)
-  code.append("ASSIGN," + t + ',1')
-  code.append("LABEL," + j_fi)
+  code.append('GREATER_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+
+  # code.append("IFGOTO,GREATER_THAN," + p[1].place + ',' + p[3].place + ',' + j_if)
+  # code.append("ASSIGN," + t + ',0')
+  # code.append("GOTO," + j_fi)
+  # code.append("LABEL,"+j_if)
+  # code.append("ASSIGN," + t + ',1')
+  # code.append("LABEL," + j_fi)
 
   p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
@@ -721,13 +737,14 @@ def p_expression_lteq(p):
   j_fi = newjump()
   code = p[1].code
   code.extend(p[3].code)
-  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
-  code.append("IFGOTO,LESS_THAN_EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
-  code.append("ASSIGN," + t + ',0')
-  code.append("JUMP," + j_fi)
-  code.append("LABEL,"+j_if)
-  code.append("ASSIGN," + t + ',1')
-  code.append("LABEL," + j_fi)
+  code.append('LESS_THAN_EQUALS,' + t + ',' + p[1].place + ',' + p[3].place)
+
+  # code.append("IFGOTO,LESS_THAN_EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
+  # code.append("ASSIGN," + t + ',0')
+  # code.append("GOTO," + j_fi)
+  # code.append("LABEL,"+j_if)
+  # code.append("ASSIGN," + t + ',1')
+  # code.append("LABEL," + j_fi)
 
   p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
@@ -745,13 +762,15 @@ def p_expression_gteq(p):
   j_fi = newjump()
   code = p[1].code
   code.extend(p[3].code)
-  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
-  code.append("IFGOTO,GREATER_THAN_EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
-  code.append("ASSIGN," + t + ',0')
-  code.append("JUMP," + j_fi)
-  code.append("LABEL,"+j_if)
-  code.append("ASSIGN," + t + ',1')
-  code.append("LABEL," + j_fi)
+  code.append('GREATER_THAN_EQUALS,' + t + ',' + p[1].place + ',' + p[3].place)
+
+
+  # code.append("IFGOTO,GREATER_THAN_EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
+  # code.append("ASSIGN," + t + ',0')
+  # code.append("GOTO," + j_fi)
+  # code.append("LABEL,"+j_if)
+  # code.append("ASSIGN," + t + ',1')
+  # code.append("LABEL," + j_fi)
 
   p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
@@ -769,13 +788,15 @@ def p_expression_equal(p):
   j_fi = newjump()
   code = p[1].code
   code.extend(p[3].code)
-  # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
-  code.append("IFGOTO,EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
-  code.append("ASSIGN," + t + ',0')
-  code.append("JUMP," + j_fi)
-  code.append("LABEL,"+j_if)
-  code.append("ASSIGN," + t + ',1')
-  code.append("LABEL," + j_fi)
+  code.append('EQUALS,' + t + ',' + p[1].place + ',' + p[3].place)
+
+
+  # code.append("IFGOTO,EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
+  # code.append("ASSIGN," + t + ',0')
+  # code.append("GOTO," + j_fi)
+  # code.append("LABEL,"+j_if)
+  # code.append("ASSIGN," + t + ',1')
+  # code.append("LABEL," + j_fi)
 
   p[0] = TREE.Expression(code = code, place = t, datatype = 'Bool')
 
@@ -795,20 +816,16 @@ def p_expression_or(p):
   t = newtemp()
   l1 = newjump()
   l2 = newjump()
-  l3 = newjump()
 
   code = p[1].code
-  code.append('IFGOTO,EQUALS,' + p[1].place + ',0,' + l1)
-  code.append('ASSIGN,'+t+',1')
-  code.append('JUMP,'+l3)
-  code.append('LABEL,' + l1)
+  code.append('IFGOTO,' + p[1].place + ',' + l1)
   code.extend(p[3].code)
-  code.append('IFGOTO,EQUALS,' + p[3].place + ',0,' + l2)
-  code.append('ASSIGN,'+t+',1')
-  code.append('JUMP,'+l3)
-  code.append('LABEL,' + l2)
+  code.append('IFGOTO,' + p[3].place + ',' + l1)
   code.append('ASSIGN,' + t + ',0')
-  code.append('LABEL,' + l3)
+  code.append('GOTO,'+l2)
+  code.append('LABEL,' + l1)
+  code.append('ASSIGN,'+t+',1')
+  code.append('LABEL,' + l2)
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
@@ -821,28 +838,24 @@ def p_expression_and(p):
   t = newtemp()
   l1 = newjump()
   l2 = newjump()
-  l3 = newjump()
 
   code = p[1].code
-  code.append('IFGOTO,GREATER_THAN,' + p[1].place + ',0,' + l1)
-  code.append('ASSIGN,'+t+',0')
-  code.append('JUMP,'+l3)
-  code.append('LABEL,' + l1)
+  code.append('IFFALSE,' + p[1].place + ',' + l1)
   code.extend(p[3].code)
-  code.append('IFGOTO,GREATER_THAN,' + p[3].place + ',0,' + l2)
-  code.append('ASSIGN,'+t+',0')
-  code.append('JUMP,'+l3)
-  code.append('LABEL,' + l2)
+  code.append('IFFALSE,' + p[3].place + ',' + l1)
   code.append('ASSIGN,' + t + ',1')
-  code.append('LABEL,' + l3)
+  code.append('GOTO,'+l2)
+  code.append('LABEL,' + l1)
+  code.append('ASSIGN,'+t+',0')
+  code.append('LABEL,' + l2)
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
 def p_expression_not(p):
   'expression : NOT expression'
   rule.append(56)
-  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
-    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
+  if(p[2].datatype <> 'Bool'):
+    sys.exit("TYPE Check Error : Both "+p[2].place + " is NOT Bool Type")
 
   t = newtemp()
   j_if = newjump()
@@ -851,7 +864,7 @@ def p_expression_not(p):
   # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
   code.append("IFGOTO,EQUALS," + p[2].place + ',0,' + j_if)
   code.append("ASSIGN," + t + ',0')
-  code.append("JUMP," + j_fi)
+  code.append("GOTO," + j_fi)
   code.append("LABEL,"+j_if)
   code.append("ASSIGN," + t + ',1')
   code.append("LABEL," + j_fi)
@@ -897,7 +910,7 @@ def p_expression_id(p):
 
   t = p[1]
 
-  p[0] = TREE.Expression(place = t, code=[],datatype=var.datatype,isArray=var.isArray)
+  p[0] = TREE.Expression(place = var.parent_scope_name + '.' + t, code=[],datatype=var.datatype,isArray=var.isArray)
 
 def p_expression_arr(p):
   'expression : ID LSQRBRACKET expression RSQRBRACKET'
@@ -906,7 +919,7 @@ def p_expression_arr(p):
 
   t = newtemp()
   code = p[3].code
-  code.append('INDEX_ASSIGN_R,' + t + ',' + p[1] + ',' + p[3].place)
+  code.append('INDEX_ASSIGN_R,' + t + ',' + var.parent_scope_name +'.'+p[1] + ',' + p[3].place)
 
   p[0] = TREE.Expression(place = t, code = code, datatype=var.datatype,isArray=False)
 
@@ -994,19 +1007,23 @@ def p_let_to_let(p):
 
   let_id = newLet()
 
-  new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='LET', scope_name=let_id)
+  code = ['LABEL,' + 'LET_BEGIN_' + current_symbol_table[0].scope_name + '.'+ str(let_id)]
+  new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='LET', scope_name=current_symbol_table[0].scope_name + '.' + str(let_id))
   current_symbol_table[0].lets.append(new_sym_tab)
   SymbolTables.append(new_sym_tab)
   current_symbol_table[0] = new_sym_tab
 
+  p[0]=TREE.Let(code=code, datatype='',let_id=let_id)
 
 
 def p_let_expression(p):
   'let_expression : let formaldehyde IN expression TEL'
   rule.append(73)
 
-  code = p[2].code
+  code = p[1].code
+  code.extend(p[2].code)
   code.extend(p[4].code)
+  code.append('LABEL,LET_OVER_'+str(p[1].let_id))
   p[0] = TREE.Let(code = code, datatype=p[4].datatype)
 
   current_symbol_table[0] = current_symbol_table[0].parent
@@ -1047,9 +1064,9 @@ def p_if_then_else(p):
   _if = newjump()
   _fi = newjump()
   code=p[2].code
-  code.append('IFGOTO,GREATER_THAN,' + p[2].place + ',0,' +  _if)
+  code.append('IFGOTO,' + p[2].place + ',' +  _if)
   code.extend(p[6].code)
-  code.append('JUMP,' + _fi)
+  code.append('GOTO,' + _fi)
   code.append('LABEL,' + _if)
   code.extend(p[4].code)
   code.append('LABEL,'+_fi)
@@ -1074,7 +1091,7 @@ def p_while(p):
   code.extend(p[2].code)
   code.append('IFGOTO,EQUALS,' + p[2].place + ',0,' +  _pool)
   code.extend(p[4].code)
-  code.append('JUMP,'+_loop)
+  code.append('GOTO,'+_loop)
   code.append('LABEL,'+_pool)
   for i in range(len(code)):
     if(code[i]=='BREAK'):
@@ -1107,15 +1124,15 @@ def p_for(p):
   code.append('IFGOTO,EQUALS,'+p[5].place+',0,' + _pool)
   code.extend(p[10].code)
   code.extend(p[7].code)
-  code.append('JUMP,'+ _loop)
+  code.append('GOTO,'+ _loop)
   code.append('LABEL,' + _pool)
 
   for i in range(len(code)):
     if(code[i]=='BREAK'):
-      code[i]='JUMP,'+_pool
+      code[i]='GOTO,'+_pool
       # sys.exit(_pool)
     elif(code[i]=='CONTINUE'):
-      code[i]='JUMP,'+_loop
+      code[i]='GOTO,'+_loop
 
   # print "agsdiagsdia"
   p[0] = TREE.For(code=code, datatype=p[10].datatype)
@@ -1124,9 +1141,10 @@ def p_for(p):
 def p_formaldehyde_with_assign_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type GETS expression'
   # rule.append(31)
+  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4, isArray =False)
 
   code = p[1].code
-  code.append('ASSIGN,%s,%s'%(p[3], p[7].place))
+  code.append('ASSIGN,%s,%s'%(current_symbol_table[0].scope_name + '.' + p[3], p[7].place))
 
   if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
@@ -1137,7 +1155,6 @@ def p_formaldehyde_with_assign_many(p):
   p[0]=TREE.Formal(code=code)
 
 
-  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4, isArray =False)
 
 def p_formaldehyde_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type'
@@ -1157,22 +1174,23 @@ def p_formaldehyde_many(p):
 def p_formaldehyde_arr_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET'
   # rule.append(33)
+  current_symbol_table[0].enter(name= p[3],datatype=p[5].place, size=4*int(p[7].place), isArray =True)
 
-  p[0]=TREE.Formal(code=[])
+  p[0]=TREE.Formal(code=p[7].code)
   if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4000, isArray =True)
 
 
 def p_formaldehyde_with_assign(p):
   'formaldehyde : ID COLON type GETS expression'
   # rule.append(31)
+  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4, isArray =False)
 
-  code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
+  code=['ASSIGN,%s,%s'%(current_symbol_table[0].scope_name + '.'+p[1], p[5].place)]
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
   p[0]=TREE.Formal(code=code)
   if p[3].place in ClassDict or p[3].place in basicDataType:
@@ -1181,7 +1199,6 @@ def p_formaldehyde_with_assign(p):
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4, isArray =False)
 
 def p_formaldehyde(p):
   'formaldehyde : ID COLON type'
@@ -1200,14 +1217,14 @@ def p_formaldehyde_arr(p):
   'formaldehyde : ID COLON type LSQRBRACKET expression RSQRBRACKET'
   # rule.append(33)
 
-  p[0]=TREE.Formal(code=[])
+  p[0]=TREE.Formal(code=p[5].code)
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4000, isArray =True)
+  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
 
 
 def p_error(p):
@@ -1234,9 +1251,11 @@ parser.parse(data)
 # print(rule)
 
 
-for s in SymbolTables:
-  print("===========")
-  s.printsymtab()
+# for s in SymbolTables:
+#   print("===========")
+#   s.printsymtab()
 # print "*****class dictionary*****"
 # for x in ClassDict:
 # 	print ClassDict[x].scope_name
+
+main(SymbolTables)

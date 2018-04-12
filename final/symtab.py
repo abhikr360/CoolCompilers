@@ -2,17 +2,19 @@ import sys
 
 class Variable:
 	"""docstring for Variable"""
-	def __init__(self,name, datatype='Int', size=4,isArray=False):
+	def __init__(self,name, datatype='Int', size=4,isArray=False,parent_scope_name = None):
 		self.name = name
 		self.datatype = datatype
 		self.isArray = isArray
 		self.size = size
+		self.parent_scope_name = parent_scope_name
 
 
 class Method:
-	def __init__(self, name, datatype='Int'):
+	def __init__(self, name, datatype='Int',parent_class = None):
 		self.name = name
 		self.datatype = datatype
+		self.parent_class = parent_class
 
 		
 class Symtab:
@@ -26,20 +28,22 @@ class Symtab:
 		self.lets = []
 
 	def enter(self,name,datatype='Int',size=4,isArray=False):
+		# name = self.scope_name + '.' + name 
 		if(self.search(name)):
 			sys.exit("Variable %s already present in symbol table"%name)
 		else:
-			newvar = Variable(name,datatype,size,isArray)
+			newvar = Variable(name,datatype,size,isArray,self.scope_name)
 			self.variables.append(newvar)
 
-	def enter_method(self, name,datatype='Int'):
+	def enter_method(self, name,datatype='Int',parent_class=None):
 		if(self.search_method(name)):
 			sys.exit("Method %s already present in symbol table"%name)
 		else:
-			newmethod = Method(name,datatype)
+			newmethod = Method(name,datatype,parent_class)
 			self.methods.append(newmethod)
 
 	def getVariable(self,name):
+		# name = self.scope_name + '.' + name
 		current_sym_tab = self
 
 		while current_sym_tab <> None:
