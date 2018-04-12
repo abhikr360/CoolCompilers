@@ -1312,4 +1312,4 @@ for s in SymbolTables:
 # for x in ClassDict:
 # 	print ClassDict[x].scope_name
 
-main(SymbolTables)
+# main(SymbolTables)
