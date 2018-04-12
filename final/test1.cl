@@ -1,4 +1,4 @@
-class Japanese inherits IO {
+(*class Japanese inherits IO {
 	i : Int[2];
    def  main2 : SELF_TYPE (b : Int) {
    	   	
@@ -7,27 +7,29 @@ class Japanese inherits IO {
 		pool
    	};
 
-};
+};*)
 
 class Main inherits IO {
 	
 		i : Int[2];
 		b : String;
-		c : Japanese;
 		
 		def main : SELF_TYPE (a : Int, b : Int) {
 			{
-				c.main2(i,c,b);
+				(*c.main2(i,c,b);*)
 				b <- 2;
 				let c : Int <- 0 in 
 				b <- 4
 				tel;
-				let s : String,c : Int in
+				let s : Int,c : Int in
 					let p : Int in
 						s <- p
 					tel
 				tel;
 			}
+		};
+		def do : Int (a : Int) {
+			main(a,3)
 		};		
 
 };
