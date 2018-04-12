@@ -72,14 +72,14 @@ def p_start(p):
   print "1,GOTO,CLASS.Main"
   print "2,EXIT"
   i=3
-  # f=open(sys.argv[2], 'wb')
-  # f.write("1,GOTO,CLASS.Main,"+t + '\n')
-  # f.write("2,EXIT\n")
+  f=open(sys.argv[2], 'wb')
+  f.write("1,GOTO,CLASS.Main,"+t + '\n')
+  f.write("2,EXIT\n")
   for a in p[0].code:
     print(str(i) + ',' + a)
-    # f.write(str(i) + ',' + a + '\n')
+    f.write(str(i) + ',' + a + '\n')
     i+=1
-  # f.close()
+  f.close()
 
 def p_program_with_imports(p):
   'program : imports classes'
@@ -745,7 +745,7 @@ def p_expression_lt(p):
   rule.append(49)
 
   # print "Bool Expr : ",p[1].datatype,p[3].datatype
-  print p[1].datatype
+  # print p[1].datatype
   if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool'] ):
     sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Int or Bool Type")
   if(p[1].isArray or p[3].isArray):
