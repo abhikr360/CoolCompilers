@@ -1,6 +1,16 @@
 class Main inherits IO {
 	(*arr : Int[10];*)
 	n : Int <- 5;
+   def fib : Int (n: Int){
+      if n<3 then
+         return n;
+      else
+         return n ;
+      
+      fi
+
+   };
+
    def  main : SELF_TYPE () {
 
       {
@@ -19,19 +29,12 @@ class Main inherits IO {
             }
 
          pool;*)
-         out_int(fib(n));
+         fib(n);
       }
 
    };
 
-   def fib : Int (n: Int){
-      if(n<3)
-         return n
-      else
-      {
-         return (fib(n-1) + fib(n-2))
-      }
-      fi
-
-   };
+   
 };
+
+(*(fib(n-1) + fib(n-2))*)

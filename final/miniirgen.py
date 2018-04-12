@@ -580,12 +580,12 @@ def p_expression_function_call_2(p):
 def p_argument_list(p):
   'argument_list : expression'
   rule.append(42)
-  # var = current_symbol_table[0].getVariable(p[1].place)
+  var = current_symbol_table[0].getVariable(p[1].place)
 
   print p[1].place
   changed_name = p[1].place
-  # if var <> None :
-  # 	changed_name = var.parent_scope_name + '.' + p[1].place
+  if var <> None :
+  	changed_name = var.parent_scope_name + '.' + p[1].place
 
   code = ['FUNC_PARAM,{}'.format(changed_name)]
   p[0]=TREE.ArgumentList(code=code)
