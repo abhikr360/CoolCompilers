@@ -9,8 +9,9 @@ def is_int(row):
 
 class Variable:
 	"""docstring for Variable"""
-	def __init__(self,name, datatype='Int', size=4,isArray=False,parent_scope_name = None):
+	def __init__(self,name,changed_name datatype='Int', size=4,isArray=False,parent_scope_name = None):
 		self.name = name
+		self.changed_name = changed_name
 		self.datatype = datatype
 		self.isArray = isArray
 		self.size = size

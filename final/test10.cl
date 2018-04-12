@@ -1,6 +1,8 @@
 class Main inherits IO {
 
    n : Int <- 5;
+   m : Int;
+
    def fib : Int (n: Int){
       if n<3 then
          return n;
@@ -29,13 +31,17 @@ class Main inherits IO {
             }
 
          pool;*)
-         fib(n);
+         m <- fib(n);
+         out_int(m);
       }
 
    };
 
    
 };
+
+
+
 
 (*(fib(n-1) + fib(n-2))*)
 

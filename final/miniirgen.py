@@ -32,7 +32,7 @@ basicDataType = ['Int','String','Bool']
 '''
      TO BE DONE
 '''
-
+flag=[0]
 tempCount=[0]
 def newtemp():
   tempCount[0] += 1
@@ -58,18 +58,18 @@ def p_start(p):
   rule.append(0)
 
   p[0]=TREE.Start(code=p[1].code)
-  t = newtemp()
-  print "1,GOTO,CLASS.Main,"+t
+  # t = newtemp()
+  print "1,GOTO,CLASS.Main"
   print "2,EXIT"
   i=3
-  f=open(sys.argv[2], 'wb')
-  f.write("1,GOTO,CLASS.Main,"+t + '\n')
-  f.write("2,EXIT\n")
+  # f=open(sys.argv[2], 'wb')
+  # f.write("1,GOTO,CLASS.Main,"+t + '\n')
+  # f.write("2,EXIT\n")
   for a in p[0].code:
     print(str(i) + ',' + a)
-    f.write(str(i) + ',' + a + '\n')
+    # f.write(str(i) + ',' + a + '\n')
     i+=1
-  f.close()
+  # f.close()
 
 def p_program_with_imports(p):
   'program : imports classes'
@@ -232,8 +232,11 @@ def p_feature_header_body(p):
 
 def p_feature_header_with_modifier(p):
   'feature_header : DEF modifier ID COLON type'
-
-  code = ['FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3]]
+  code=[]
+  if(not flag[0]):
+    code.append('GOTO,Main.main')
+    flag[0]=1
+  codea.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3])
   p[0] = TREE.FeatureHeader(code=code, datatype=p[5].place)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[3])
@@ -244,10 +247,15 @@ def p_feature_header_with_modifier(p):
 
 def p_feature_header(p):
   'feature_header : DEF ID COLON type'
-  code = ['FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[2]]
+  code=[]
+  if(not flag[0]):
+    code.append('GOTO,Main.main')
+    flag[0]=1
+  code.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[2])
   p[0] = TREE.FeatureHeader(code=code, datatype=p[4].place)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[2])
+
   current_symbol_table[0].enter_method(p[2],p[4].place,current_symbol_table[0].scope_name)
   # current_symbol_table[0].methods.append(new_sym_tab,p[4])
   current_symbol_table[0] = new_sym_tab
@@ -394,6 +402,11 @@ def p_formal_parameter_list_many(p):
   rule.append(27)
 
   code = p[1].code
+  # changed_name = p[3].place
+
+
+  # if p[3].datatype.place == 'Int':
+  #   changed_name = current_symbol_table[0].getVariable(p[3].place).parent_scope_name + '.' + p[3].place
   code.append('READ_STACK,' + p[3].place)
   p[0] = TREE.FormalParameterList(code=code,nargs=p[1].nargs+1)
 
@@ -401,7 +414,11 @@ def p_formal_parameter_list_many(p):
 def p_formal_parameter_list(p):
   'formal_parameter_list : formal_parameter'
   rule.append(28)
-
+  
+  # changed_name = p[1].place
+  # if p[1].datatype.place == 'Int':
+  #   changed_name = current_symbol_table[0].getVariable(p[1].place).parent_scope_name + '.' + p[1].place
+  
   code = ['READ_STACK,' + p[1].place]
   p[0] = TREE.FormalParameterList(code=code,nargs=1)
 
@@ -419,7 +436,7 @@ def p_formal_parameter(p):
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
+  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
 def p_formal_parameter_arr(p):
   'formal_parameter : ID LSQRBRACKET RSQRBRACKET COLON type'
@@ -433,12 +450,14 @@ def p_formal_parameter_arr(p):
     sys.exit('No object found named ' + p[3].place)
 
 
-  current_symbol_table[0].enter(name=p[1], datatype=p[5].place, size=4*1000, isArray=True)
+  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[5].place, size=4*1000, isArray=True)
 
 
 def p_formal_with_assign(p):
   'formal : ID COLON type GETS expression'
   rule.append(31)
+
+  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name + '.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
 
   code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
@@ -450,7 +469,6 @@ def p_formal_with_assign(p):
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
 
 def p_formal(p):
   'formal : ID COLON type'
@@ -465,7 +483,7 @@ def p_formal(p):
     sys.exit('No object found named ' + p[3].place)
   # quit()
   
-  current_symbol_table[0].enter(name=p[1], datatype=p[3].place, size=4, isArray =False)
+  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
@@ -479,7 +497,7 @@ def p_formal_arr(p):
     # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
-  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
+  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name + '.' + p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
 
 
 #--------------------------------------------  Not DONE ----------------------------------------------
@@ -526,7 +544,7 @@ def p_expression_assign(p):
     sys.exit("Type Check Error "+var.name+" is assigned "+p[3].datatype)
   code = p[3].code
   # print("CODE : ", code, p[3].place, p[3])
-  s = 'ASSIGN,' + var.parent_scope_name + '.' + p[1] +',' + p[3].place
+  s = 'ASSIGN,' + p[1] +',' + p[3].place
   code.append(s)
   p[0] = TREE.Expression(code=code, datatype=p[3].datatype,place=p[3].place)
   # print("================")
@@ -555,12 +573,22 @@ def p_expression_assign_arr(p):
 def p_expression_function_call_with_arguments_2(p):
   'expression : ID LPAREN argument_list RPAREN'
   rule.append(40)
-  met = current_symbol_table[0].getMethod(p[1])
-  
-  code = p[3].code
-  code.append('FUNC_CALL,'+met.parent_class + '.' + p[1])
-  datatype = met.datatype
-  p[0]=TREE.FunctionCall(code=code, datatype=datatype)
+
+  if(p[1] == 'out_int'):
+    code = ['PRINT_INT,' + p[3].place]
+    p[0]=TREE.FunctionCall(code=code)
+
+
+
+  else:
+    met = current_symbol_table[0].getMethod(p[1])
+    
+    t = newtemp()
+
+    code = p[3].code
+    code.append('FUNC_CALL,'+met.parent_class + '.' + p[1] + ',' + str(t))
+    datatype = met.datatype
+    p[0]=TREE.FunctionCall(code=code, datatype=datatype, place=t)
 
 
 def p_expression_function_call_2(p):
@@ -580,7 +608,7 @@ def p_expression_function_call_2(p):
 def p_argument_list(p):
   'argument_list : expression'
   rule.append(42)
-  
+
   var = current_symbol_table[0].getVariable(p[1].place)
 
   changed_name = p[1].place
@@ -588,7 +616,7 @@ def p_argument_list(p):
   	changed_name = var.parent_scope_name + '.' + p[1].place
 
   code = ['FUNC_PARAM,{}'.format(changed_name)]
-  p[0]=TREE.ArgumentList(code=code)
+  p[0]=TREE.ArgumentList(code=code, place=changed_name)
 
 def p_argument_list_many(p):
   'argument_list : argument_list COMMA expression'
@@ -976,7 +1004,10 @@ def p_expression_return(p):
   func = [x.strip() for x in current_symbol_table[0].scope_name.split('.')][1]
   if current_symbol_table[0].getMethod(func).datatype <> p[2].datatype:
   	sys.exit("return type doesnot match for fucntion "+ func)
-  p[0] = TREE.Expression(code=['RETURN,'+p[2].place],datatype='continue',isArray=False,place=None)
+  changed_name = p[2].place
+  if(p[2].datatype=='Int'):
+    changed_name = current_symbol_table[0].getVariable(p[2].place).parent_scope_name+'.'+p[2].place
+  p[0] = TREE.Expression(code=['RETURN,'+changed_name],datatype='continue',isArray=False,place=None)
 
 
 def p_expression_function_call_with_arguments(p):
@@ -1274,11 +1305,11 @@ parser.parse(data)
 # print(rule)
 
 
-# for s in SymbolTables:
-#   print("===========")
-#   s.printsymtab()
+for s in SymbolTables:
+  print("===========")
+  s.printsymtab()
 # print "*****class dictionary*****"
 # for x in ClassDict:
 # 	print ClassDict[x].scope_name
 
-# main(SymbolTables)
+main(SymbolTables)

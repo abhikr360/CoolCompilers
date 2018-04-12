@@ -9,8 +9,9 @@ class Expression:
 
 class ArgumentList:
 	"""docstring for ArgumentList"""
-	def __init__(self, code):
+	def __init__(self, code, place):
 		self.code = code
+		self.place = place
 
 class FunctionCall:
 	"""docstring for FunctionCall"""
@@ -127,7 +128,7 @@ class FormalParameter:
 
 
 
-class Let(object):
+class Let:
 		"""docstring for Let"""
 		def __init__(self, code=[],datatype='Int',let_id = 0):
 			self.code=code
@@ -135,17 +136,17 @@ class Let(object):
 			self.let_id = let_id
 
 
-class Type(object):
+class Type:
 	"""docstring for Type"""
 	def __init__(self,place):
 		self.place = place
 		
-class ClassHeader(object):
+class ClassHeader:
 	"""docstring for ClassHeader"""
 	def __init__(self, code):
 		self.code=code
 
-class Id(object):
+class Id:
 	"""docstring for Id"""
 	def __init__(self,place = ''):
 		self.place = place 

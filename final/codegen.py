@@ -57,6 +57,8 @@ class InstrType(Enum):
 	IFFALSE=17
 	FUNC_START=18
 	POP_STACK=19
+	RETURN=20
+
 
 class EntryType(Enum):
 	'''Data Type of variable in three address code'''
@@ -256,7 +258,7 @@ def set_inputs(row, curr_statement):
 			curr_statement.in1 = row[2]
 			curr_statement.in1_type = EntryType.VARIABLE
 
-	elif(curr_statement.instr_typ == InstrType.FUNC_RETURN):
+	elif(curr_statement.instr_typ == InstrType.RETURN):
 		if(is_int(row[2])):
 			curr_statement.out = int(row[2])
 			curr_statement.out_type = EntryType.INTEGER
@@ -379,7 +381,8 @@ def construct_NextUse():
 					steo.isLive=False
 					LocalSymbolTable[out]=steo
 				else:
-					print("No entry for this variable in LocalSymbolTable" + str(out))
+					print LocalSymbolTable
+					print("No entry for this variable in out LocalSymbolTable" + str(out))
 					# s=LocalSymTabEntry()
 					# insert_LocalSymbolTable(out,s)
 			if(in1):
@@ -393,7 +396,7 @@ def construct_NextUse():
 				else:
 					# s=LocalSymTabEntry(True, stmt.linenum)
 					# insert_LocalSymbolTable(in1,s)
-					print("No entry for this variable in LocalSymbolTable" + str(in1))
+					print("No entry for this variable in in1 LocalSymbolTable" + str(in1))
 			if(in2):
 				if(ste2):
 					# if(ste2.dataType <> 'Temp'):
@@ -405,7 +408,7 @@ def construct_NextUse():
 				else:
 					# s=LocalSymTabEntry(True, stmt.linenum)
 					# insert_LocalSymbolTable(in2,s)
-					print("No entry for this variable in LocalSymbolTable" + str(in2))
+					print("No entry for this variable in in2 LocalSymbolTable" + str(in2))
 			
 
 			nue = NextUseEntry(in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive)
@@ -557,10 +560,10 @@ def main(SymbolTables):
 
 
 #----------------------------------------Local Symbol Table Loaded----------------------------------
-	# print("--------------------")
-	# for s in LocalSymbolTable:
-	# 	print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
-	# quit()
+	print("--------------------")
+	for s in LocalSymbolTable:
+		print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
+	quit()
 
 
 	os.system('rm -f temp.asm')
@@ -579,7 +582,7 @@ def main(SymbolTables):
 			code.append(curr_statement)
 
 			#------------------------------------------------
-			if(curr_statement.instr_typ == InstrType.GOTO or curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.FUNC_RETURN or curr_statement.instr_typ == InstrType.FUNC_CALL):
+			if(curr_statement.instr_typ == InstrType.GOTO or curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.FUNC_RETURN or curr_statement.instr_typ == InstrType.FUNC_CALL or curr_statement.instr_typ==InstrType.RETURN):
 				leaders.append(int(curr_statement.linenum)+1)
 				# if(curr_statement.instr_typ == InstrType.IFGOTO or curr_statement.instr_typ == InstrType.GOTO):
 				# 	leaders.append(int(curr_statement.jump_tagret))
@@ -746,12 +749,14 @@ def main(SymbolTables):
 				st.code_statement += "sw $fp, ($sp)\n"
 
 
-			elif(st.instr_typ == InstrType.FUNC_RETURN):
+			elif(st.instr_typ == InstrType.RETURN):
 				if(st.out_type == EntryType.INTEGER):
 					st.code_statement += "li $v0, %d\n"%(st.out)
 				else:
 					st.code_statement += "move $v0, $%s\n"%(VariableData[st.out][1])
 
+
+			elif(st.instr_typ == InstrType.FUNC_RETURN):
 				st.code_statement = st.code_statement + "lw $ra, ($sp)\nadd $sp, $sp, 4\n"
 				st.code_statement = st.code_statement + "jr $ra\n"
 
@@ -930,7 +935,7 @@ def main(SymbolTables):
 				assemblyfile.write(stmt.code_statement)
 				assemblyfile.write('\n')
 			else:
-				if(stmt.instr_typ in [InstrType.GOTO, InstrType.IFGOTO, InstrType.FUNC_CALL, InstrType.FUNC_RETURN, InstrType.EXIT]):
+				if(stmt.instr_typ in [InstrType.GOTO, InstrType.IFGOTO, InstrType.FUNC_CALL, InstrType.FUNC_RETURN, InstrType.EXIT, InstrType.RETURN]):
 					temp = stmt.code_statement.split('\n')
 					ne = temp[:len(temp)-2] + [block_codes[id(basic_block)]] + temp[len(temp)-2:]
 					res = ""
