@@ -61,6 +61,8 @@ class InstrType(Enum):
 	SPACE=15
 	FUNC_LABEL=16
 	IFFALSE=17
+	FUNC_START=18
+	POP_STACK=19
 
 class EntryType(Enum):
 	'''Data Type of variable in three address code'''
@@ -81,7 +83,7 @@ class Operator(Enum):
 	MUL = 9
 	DIV = 10
 	MOD = 11
-	POP_STACK=12
+	READ_STACK=12
 
 class statement:
 	''' A instruction in three address code'''
@@ -107,7 +109,7 @@ def set_inputs(row, curr_statement):
 	'''Reads input stores it in a list of classes'''
 	curr_statement.linenum = int(row[0])
 	#------------------------------------------------
-	assign_list = ["LESS_THAN", "GREATER_THAN", "LESS_THAN_EQUALS", "GREATER_THAN_EQUALS", "EQUALS", "NOT_EQUALS", "ADD", "SUB", "MUL", "DIV", "MOD", "POP_STACK"]
+	assign_list = ["LESS_THAN", "GREATER_THAN", "LESS_THAN_EQUALS", "GREATER_THAN_EQUALS", "EQUALS", "NOT_EQUALS", "ADD", "SUB", "MUL", "DIV", "MOD", "READ_STACK"]
 	if(row[1] == "ASSIGN" or row[1] in assign_list):
 		curr_statement.instr_typ = InstrType.ASSIGN
 		if(row[1] in assign_list):
@@ -119,10 +121,10 @@ def set_inputs(row, curr_statement):
 	#         --------------- For row 2 ----------------------
 
 	if(curr_statement.instr_typ == InstrType.ASSIGN):
-		if(curr_statement.operator == Operator.POP_STACK):
+		if(curr_statement.operator == Operator.READ_STACK):
 			curr_statement.out=row[2]
 			curr_statement.out_type = EntryType.VARIABLE
-		if(curr_statement.operator <> None and curr_statement.operator <> Operator.POP_STACK ):					#for statements of type a = b + 2
+		if(curr_statement.operator <> None and curr_statement.operator <> Operator.READ_STACK ):					#for statements of type a = b + 2
 			curr_statement.out = row[2]
 			curr_statement.out_type = EntryType.VARIABLE
 
@@ -143,7 +145,7 @@ def set_inputs(row, curr_statement):
 				temp = row[4]
 				curr_statement.in2 = temp
 				curr_statement.in2_type = EntryType.VARIABLE
-		elif(curr_statement.operator <> Operator.POP_STACK):
+		elif(curr_statement.operator <> Operator.READ_STACK):
 			curr_statement.out = row[2]
 			curr_statement.out_type = EntryType.VARIABLE
 			try:
@@ -248,6 +250,24 @@ def set_inputs(row, curr_statement):
 
 	elif(curr_statement.instr_typ == InstrType.GOTO):
 		curr_statement.jump_tagret = row[2]
+
+
+	elif(curr_statement.instr_typ == InstrType.FUNC_PARAM):
+		if(is_int(row[2])):
+			curr_statement.in1 = int(row[2])
+			curr_statement.in1_type = EntryType.INTEGER
+		else:
+			curr_statement.in1 = row[2]
+			curr_statement.in1_type = EntryType.VARIABLE
+
+	elif(curr_statement.instr_typ == InstrType.FUNC_RETURN):
+		if(is_int(row[2])):
+			curr_statement.out = int(row[2])
+			curr_statement.out_type = EntryType.INTEGER
+		else:
+			curr_statement.out = row[2]
+			curr_statement.out_type = EntryType.VARIABLE
+
 	elif(curr_statement.instr_typ == InstrType.SCAN_INT or curr_statement.instr_typ == InstrType.PRINT_INT):
 		try:
 			temp = int(row[2])
@@ -288,10 +308,10 @@ def lookup_LocalSymbolTable(s):
 		# 	sym_entry = LocalSymTabEntry(size=int(s[2:]),dataType='Temp',isArray=False)
 		# 	# insert_LocalSymbolTable(s,sym_entry)
 		# 	return sym_entry
-	if(s in LocalSymbolTable.keys() and s !=''):
-		return LocalSymbolTable[s]
-	else:
-		return None
+		if(s in LocalSymbolTable.keys() and s !=''):
+			return LocalSymbolTable[s]
+		else:
+			return None
 
 def insert_LocalSymbolTable(s, symbolTableEntry):
 	'''Insert into symbol table'''
@@ -478,12 +498,10 @@ def UpdateVariableData(statement,block):
 			# if(statement.instr_typ==InstrType.INDEX_ASSIGN_R or (l.dataType=="Array" and (statement.instr_typ==InstrType.SCAN_INT or statement.instr_typ==InstrType.PRINT_INT))):
 
 
-			if l.dataType == 'Temp':
-				statement.code_statement = statement.code_statement + "la $t7,temporaries\nlw $%s, %d($t7)\n"%(VariableData[statement.in2][1],l.size*4)
 			if(l.isArray==True):
-				statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
-			elif(l.dataType <> 'Temp'):
-				statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
+				statement.code_statement = statement.code_statement + "la $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
+			else:
+				statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
 
 	if(statement.in2_type == EntryType.VARIABLE):
 		if(statement.in2 not in VariableData or VariableData[statement.in2][1] == 0):
@@ -492,12 +510,8 @@ def UpdateVariableData(statement,block):
 			UsableRegisters[register] = statement.in2
 			l = lookup_LocalSymbolTable(statement.in2)
 			# statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
-			if l.dataType == 'Temp':
-				# print VariableData[statement.in1][1],l.size
-				# quit()
-				statement.code_statement = statement.code_statement + "la $t7,temporaries\nlw $%s, %d($t7)\n"%(VariableData[statement.in2][1],l.size*4)
-			else:
-				statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in2][1], statement.in2)
+			
+			statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in2][1], VariableData[statement.in2][0])
 
 	if(statement.out_type == EntryType.VARIABLE):
 		if(statement.out not in VariableData or VariableData[statement.out][1] == 0):
@@ -508,14 +522,10 @@ def UpdateVariableData(statement,block):
 			l=lookup_LocalSymbolTable(statement.out)
 			# if(statement.instr_typ==InstrType.INDEX_ASSIGN_L):
 			
-			if l.dataType == 'Temp':
-				# print VariableData[statement.in1][1],l.size
-				# quit()
-				statement.code_statement = statement.code_statement + "la  $t7,temporaries\nlw $%s,%d($t7)\n"%(register,l.size*4)
 			if(l.isArray==True):
-				statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.out][1], statement.out)
-			elif(l.dataType <> 'Temp'):
-				statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
+				statement.code_statement = statement.code_statement + "la $%s, -%d($fp)\n"%(VariableData[statement.out][1], VariableData[statement.out][0])
+			else:
+				statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n" % (register, VariableData[statement.out][0])
 
 def main(SymbolTables):
 
@@ -530,47 +540,12 @@ def main(SymbolTables):
 
 
 
-#-------------------------------------------- Local Symbol Table-------------------------
-	# with open(str(sys.argv[2]), 'rb') as symbolfile:
-	# 	line_reader = csv.reader(symbolfile, delimiter = ',')
-	# 	for row in line_reader:
-	# 		varname = row[0]
-	# 		size=row[1]
-	# 		datatype=row[2]
-	# 		if(row[3]=="GLOBAL"):
-	# 			scope=Scope.GLOBAL
-	# 		else:
-	# 			scope=Scope.LOCAL
 
-	# 		s=LocalSymTabEntry(size, datatype, scope)
-	# 		insert_LocalSymbolTable(varname, s)
-
-	# 		if(datatype == 'Int'):
-	# 			data_code = data_code + "%s : .word 0\n"%(varname)
-	# 		elif(datatype == "Array"):
-	# 			data_code = data_code + "%s : .space %d\n"%(varname, 4*int(size))
-
-
-#----------------------------------------Local Symbol Table Loaded----------------------------------
-	# for s in LocalSymbolTable:
-	# 	print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
-	# quit()
 
 
 
 
 #------------------------------------- Reading Code----------------------------------------
-
-	# numtemp = len(set(re.findall('t\.[0-9]+', open(sys.argv[2], 'rb').read())))
-	# t=''
-	# for i in range(numtemp):
-	# 	t = t + '0, '
-	# 	s=LocalSymTabEntry( datatype =  'Temp')
-	# 	insert_LocalSymbolTable('t.' + str(i+1), s)
-	# 	VariableData['t.' + str(i+1)] = (i,0)
-
-
-	# data_code = data_code + "temporaries : .space %s\n"%(t)
 
 	for  x in SymbolTables:
 		if(x.symtab_type != 'LET'):
@@ -583,6 +558,13 @@ def main(SymbolTables):
 			insert_LocalSymbolTable(var.name, s)
 			# data_code = data_code + "%s : .word 0\n"%var.name
 		MethodSize[x]=i
+
+
+#----------------------------------------Local Symbol Table Loaded----------------------------------
+	# print("--------------------")
+	# for s in LocalSymbolTable:
+	# 	print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
+	# quit()
 
 
 	os.system('rm -f temp.asm')
@@ -729,9 +711,11 @@ def main(SymbolTables):
 						st.code_statement = st.code_statement + "mfhi $%s"%(VariableData[st.out][1])
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 % st.in2)
-				elif(st.operator == Operator.POP_STACK):
+				elif(st.operator == Operator.READ_STACK):
 					st.code_statement = st.code_statement + "lw $%s, ($sp)"%(VariableData[st.out][1])
-					st.code_statement = st.code_statement + "addiu $sp, $sp, 4"
+
+			elif(st.instr_typ == InstrType.POP_STACK):
+				st.code_statement = st.code_statement + "addiu $sp, $sp, 4"
 
 			elif(st.instr_typ == InstrType.FUNC_LABEL):
 				st.code_statement = st.code_statement + "%s:\n"%(st.label)
@@ -755,7 +739,18 @@ def main(SymbolTables):
 				st.code_statement = st.code_statement + "jal %s\n"%(st.jump_tagret) # handle return register
 				previousSymbolTables.append(current_symbol_table[0])
 				current_symbol_table[0] = searchinSymbolTables( SymbolTables, st.jump_tagret)
-				
+			
+			elif(st.instr_typ == InstrType.FUNC_PARAM):
+				if(st.in1_type == EntryType.INTEGER):
+					st.code_statement = st.code_statement + "addiu $sp, $sp, -4\n"
+					st.code_statement += "li $t7, %d\n"%(st.in1)
+					st.code_statement += "sw $t7, ($sp)\n"
+				else:
+					st.code_statement = st.code_statement + "addiu $sp, $sp, -4\n"
+					st.code_statement += "lw $%s, ($sp)\n"%(VariableData[st.in1][1])
+
+			elif(st.instr_typ == InstrType.FUNC_START):
+				st.code_statement += "addiu $sp, $sp, -4"
 			elif(st.instr_typ == InstrType.FUNC_RETURN):
 				st.code_statement = st.code_statement + "lw $ra, ($sp)\nadd $sp, $sp, 4\n"
 				st.code_statement = st.code_statement + "jr $ra\n"

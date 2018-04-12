@@ -1,121 +1,60 @@
-FUNC_CALL,THE_MAIN_CLASS,t.14
-EXIT
-FUNC_LABEL,THE_MAIN_CLASS
-ASSIGN,b,4
-FUNC_LABEL,Main.main
-IFGOTO,LESS_THAN,b,1,label.1
-ASSIGN,t.1,0
-JUMP,label.2
-LABEL,label.1
-ASSIGN,t.1,1
-LABEL,label.2
-IFGOTO,GREATER_THAN,t.1,0,label.5
-ASSIGN,t.3,0
-JUMP,label.7
-LABEL,label.5
-IFGOTO,LESS_THAN,b,8,label.3
-ASSIGN,t.2,0
-JUMP,label.4
-LABEL,label.3
-ASSIGN,t.2,1
-LABEL,label.4
-IFGOTO,GREATER_THAN,t.2,0,label.6
-ASSIGN,t.3,0
-JUMP,label.7
-LABEL,label.6
-ASSIGN,t.3,1
-LABEL,label.7
-IFGOTO,EQUALS,t.3,0,label.10
-ASSIGN,t.6,1
-JUMP,label.12
-LABEL,label.10
-SUB,t.4,0,1
-IFGOTO,GREATER_THAN,b,t.4,label.8
-ASSIGN,t.5,0
-JUMP,label.9
-LABEL,label.8
-ASSIGN,t.5,1
-LABEL,label.9
-IFGOTO,EQUALS,t.5,0,label.11
-ASSIGN,t.6,1
-JUMP,label.12
-LABEL,label.11
-ASSIGN,t.6,0
-LABEL,label.12
-IFGOTO,GREATER_THAN,t.6,0,label.25
-ASSIGN,t.12,0
-JUMP,label.27
-LABEL,label.25
-IFGOTO,GREATER_THAN,b,1,label.13
-ASSIGN,t.7,0
-JUMP,label.14
-LABEL,label.13
-ASSIGN,t.7,1
-LABEL,label.14
-IFGOTO,EQUALS,t.7,0,label.22
-ASSIGN,t.11,1
-JUMP,label.24
-LABEL,label.22
-IFGOTO,LESS_THAN,b,9,label.15
-ASSIGN,t.8,0
-JUMP,label.16
-LABEL,label.15
-ASSIGN,t.8,1
-LABEL,label.16
-IFGOTO,EQUALS,t.8,0,label.19
-ASSIGN,t.10,1
-JUMP,label.21
-LABEL,label.19
-IFGOTO,LESS_THAN,b,10,label.17
-ASSIGN,t.9,0
-JUMP,label.18
-LABEL,label.17
-ASSIGN,t.9,1
-LABEL,label.18
-IFGOTO,EQUALS,t.9,0,label.20
-ASSIGN,t.10,1
-JUMP,label.21
-LABEL,label.20
-ASSIGN,t.10,0
-LABEL,label.21
-IFGOTO,EQUALS,t.10,0,label.23
-ASSIGN,t.11,1
-JUMP,label.24
-LABEL,label.23
-ASSIGN,t.11,0
-LABEL,label.24
-IFGOTO,GREATER_THAN,t.11,0,label.26
-ASSIGN,t.12,0
-JUMP,label.27
-LABEL,label.26
-ASSIGN,t.12,1
-LABEL,label.27
-IFGOTO,GREATER_THAN,t.12,0,label.28
-INDEX_ASSIGN_R,t.13,i,1
-ASSIGN,b,t.13
-JUMP,label.29
-LABEL,label.28
-INDEX_ASSIGN_L,i,0,10
-LABEL,label.29
-FUNC_RETURN
-===========
-Symbol Table :  Main
-('i', 'Array', 8)
-('b', 'Int', 4)
-('t.14', 'Int', 4)
-===========
-Symbol Table :  main
-Parent :  Main
-('t.1', 'Int', 4)
-('t.2', 'Int', 4)
-('t.3', 'Int', 4)
-('t.4', 'Int', 4)
-('t.5', 'Int', 4)
-('t.6', 'Int', 4)
-('t.7', 'Int', 4)
-('t.8', 'Int', 4)
-('t.9', 'Int', 4)
-('t.10', 'Int', 4)
-('t.11', 'Int', 4)
-('t.12', 'Int', 4)
-('t.13', 'Int', 4)
+1,FUNC_CALL,THE_MAIN_CLASS,t.14
+2,EXIT
+3,FUNC_LABEL,THE_MAIN_CLASS
+4,ASSIGN,b_,4
+5,FUNC_LABEL,Main.main
+6,LESS_THAN,t.1,b_,1
+7,IFFALSE,t.1,label.3
+8,LESS_THAN_EQUALS,t.2,b_,8
+9,IFFALSE,t.2,label.3
+10,ASSIGN,t.3,1
+11,GOTO,label.4
+12,LABEL,label.3
+13,ASSIGN,t.3,0
+14,LABEL,label.4
+15,IFGOTO,t.3,label.5
+16,SUB,t.4,0,1
+17,LESS_THAN,t.5,b_,t.4
+18,IFGOTO,t.5,label.5
+19,ASSIGN,t.6,0
+20,GOTO,label.6
+21,LABEL,label.5
+22,ASSIGN,t.6,1
+23,LABEL,label.6
+24,IFFALSE,t.6,label.19
+25,GREATER_THAN,t.7,b_,1
+26,IFGOTO,EQUALS,t.7,0,label.9
+27,ASSIGN,t.8,0
+28,GOTO,label.10
+29,LABEL,label.9
+30,ASSIGN,t.8,1
+31,LABEL,label.10
+32,IFGOTO,t.8,label.17
+33,EQUALS,t.9,b_,9
+34,IFGOTO,t.9,label.15
+35,GREATER_THAN_EQUALS,t.10,b_,10
+36,IFGOTO,t.10,label.15
+37,ASSIGN,t.11,0
+38,GOTO,label.16
+39,LABEL,label.15
+40,ASSIGN,t.11,1
+41,LABEL,label.16
+42,IFGOTO,t.11,label.17
+43,ASSIGN,t.12,0
+44,GOTO,label.18
+45,LABEL,label.17
+46,ASSIGN,t.12,1
+47,LABEL,label.18
+48,IFFALSE,t.12,label.19
+49,ASSIGN,t.13,1
+50,GOTO,label.20
+51,LABEL,label.19
+52,ASSIGN,t.13,0
+53,LABEL,label.20
+54,IFGOTO,t.13,label.21
+55,ASSIGN,a,0
+56,GOTO,label.22
+57,LABEL,label.21
+58,ASSIGN,a,1
+59,LABEL,label.22
+60,FUNC_RETURN

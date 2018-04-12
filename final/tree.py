@@ -1,7 +1,7 @@
 # f = open('symtab.txt', 'wb')
 class Expression:
 	"""docstring for Expression"""
-	def __init__(self, code=[], place='', datatype='Int', isArray=False):
+	def __init__(self, code=[], place='', datatype='Int', isArray=False, relop=''):
 		self.code = code
 		self.place = place
 		self.datatype = datatype
@@ -111,8 +111,9 @@ class Formal:
 		
 class FormalParameterList(object):
 	"""docstring for FormalParameterList"""
-	def __init__(self, code):
+	def __init__(self, code,nargs=0):
 		self.code = code
+		self.nargs = nargs
 		# self.symtab = symtab
 
 
@@ -127,9 +128,10 @@ class FormalParameter:
 
 class Let(object):
 		"""docstring for Let"""
-		def __init__(self, code=[],datatype='Int'):
+		def __init__(self, code=[],datatype='Int',let_id = 0):
 			self.code=code
 			self.datatype=datatype
+			self.let_id = let_id
 
 
 class Type(object):
@@ -141,4 +143,9 @@ class ClassHeader(object):
 	"""docstring for ClassHeader"""
 	def __init__(self, code):
 		self.code=code
+
+class Id(object):
+	"""docstring for Id"""
+	def __init__(self,place = ''):
+		self.place = place 
 		
