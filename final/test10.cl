@@ -1,5 +1,4 @@
 class Main inherits IO {
-   arr : Int[10];
    n : Int <- 5;
    def fib : Int (n: Int){
       if n<3 then
@@ -37,4 +36,3 @@ class Main inherits IO {
    
 };
 
-(*(fib(n-1) + fib(n-2))*)

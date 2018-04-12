@@ -28,12 +28,6 @@ current_symbol_table = [None]
 previousSymbolTables = []
 
 
-def searchinSymbolTables(SymbolTables, name):
-	for x in SymbolTables:
-		if x.scope_name == name:
-			return x
-	print("Method Not found")
-	exit()
 
 def is_int(row):
 	try:
@@ -247,6 +241,8 @@ def set_inputs(row, curr_statement):
 
 	elif(curr_statement.instr_typ == InstrType.FUNC_CALL):
 		curr_statement.jump_tagret = row[2]
+		curr_statement.out = row[3]
+		curr_statement.out_type = EntryType.VARIABLE
 
 	elif(curr_statement.instr_typ == InstrType.GOTO):
 		curr_statement.jump_tagret = row[2]
@@ -719,26 +715,19 @@ def main(SymbolTables):
 
 			elif(st.instr_typ == InstrType.FUNC_LABEL):
 				st.code_statement = st.code_statement + "%s:\n"%(st.label)
-				st.code_statement = st.code_statement + "add $sp, $sp, -4\nsw $ra, ($sp)\n"
 
 			elif(st.instr_typ == InstrType.LABEL):
 				st.code_statement = st.code_statement + "%s:\n"%(st.label)
-				if('LET_BEGIN_' in st.label):
-					previousSymbolTables.append(current_symbol_table[0])
-					current_symbol_table[0] = searchinSymbolTables( SymbolTables, st.label[10:])
-
-				if('LET_OVER' in st.label):
-					current_symbol_table[0] = previousSymbolTables.pop()
-
-				if('CLASS' in st.label):
-					current_symbol_table[0] = searchinSymbolTables(SymbolTables, st.label[6:])
 
 
 		
 			elif(st.instr_typ == InstrType.FUNC_CALL):
 				st.code_statement = st.code_statement + "jal %s\n"%(st.jump_tagret) # handle return register
-				previousSymbolTables.append(current_symbol_table[0])
-				current_symbol_table[0] = searchinSymbolTables( SymbolTables, st.jump_tagret)
+				st.code_statement += "addiu $sp, $sp, %d"%(MethodSize[st.jump_tagret])
+				st.code_statement += "lw $ra, ($sp)\naddiu $sp, $sp, 4"
+				st.code_statement += "lw $fp, ($sp)\naddiu $sp, $sp, 4"
+				st.code_statement += "move $%s, $v0\n"%(VariableData[st.out][1])
+
 			
 			elif(st.instr_typ == InstrType.FUNC_PARAM):
 				if(st.in1_type == EntryType.INTEGER):
@@ -750,8 +739,19 @@ def main(SymbolTables):
 					st.code_statement += "lw $%s, ($sp)\n"%(VariableData[st.in1][1])
 
 			elif(st.instr_typ == InstrType.FUNC_START):
-				st.code_statement += "addiu $sp, $sp, -4"
+				st.code_statement += "addiu $sp, $sp, -4\n"
+				st.code_statement += "sw $ra, ($sp)\n"
+
+				st.code_statement += "addiu $sp, $sp, -4\n"
+				st.code_statement += "sw $fp, ($sp)\n"
+
+
 			elif(st.instr_typ == InstrType.FUNC_RETURN):
+				if(st.out_type == EntryType.INTEGER):
+					st.code_statement += "li $v0, %d\n"%(st.out)
+				else:
+					st.code_statement += "move $v0, $%s\n"%(VariableData[st.out][1])
+
 				st.code_statement = st.code_statement + "lw $ra, ($sp)\nadd $sp, $sp, 4\n"
 				st.code_statement = st.code_statement + "jr $ra\n"
 
