@@ -560,14 +560,21 @@ def p_expression_function_call_2(p):
 def p_argument_list(p):
   'argument_list : expression'
   rule.append(42)
+  var = current_symbol_table[0].getVariable(p[1].place)
 
+  changed_name = var.parent_scop
+  if var <> None :
+
+  print p[1].place
   code = ['FUNC_PARAM,{}'.format(p[1].place)]
   p[0]=TREE.ArgumentList(code=code)
 
 def p_argument_list_many(p):
   'argument_list : argument_list COMMA expression'
   rule.append(43)
+  var = current_symbol_table[0].getVariable(p[3].place)
 
+  print p[3].place
   code = []
   code.append('FUNC_PARAM,{}'.format(p[3].place))
   code.extend(p[1].code)

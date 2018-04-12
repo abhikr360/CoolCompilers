@@ -1,5 +1,12 @@
 import sys
 
+def is_int(row):
+	try:
+		temp = int(row)
+		return True
+	except Exception as e:
+		return False
+
 class Variable:
 	"""docstring for Variable"""
 	def __init__(self,name, datatype='Int', size=4,isArray=False):
@@ -48,8 +55,9 @@ class Symtab:
 					return variable_entry
 
 			current_sym_tab = current_sym_tab.parent
-
-		sys.exit('Error no entry in Symbol table for : '+name)
+		if(is_int(name)):
+			return None
+		sys.exit('Error no entry in Symbol table for : '+str(name))
 		return None
 
 	def getMethod(self,name):
