@@ -32,12 +32,22 @@ basicDataType = ['Int','String','Bool']
 '''
      TO BE DONE
 '''
+
+def get_expression_place(name):
+	if current_symbol_table[0].search(name):
+	  var = current_symbol_table[0].getVariable(name)
+	  expression_place = var.changed_name
+	else:
+		expression_place = name
+
+	return expression_place
+
 flag=[0]
 tempCount=[0]
 def newtemp():
   tempCount[0] += 1
   temp_name = 't.' + str(tempCount[0])
-  current_symbol_table[0].enter(name = temp_name)
+  current_symbol_table[0].enter(name = temp_name,changed_name=current_symbol_table[0].scope_name + '.' + temp_name,datatype='Int')
   
   return temp_name
 
@@ -241,7 +251,7 @@ def p_feature_header_with_modifier(p):
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[3])
   # current_symbol_table[0].methods.append(new_sym_tab)
-  current_symbol_table[0].enter_method(p[3],p[5].pla,current_symbol_table[0].scope_name)
+  current_symbol_table[0].enter_method(p[3],p[5].place,current_symbol_table[0].scope_name)
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
 
@@ -407,7 +417,8 @@ def p_formal_parameter_list_many(p):
 
   # if p[3].datatype.place == 'Int':
   #   changed_name = current_symbol_table[0].getVariable(p[3].place).parent_scope_name + '.' + p[3].place
-  code.append('READ_STACK,' + p[3].place)
+  var = current_symbol_table[0].getVariable(p[3].place)
+  code.append('READ_STACK,' + var.changed_name)
   p[0] = TREE.FormalParameterList(code=code,nargs=p[1].nargs+1)
 
 
@@ -418,8 +429,9 @@ def p_formal_parameter_list(p):
   # changed_name = p[1].place
   # if p[1].datatype.place == 'Int':
   #   changed_name = current_symbol_table[0].getVariable(p[1].place).parent_scope_name + '.' + p[1].place
+  var = current_symbol_table[0].getVariable(p[1].place)
   
-  code = ['READ_STACK,' + p[1].place]
+  code = ['READ_STACK,' + var.changed_name]
   p[0] = TREE.FormalParameterList(code=code,nargs=1)
 
 
@@ -435,8 +447,10 @@ def p_formal_parameter(p):
     # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
+  # print p[3].place
 
-  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
+  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
+
 
 def p_formal_parameter_arr(p):
   'formal_parameter : ID LSQRBRACKET RSQRBRACKET COLON type'
@@ -450,17 +464,17 @@ def p_formal_parameter_arr(p):
     sys.exit('No object found named ' + p[3].place)
 
 
-  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[5].place, size=4*1000, isArray=True)
+  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[5].place, size=4*1000, isArray=True)
 
 
 def p_formal_with_assign(p):
   'formal : ID COLON type GETS expression'
   rule.append(31)
 
-  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name + '.' + p[1], datatype=p[3].place, size=4, isArray =False)
+  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name + '.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
 
-  code=['ASSIGN,%s,%s'%(p[1], p[5].place)]
+  code=['ASSIGN,%s,%s'%(get_expression_place(p[1]), get_expression_place(p[5].place))]
   p[0]=TREE.Formal(code=code)
 
   if p[3].place in ClassDict or p[3].place in basicDataType:
@@ -483,7 +497,7 @@ def p_formal(p):
     sys.exit('No object found named ' + p[3].place)
   # quit()
   
-  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
+  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
@@ -497,7 +511,7 @@ def p_formal_arr(p):
     # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
-  current_symbol_table[0].enter(name=current_symbol_table[0].scope_name + '.' + p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
+  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name + '.' + p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
 
 
 #--------------------------------------------  Not DONE ----------------------------------------------
@@ -542,9 +556,17 @@ def p_expression_assign(p):
   # p[1] = TREE.Id(place = var.parent_table.scope_name + '.' + p[1] )
   if(var.datatype <> p[3].datatype and (var.datatype <> 'Int' and p[3].datatype <> 'Bool')):
     sys.exit("Type Check Error "+var.name+" is assigned "+p[3].datatype)
+
   code = p[3].code
-  # print("CODE : ", code, p[3].place, p[3])
-  s = 'ASSIGN,' + p[1] +',' + p[3].place
+  var1 = current_symbol_table[0].getVariable(p[1])
+
+  if(current_symbol_table[0].search(p[3].place)):
+    var2 = current_symbol_table[0].getVariable(p[3].place)
+    expression_place = var2.changed_name
+  else:
+  	expression_place = p[3].place
+
+  s = 'ASSIGN,' + get_expression_place(p[1]) +',' + get_expression_place(p[3].place)
   code.append(s)
   p[0] = TREE.Expression(code=code, datatype=p[3].datatype,place=p[3].place)
   # print("================")
@@ -566,7 +588,7 @@ def p_expression_assign_arr(p):
     sys.exit("Type Check Error "+var.name+" is assigned "+p[3].datatype)
   code = p[6].code
   code.extend(p[3].code)
-  code.append('INDEX_ASSIGN_L,'+var.parent_scope_name +'.'+ p[1]+','+p[3].place+','+p[6].place)
+  code.append('INDEX_ASSIGN_L,'+ get_expression_place(p[1]) +','+get_expression_place(p[3].place)+','+get_expression_place(p[6].place))
   
   p[0] = TREE.Expression(code=code,place=p[6].place, datatype=p[6].datatype)
 
@@ -575,7 +597,7 @@ def p_expression_function_call_with_arguments_2(p):
   rule.append(40)
 
   if(p[1] == 'out_int'):
-    code = ['PRINT_INT,' + p[3].place]
+    code = ['PRINT_INT,' + get_expression_place(p[3].place)]
     p[0]=TREE.FunctionCall(code=code)
 
 
@@ -586,7 +608,7 @@ def p_expression_function_call_with_arguments_2(p):
     t = newtemp()
 
     code = p[3].code
-    code.append('FUNC_CALL,'+met.parent_class + '.' + p[1] + ',' + str(t))
+    code.append('FUNC_CALL,'+met.parent_class + '.' + p[1] + ',' + get_expression_place(t))
     datatype = met.datatype
     p[0]=TREE.FunctionCall(code=code, datatype=datatype, place=t)
 
@@ -598,7 +620,7 @@ def p_expression_function_call_2(p):
 
   t=newtemp()
   # print current_symbol_table[0].parent.scope_name
-  code = ['FUNC_CALL,'+met.parent_class +'.'+p[1]+','+t]
+  code = ['FUNC_CALL,'+met.parent_class +'.'+p[1]+','+get_expression_place(t)]
   # quit()
   # code = ['FUNC_CALL,'+current_symbol_table[0].getMethod(p[1]).name+'.'+p[1]+','+t]
   datatype = met.datatype
@@ -609,29 +631,32 @@ def p_argument_list(p):
   'argument_list : expression'
   rule.append(42)
 
-  var = current_symbol_table[0].getVariable(p[1].place)
+  # if current_symbol_table[0].search(p[1].place):
+	 #  var = current_symbol_table[0].getVariable(p[1].place)
+	 #  expression_place = var.changed_name
+  # else:
+		# expression_place = p[1].place
 
-  changed_name = p[1].place
-  if var <> None :
-  	changed_name = var.parent_scope_name + '.' + p[1].place
-
-  code = ['FUNC_PARAM,{}'.format(changed_name)]
-  p[0]=TREE.ArgumentList(code=code, place=changed_name)
+  code = p[1].code
+  code.append('FUNC_PARAM,{}'.format(get_expression_place(p[1].place)))
+  p[0]=TREE.ArgumentList(code=code, place=p[1].place)
 
 def p_argument_list_many(p):
   'argument_list : argument_list COMMA expression'
   rule.append(43)
-  print p[3].place
-  var = current_symbol_table[0].getVariable(p[3].place)
-  changed_name = p[3].place
-  if var <> None :
-  	changed_name = var.parent_scope_name + '.' + p[3].place
+  # print p[3].place
 
-  code = []
-  code.append('FUNC_PARAM,{}'.format(changed_name))
+  # if current_symbol_table[0].search(p[3].place):
+	 #  var = current_symbol_table[0].getVariable(p[3].place)
+	 #  expression_place = var.changed_name
+  # else:
+		# expression_place = p[3].place
+
+  code = p[3].code
+  code.append('FUNC_PARAM,{}'.format(get_expression_place(p[1].place)))
   code.extend(p[1].code)
 
-  p[0]=TREE.ArgumentList(code=code)
+  p[0]=TREE.ArgumentList(code=code,place = p[3].place)
 
 def p_expression_plus(p):
   'expression : expression PLUS expression'
@@ -648,7 +673,7 @@ def p_expression_plus(p):
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
-  code.append('ADD,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('ADD,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
@@ -666,7 +691,7 @@ def p_expression_minus(p):
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
-  code.append('SUB,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('SUB,' + get_expression_place(t) + ',' +  get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
@@ -681,7 +706,7 @@ def p_expression_times(p):
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
-  code.append('MUL,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('MUL,' + get_expression_place(t) + ',' +  get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
@@ -696,9 +721,9 @@ def p_expression_divide(p):
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
-  code.append('DIV,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('DIV,' + t + ',' +  get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
-  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
+  p[0] = TREE.Expression(place = get_expression_place(t), code = code, datatype = p[1].datatype)
 
 def p_expression_mod(p):
   'expression : expression MOD expression'
@@ -711,7 +736,7 @@ def p_expression_mod(p):
   t = newtemp()
   code = p[1].code
   code.extend(p[3].code)
-  code.append('MOD,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('MOD,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
@@ -720,6 +745,7 @@ def p_expression_lt(p):
   rule.append(49)
 
   # print "Bool Expr : ",p[1].datatype,p[3].datatype
+  print p[1].datatype
   if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool'] ):
     sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Int or Bool Type")
   if(p[1].isArray or p[3].isArray):
@@ -730,7 +756,7 @@ def p_expression_lt(p):
  
   code = p[1].code
   code.extend(p[3].code)
-  code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('LESS_THAN,' + get_expression_place(t) + ',' +  get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
   # code.append("IFGOTO,LESS_THAN," + p[1].place + ',' + p[3].place + ',' + j_if)
   # code.append("ASSIGN," + t + ',0')
@@ -754,7 +780,7 @@ def p_expression_gt(p):
   j_fi = newjump()
   code = p[1].code
   code.extend(p[3].code)
-  code.append('GREATER_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('GREATER_THAN,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
   # code.append("IFGOTO,GREATER_THAN," + p[1].place + ',' + p[3].place + ',' + j_if)
   # code.append("ASSIGN," + t + ',0')
@@ -779,7 +805,7 @@ def p_expression_lteq(p):
   j_fi = newjump()
   code = p[1].code
   code.extend(p[3].code)
-  code.append('LESS_THAN_EQUALS,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('LESS_THAN_EQUALS,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
   # code.append("IFGOTO,LESS_THAN_EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
   # code.append("ASSIGN," + t + ',0')
@@ -804,7 +830,7 @@ def p_expression_gteq(p):
   j_fi = newjump()
   code = p[1].code
   code.extend(p[3].code)
-  code.append('GREATER_THAN_EQUALS,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('GREATER_THAN_EQUALS,' + get_expression_place(t) + ',' +  get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
 
   # code.append("IFGOTO,GREATER_THAN_EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
@@ -830,7 +856,7 @@ def p_expression_equal(p):
   j_fi = newjump()
   code = p[1].code
   code.extend(p[3].code)
-  code.append('EQUALS,' + t + ',' + p[1].place + ',' + p[3].place)
+  code.append('EQUALS,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
 
   # code.append("IFGOTO,EQUALS," + p[1].place + ',' + p[3].place + ',' + j_if)
@@ -860,13 +886,13 @@ def p_expression_or(p):
   l2 = newjump()
 
   code = p[1].code
-  code.append('IFGOTO,' + p[1].place + ',' + l1)
+  code.append('IFGOTO,' + get_expression_place(p[1].place) + ',' + l1)
   code.extend(p[3].code)
-  code.append('IFGOTO,' + p[3].place + ',' + l1)
-  code.append('ASSIGN,' + t + ',0')
+  code.append('IFGOTO,' + get_expression_place(p[3].place) + ',' + l1)
+  code.append('ASSIGN,' + get_expression_place(t) + ',0')
   code.append('GOTO,'+l2)
   code.append('LABEL,' + l1)
-  code.append('ASSIGN,'+t+',1')
+  code.append('ASSIGN,'+get_expression_place(t)+',1')
   code.append('LABEL,' + l2)
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
@@ -882,13 +908,13 @@ def p_expression_and(p):
   l2 = newjump()
 
   code = p[1].code
-  code.append('IFFALSE,' + p[1].place + ',' + l1)
+  code.append('IFFALSE,' + get_expression_place(p[1].place) + ',' + l1)
   code.extend(p[3].code)
-  code.append('IFFALSE,' + p[3].place + ',' + l1)
-  code.append('ASSIGN,' + t + ',1')
+  code.append('IFFALSE,' + get_expression_place(p[3].place) + ',' + l1)
+  code.append('ASSIGN,' + get_expression_place(t) + ',1')
   code.append('GOTO,'+l2)
   code.append('LABEL,' + l1)
-  code.append('ASSIGN,'+t+',0')
+  code.append('ASSIGN,'+get_expression_place(t)+',0')
   code.append('LABEL,' + l2)
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
@@ -904,11 +930,11 @@ def p_expression_not(p):
   j_fi = newjump()
   code = p[2].code
   # code.append('LESS_THAN,' + t + ',' + p[1].place + ',' + p[3].place)
-  code.append("IFGOTO,EQUALS," + p[2].place + ',0,' + j_if)
-  code.append("ASSIGN," + t + ',0')
+  code.append("IFGOTO,EQUALS," + get_expression_place(p[2].place) + ',0,' + j_if)
+  code.append("ASSIGN," + get_expression_place(t) + ',0')
   code.append("GOTO," + j_fi)
   code.append("LABEL,"+j_if)
-  code.append("ASSIGN," + t + ',1')
+  code.append("ASSIGN," + get_expression_place(t) + ',1')
   code.append("LABEL," + j_fi)
 
   p[0] = TREE.Expression(code = code, place = t, datatype = p[2].datatype)
@@ -922,7 +948,7 @@ def p_expression_tilda(p):
 
   t = newtemp()
   code = p[2].code
-  code.append('SUB,' + t + ',0,' + p[2].place)
+  code.append('SUB,' + get_expression_place(t) + ',0,' + get_expression_place(p[2].place))
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[2].datatype,isArray=False)
 
@@ -949,7 +975,7 @@ def p_expression_id(p):
   'expression : ID'
   rule.append(60)
   var = current_symbol_table[0].getVariable(p[1])
-
+  # print var.
   t = p[1]
 
   p[0] = TREE.Expression(place = t, code=[],datatype=var.datatype,isArray=var.isArray)
@@ -961,7 +987,7 @@ def p_expression_arr(p):
 
   t = newtemp()
   code = p[3].code
-  code.append('INDEX_ASSIGN_R,' + t + ',' + var.parent_scope_name +'.'+p[1] + ',' + p[3].place)
+  code.append('INDEX_ASSIGN_R,' + get_expression_place(t) + ',' + get_expression_place(p[1]) + ',' + get_expression_place(p[3].place))
 
   p[0] = TREE.Expression(place = t, code = code, datatype=var.datatype,isArray=False)
 
@@ -1118,14 +1144,14 @@ def p_if_then_else(p):
   _if = newjump()
   _fi = newjump()
   code=p[2].code
-  code.append('IFGOTO,' + p[2].place + ',' +  _if)
+  code.append('IFGOTO,' + get_expression_place(p[2].place) + ',' +  _if)
   code.extend(p[6].code)
   code.append('GOTO,' + _fi)
   code.append('LABEL,' + _if)
   code.extend(p[4].code)
   code.append('LABEL,'+_fi)
 
-  p[0] = TREE.If_Then_Else(code=code, datatype=p[6].datatype)
+  p[0] = TREE.If_Then_Else(code=code, datatype='if')
 
 def p_expression_while(p):
   'expression : while'
@@ -1143,7 +1169,7 @@ def p_while(p):
   _pool = newjump()
   code = ['LABEL,' + _loop]
   code.extend(p[2].code)
-  code.append('IFGOTO,EQUALS,' + p[2].place + ',0,' +  _pool)
+  code.append('IFGOTO,EQUALS,' + get_expression_place(p[2].place) + ',0,' +  _pool)
   code.extend(p[4].code)
   code.append('GOTO,'+_loop)
   code.append('LABEL,'+_pool)
@@ -1175,7 +1201,7 @@ def p_for(p):
   # print("==================")
   code.append('LABEL,' + _loop)
   code.extend(p[5].code)
-  code.append('IFGOTO,EQUALS,'+p[5].place+',0,' + _pool)
+  code.append('IFGOTO,EQUALS,'+get_expression_place(p[5].place)+',0,' + _pool)
   code.extend(p[10].code)
   code.extend(p[7].code)
   code.append('GOTO,'+ _loop)
@@ -1195,7 +1221,7 @@ def p_for(p):
 def p_formaldehyde_with_assign_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type GETS expression'
   # rule.append(31)
-  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4, isArray =False)
+  current_symbol_table[0].enter(name=p[3],changed_name=current_symbol_table[0].scope_name +'.'+p[3], datatype=p[5].place,size=4, isArray =False)
 
   code = p[1].code
   code.append('ASSIGN,%s,%s'%(current_symbol_table[0].scope_name + '.' + p[3], p[7].place))
@@ -1222,13 +1248,13 @@ def p_formaldehyde_many(p):
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[3],datatype=p[5].place,size=4, isArray =False)
+  current_symbol_table[0].enter(name=p[3],changed_name=current_symbol_table[0].scope_name +'.' +p[3],datatype=p[5].place,size=4, isArray =False)
 
 
 def p_formaldehyde_arr_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET'
   # rule.append(33)
-  current_symbol_table[0].enter(name= p[3],datatype=p[5].place, size=4*int(p[7].place), isArray =True)
+  current_symbol_table[0].enter(name= p[3],changed_name=current_symbol_table[0].scope_name +'.' +p[3],datatype=p[5].place, size=4*int(p[7].place), isArray =True)
 
   p[0]=TREE.Formal(code=p[7].code)
   if p[5].place in ClassDict or p[5].place in basicDataType:
@@ -1242,7 +1268,7 @@ def p_formaldehyde_arr_many(p):
 def p_formaldehyde_with_assign(p):
   'formaldehyde : ID COLON type GETS expression'
   # rule.append(31)
-  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4, isArray =False)
+  current_symbol_table[0].enter(name=p[1],changed_name=current_symbol_table[0].scope_name +'.' +p[1],datatype=p[3].place,size=4, isArray =False)
 
   code=['ASSIGN,%s,%s'%(current_symbol_table[0].scope_name + '.'+p[1], p[5].place)]
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
@@ -1278,7 +1304,7 @@ def p_formaldehyde_arr(p):
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  current_symbol_table[0].enter(name=p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
+  current_symbol_table[0].enter(name=p[1],changed_name=current_symbol_table[0].scope_name +'.' +p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
 
 
 def p_error(p):

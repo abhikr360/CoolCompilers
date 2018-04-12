@@ -9,7 +9,7 @@ def is_int(row):
 
 class Variable:
 	"""docstring for Variable"""
-	def __init__(self,name,changed_name datatype='Int', size=4,isArray=False,parent_scope_name = None):
+	def __init__(self,name,changed_name ,datatype='Int', size=4,isArray=False,parent_scope_name = None):
 		self.name = name
 		self.changed_name = changed_name
 		self.datatype = datatype
@@ -35,12 +35,12 @@ class Symtab:
 		self.scope_name = scope_name 	# name of class or method or let id
 		self.lets = []
 
-	def enter(self,name,datatype='Int',size=4,isArray=False):
+	def enter(self,name,changed_name, datatype='Int',size=4,isArray=False):
 		# name = self.scope_name + '.' + name 
-		if(self.search(name)):
+		if(self.local_search(name)):
 			sys.exit("Variable %s already present in symbol table"%name)
 		else:
-			newvar = Variable(name,datatype,size,isArray,self.scope_name)
+			newvar = Variable(name,changed_name,datatype,size,isArray,self.scope_name)
 			self.variables.append(newvar)
 
 	def enter_method(self, name,datatype='Int',parent_class=None):
@@ -78,15 +78,24 @@ class Symtab:
 		sys.exit('Error no entry in Symbol table for : '+name)
 		return None	
 
-	def search(self,name):
+	def local_search(self,name):
 		for variable_entry in self.variables:
 			if(variable_entry.name == name):
 				return True
 		return False
+	def search(self,name):
+		current_sym_tab = self
+
+		while current_sym_tab <> None:
+			for variable_entry in current_sym_tab.variables:
+				if(variable_entry.name == name):
+					return True
+			current_sym_tab  =current_sym_tab.parent
+		return False
 
 	def search_method(self, name):
 		for method_entry in self.methods:
-			if(method_entry.name == name):
+			if(method_entry.name == str(name)):
 				return True
 		return False
 
