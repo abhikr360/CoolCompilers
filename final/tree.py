@@ -19,6 +19,7 @@ class FunctionCall:
 		self.code = code
 		self.datatype = datatype
 		self.place = place
+		self.isArray =False
 
 class Feature:
 	"""docstring for Feature"""

@@ -73,7 +73,7 @@ def p_start(p):
   print "2,EXIT"
   i=3
   f=open(sys.argv[2], 'wb')
-  f.write("1,GOTO,CLASS.Main,"+t + '\n')
+  f.write("1,GOTO,CLASS.Main,"+'\n')
   f.write("2,EXIT\n")
   for a in p[0].code:
     print(str(i) + ',' + a)
@@ -610,7 +610,7 @@ def p_expression_function_call_with_arguments_2(p):
     code = p[3].code
     code.append('FUNC_CALL,'+met.parent_class + '.' + p[1] + ',' + get_expression_place(t))
     datatype = met.datatype
-    p[0]=TREE.FunctionCall(code=code, datatype=datatype, place=t)
+    p[0]=TREE.FunctionCall(code=code, datatype=datatype, place=get_expression_place(t))
 
 
 def p_expression_function_call_2(p):
@@ -622,9 +622,8 @@ def p_expression_function_call_2(p):
   # print current_symbol_table[0].parent.scope_name
   code = ['FUNC_CALL,'+met.parent_class +'.'+p[1]+','+get_expression_place(t)]
   # quit()
-  # code = ['FUNC_CALL,'+current_symbol_table[0].getMethod(p[1]).name+'.'+p[1]+','+t]
   datatype = met.datatype
-  p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
+  p[0] = TREE.Expression(code=code,place=get_expression_place(t), datatype=datatype)
 
 
 def p_argument_list(p):
@@ -638,6 +637,7 @@ def p_argument_list(p):
 		# expression_place = p[1].place
 
   code = p[1].code
+  code.append('FUNC_START')
   code.append('FUNC_PARAM,{}'.format(get_expression_place(p[1].place)))
   p[0]=TREE.ArgumentList(code=code, place=p[1].place)
 
@@ -653,6 +653,7 @@ def p_argument_list_many(p):
 		# expression_place = p[3].place
 
   code = p[3].code
+  code.append('FUNC_START')
   code.append('FUNC_PARAM,{}'.format(get_expression_place(p[1].place)))
   code.extend(p[1].code)
 
@@ -1033,7 +1034,9 @@ def p_expression_return(p):
   changed_name = p[2].place
   if(p[2].datatype=='Int'):
     changed_name = current_symbol_table[0].getVariable(p[2].place).parent_scope_name+'.'+p[2].place
-  p[0] = TREE.Expression(code=['RETURN,'+changed_name],datatype='continue',isArray=False,place=None)
+  code = p[2].code
+  code.append('RETURN,'+changed_name)
+  p[0] = TREE.Expression(code=code,datatype='continue',isArray=False,place=None)
 
 
 def p_expression_function_call_with_arguments(p):
@@ -1270,9 +1273,11 @@ def p_formaldehyde_with_assign(p):
   # rule.append(31)
   current_symbol_table[0].enter(name=p[1],changed_name=current_symbol_table[0].scope_name +'.' +p[1],datatype=p[3].place,size=4, isArray =False)
 
-  code=['ASSIGN,%s,%s'%(current_symbol_table[0].scope_name + '.'+p[1], p[5].place)]
+  code = p[5].code
+  code.append('ASSIGN,%s,%s'%(current_symbol_table[0].scope_name + '.'+p[1], p[5].place))
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
   p[0]=TREE.Formal(code=code)
+  # print("@@@", p[2].code)
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
     # print ClassDict[p[3].place].scope_name
@@ -1334,8 +1339,9 @@ parser.parse(data)
 for s in SymbolTables:
   print("===========")
   s.printsymtab()
+print("===========")
 # print "*****class dictionary*****"
 # for x in ClassDict:
 # 	print ClassDict[x].scope_name
 
-# main(SymbolTables)
+main(SymbolTables)

@@ -27,7 +27,7 @@ block_codes = {}
 current_symbol_table = [None]
 previousSymbolTables = []
 
-
+readingfromstack=[0]
 
 def is_int(row):
 	try:
@@ -414,6 +414,8 @@ def construct_NextUse():
 			nue = NextUseEntry(in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive)
 			NextUse[stmt.linenum]=nue
 
+
+
 # farthest and in variable data and usableregister   what about equality
 def constructEvictionCandidate(cur_line, basic_block):
 	EvictionCandidates={}
@@ -449,7 +451,7 @@ def FindEmptyReg():
 			return reg
 
 def GetReg(stmt, block):
-	# print(NextUse)
+	
 	nue = NextUse[stmt.linenum]
 	useless_var = None
 	empty_reg = None
@@ -490,41 +492,56 @@ def UpdateVariableData(statement,block):
 
 		if(statement.in1 not in VariableData or VariableData[statement.in1][1] == 0):
 			register = GetReg(statement,block)
-			# print("#*******************givenrehister for %s %s "%(statement.in1, register))
-			VariableData[statement.in1] = [0,register]
+			VariableData[statement.in1][1] = register
 			UsableRegisters[register] = statement.in1
 			l = lookup_LocalSymbolTable(statement.in1)
 			# if(statement.instr_typ==InstrType.INDEX_ASSIGN_R or (l.dataType=="Array" and (statement.instr_typ==InstrType.SCAN_INT or statement.instr_typ==InstrType.PRINT_INT))):
 
-
-			if(l.isArray==True):
-				statement.code_statement = statement.code_statement + "la $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
+			if(l.scope == Scope.LOCAL):
+				if(l.isArray==True):
+					statement.code_statement = statement.code_statement + "la $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
+				else:
+					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
 			else:
-				statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
+				if(l.dataType=="Array"):
+					statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
+				else:
+					statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
 
 	if(statement.in2_type == EntryType.VARIABLE):
 		if(statement.in2 not in VariableData or VariableData[statement.in2][1] == 0):
 			register = GetReg(statement,block)
-			VariableData[statement.in2] = [0,register]
+			VariableData[statement.in2][1] = register
 			UsableRegisters[register] = statement.in2
 			l = lookup_LocalSymbolTable(statement.in2)
 			# statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
-			
-			statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in2][1], VariableData[statement.in2][0])
+			if(l.scope == Scope.LOCAL):
+				statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in2][1], VariableData[statement.in2][0])
+			else:
+				statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in2][1], statement.in2)
 
 	if(statement.out_type == EntryType.VARIABLE):
 		if(statement.out not in VariableData or VariableData[statement.out][1] == 0):
 			# print(statement.out)
 			register = GetReg(statement,block)
-			VariableData[statement.out] = [0,register]
+			VariableData[statement.out][1] = register
 			UsableRegisters[register] = statement.out
 			l=lookup_LocalSymbolTable(statement.out)
-			# if(statement.instr_typ==InstrType.INDEX_ASSIGN_L):
-			
-			if(l.isArray==True):
-				statement.code_statement = statement.code_statement + "la $%s, -%d($fp)\n"%(VariableData[statement.out][1], VariableData[statement.out][0])
+
+
+			# if( statement.in1 != statement.out and statement.in2 != statement.out ):
+			# 	pass
+			# else:
+			if(l.scope == Scope.LOCAL):
+				if(l.isArray==True):
+					statement.code_statement = statement.code_statement + "la $%s, -%d($fp)\n"%(VariableData[statement.out][1], VariableData[statement.out][0])
+				else:
+					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n" % (register, VariableData[statement.out][0])
 			else:
-				statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n" % (register, VariableData[statement.out][0])
+				if(l.isArray ==True):
+					statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.out][1], statement.out)
+				else:
+					statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
 
 def main(SymbolTables):
 
@@ -545,25 +562,49 @@ def main(SymbolTables):
 
 
 #------------------------------------- Reading Code----------------------------------------
-
+	i=0
 	for  x in SymbolTables:
 		if(x.symtab_type != 'LET'):
-			i = 0
-		for var in x.variables:
-			var.name = x.scope_name + '.' + var.name
-			VariableData[var.name] = (i,0)
-			i = i + var.size
-			s=LocalSymTabEntry(var.size, var.datatype,var.isArray)
-			insert_LocalSymbolTable(var.name, s)
-			# data_code = data_code + "%s : .word 0\n"%var.name
-		MethodSize[x]=i
+			i = 4
+			name=x.scope_name
+		if(x.scope_name != 'Main'):
+			for var in x.variables:
+				var.name = x.scope_name + '.' + var.name
+				VariableData[var.name] = [i,0]
+				i = i + var.size
+				s=LocalSymTabEntry(size = var.size, dataType = var.datatype, scope = Scope.LOCAL, isArray=var.isArray)
+				insert_LocalSymbolTable(var.name, s)
+				# data_code = data_code + "%s : .word 0\n"%var.name
+			MethodSize[name]=i-4
+		else:
+			for var in x.variables:
+				var.name = x.scope_name + '.' + var.name
+				VariableData[var.name] = [0,0]
+				s=LocalSymTabEntry(size=var.size, dataType=var.datatype,scope=Scope.GLOBAL, isArray=var.isArray)
+				insert_LocalSymbolTable(var.name, s)
+				if(var.datatype == 'Int'):
+					data_code = data_code + "%s : .word 0\n"%(var.name)
+				elif(var.datatype == "Array"):
+					data_code = data_code + "%s : .space %d\n"%(var.name, 4*int(size))
+				i = i + var.size
+			MethodSize[name]=i-4
 
 
 #----------------------------------------Local Symbol Table Loaded----------------------------------
-	print("--------------------")
+	print("----------LOCAL SYMBOL TABLE START----------")
 	for s in LocalSymbolTable:
 		print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
-	quit()
+	print("----------LOCAL SYMBOL TABLE END----------")
+
+	print("---------- VariableData START--------")
+	for k in VariableData.keys():
+		print(k, VariableData[k][0], VariableData[k][1])
+	print("---------- VariableData END--------")
+
+	print("--------- MethodSize START------")
+	for k in MethodSize.keys():
+		print(k , MethodSize[k])
+	print("--------- MethodSize END ------")
 
 
 	os.system('rm -f temp.asm')
@@ -571,6 +612,8 @@ def main(SymbolTables):
 	assemblyfile.write(data_code)
 	assemblyfile.write(machine_code)
 	assemblyfile.write("main:\n")
+	assemblyfile.write("move $fp, $sp\n\n")
+	# assemblyfile.write("addiu $sp, $sp, -%d\n\n"%(MethodSize['Main']))
 
 	with open(sys.argv[2], 'rb') as codefile:
 		line_reader = csv.reader(codefile, delimiter = ',')
@@ -631,7 +674,7 @@ def main(SymbolTables):
 	for x in basic_block_list:
 		for st in x:
 			# infunction=['main']
-			# print("%s translating" %(st.linenum))
+			
 			UpdateVariableData(st,x)
 
 			# print("variable data updated :  %s" % st.linenum)
@@ -711,13 +754,29 @@ def main(SymbolTables):
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 % st.in2)
 				elif(st.operator == Operator.READ_STACK):
-					st.code_statement = st.code_statement + "lw $%s, ($sp)"%(VariableData[st.out][1])
+					st.code_statement += "lw $t7, %d($fp)\n"%(readingfromstack[0])
+					st.code_statement += "sw $t7, -%d($fp)\n"%(readingfromstack[0]+4)
+					readingfromstack[0] += 4
+					# st.code_statement = st.code_statement + "lw $%s, ($sp)\n"%(VariableData[st.out][1])
+
+
+				elif(st.operator == Operator.LESS_THAN):
+					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in2][1], VariableData[st.in1][1])
+					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in1][1])
+						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in2)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in2 - st.in1)
 
 			elif(st.instr_typ == InstrType.POP_STACK):
-				st.code_statement = st.code_statement + "addiu $sp, $sp, 4"
+				st.code_statement = st.code_statement + "addiu $sp, $sp, 4\n"
 
 			elif(st.instr_typ == InstrType.FUNC_LABEL):
 				st.code_statement = st.code_statement + "%s:\n"%(st.label)
+				readingfromstack[0]=0
 
 			elif(st.instr_typ == InstrType.LABEL):
 				st.code_statement = st.code_statement + "%s:\n"%(st.label)
@@ -725,10 +784,11 @@ def main(SymbolTables):
 
 		
 			elif(st.instr_typ == InstrType.FUNC_CALL):
+				st.code_statement += "move $fp, $sp\n"
+				st.code_statement += "addiu $sp, $sp, -%d\n"%(MethodSize[st.jump_tagret])
 				st.code_statement = st.code_statement + "jal %s\n"%(st.jump_tagret) # handle return register
-				st.code_statement += "addiu $sp, $sp, %d"%(MethodSize[st.jump_tagret])
-				st.code_statement += "lw $ra, ($sp)\naddiu $sp, $sp, 4"
-				st.code_statement += "lw $fp, ($sp)\naddiu $sp, $sp, 4"
+				st.code_statement += "lw $ra, ($sp)\naddiu $sp, $sp, 4\n"
+				st.code_statement += "lw $fp, ($sp)\naddiu $sp, $sp, 4\n"
 				st.code_statement += "move $%s, $v0\n"%(VariableData[st.out][1])
 
 			
@@ -739,7 +799,7 @@ def main(SymbolTables):
 					st.code_statement += "sw $t7, ($sp)\n"
 				else:
 					st.code_statement = st.code_statement + "addiu $sp, $sp, -4\n"
-					st.code_statement += "lw $%s, ($sp)\n"%(VariableData[st.in1][1])
+					st.code_statement += "sw $%s, ($sp)\n"%(VariableData[st.in1][1])
 
 			elif(st.instr_typ == InstrType.FUNC_START):
 				st.code_statement += "addiu $sp, $sp, -4\n"
@@ -805,7 +865,7 @@ def main(SymbolTables):
 				# st.print_stmt()
 
 				branch_instr = ""
-				if(st.operator == Operator.GREATER_THAN):
+				if(st.operator == Operator.GREATER_THAN or st.operator == ''):
 					branch_instr = "bgt"
 				elif(st.operator == Operator.GREATER_THAN_EQUALS):
 					branch_instr = "bge"
@@ -815,7 +875,7 @@ def main(SymbolTables):
 					branch_instr = "ble"
 				elif(st.operator == Operator.EQUALS):
 					branch_instr = "beq"
-				elif(st.operator == Operator.NOT_EQUALS or st.operator == ''):
+				elif(st.operator == Operator.NOT_EQUALS):
 					branch_instr = "bne"
 
 				if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
@@ -836,7 +896,7 @@ def main(SymbolTables):
 
 
 			elif(st.instr_typ == InstrType.IFFALSE ):
-				branch_instr = "beq"
+				branch_instr = "blt"
 
 				if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
 					temp_instr = "li $t7,%d\n" % st.in2
@@ -913,7 +973,10 @@ def main(SymbolTables):
 		block_code = ""
 		for var in VariableData:
 			if(VariableData[var][1] <> 0 and LocalSymbolTable[var].dataType <> "Array" ) :
-				block_code = block_code + "sw $%s, -%d($fp)\n"%(VariableData[var][1], VariableData[var][0])
+				if(lookup_LocalSymbolTable(var).scope == Scope.LOCAL):
+					block_code = block_code + "sw $%s, -%d($fp)\n"%(VariableData[var][1], VariableData[var][0])
+				else:
+					block_code = block_code + "sw $%s, %s\n"%(VariableData[var][1], var)
 			if(VariableData[var][1] <> 0):
 				UsableRegisters[VariableData[var][1]] = 0
 				VariableData[var][1] = 0
@@ -973,11 +1036,6 @@ def main(SymbolTables):
 
 	# print machine_code
 
-	assemblyfile.close()
-	# print("assemblyfile temp.asm successfully created ")
-
-	assemblyfile = open('temp.asm', 'r')
-	# print(assemblyfile.read())
 	assemblyfile.close()
 
 if __name__ == '__main__':
