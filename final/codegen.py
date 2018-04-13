@@ -243,8 +243,6 @@ def set_inputs(row, curr_statement):
 
 	elif(curr_statement.instr_typ == InstrType.FUNC_CALL):
 		curr_statement.jump_tagret = row[2]
-		curr_statement.out = row[3]
-		curr_statement.out_type = EntryType.VARIABLE
 
 	elif(curr_statement.instr_typ == InstrType.GOTO):
 		curr_statement.jump_tagret = row[2]
@@ -355,12 +353,14 @@ def construct_NextUse():
 		for stmt in reversed(basic_block):
 			in1=""
 			in2=""
+			out=""
 			# stmt.#print_stmt()
 			if(stmt.in1_type == EntryType.VARIABLE):
 				in1=stmt.in1
 			if(stmt.in2_type == EntryType.VARIABLE):
 				in2=stmt.in2
-			out = stmt.out
+			if(stmt.out_type == EntryType.VARIABLE):
+				out = stmt.out
 			in1nextuse=np.inf
 			in2nextuse=np.inf
 			outnextuse=np.inf
@@ -383,6 +383,7 @@ def construct_NextUse():
 				else:
 					print LocalSymbolTable
 					print("No entry for this variable in out LocalSymbolTable" + str(out))
+					stmt.print_stmt()
 					# s=LocalSymTabEntry()
 					# insert_LocalSymbolTable(out,s)
 			if(in1):
@@ -671,11 +672,14 @@ def main(SymbolTables):
 	space_func="space_func:\nla $a0, space\nli $v0, 4\nsyscall\njr $ra\n"
 
 # ---------------------------------------------------------------Translation -----------------------------
+	prevst = None
+	curMethod = None
 	for x in basic_block_list:
 		for st in x:
 			# infunction=['main']
 			
 			UpdateVariableData(st,x)
+
 
 			# print("variable data updated :  %s" % st.linenum)
 			# print (VariableData)
@@ -754,9 +758,17 @@ def main(SymbolTables):
 					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 % st.in2)
 				elif(st.operator == Operator.READ_STACK):
-					st.code_statement += "lw $t7, %d($fp)\n"%(readingfromstack[0])
-					st.code_statement += "sw $t7, -%d($fp)\n"%(readingfromstack[0]+4)
-					readingfromstack[0] += 4
+					# print("@@@@ The Abhishek at work")
+					# print(prevst)
+					if(prevst <> None and  prevst.instr_typ == InstrType.FUNC_CALL):
+						st.code_statement += "lw $fp, ($sp)\naddiu $sp, $sp, 4\n"
+						st.code_statement += "lw $ra, ($sp)\naddiu $sp, $sp, 4\n"
+						st.code_statement += "move $%s, $v0\n"%(VariableData[st.out][1])
+					else:
+						st.code_statement += "lw $t7, %d($fp)\n"%(readingfromstack[0])
+						st.code_statement += "sw $t7, -%d($fp)\n"%(readingfromstack[0]+4)
+						st.code_statement += "move $%s, $t7\n"%(VariableData[st.out][1])
+						readingfromstack[0] += 4
 					# st.code_statement = st.code_statement + "lw $%s, ($sp)\n"%(VariableData[st.out][1])
 
 
@@ -771,12 +783,61 @@ def main(SymbolTables):
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in2 - st.in1)
 
+				elif(st.operator == Operator.LESS_THAN_EQUALS):
+					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in2][1], VariableData[st.in1][1])
+					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in1][1])
+						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in2)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in2 - st.in1)
+					st.code_statement += "addi, $%s, $%s, 1\n"%(VariableData[st.out][1])
+
+
+				elif(st.operator == operator.GREATER_THAN):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in1)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 - st.in2)
+
+				elif(st.operator == Operator.GREATER_THAN_EQUALS):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in1)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 - st.in2)
+					st.code_statement += "addi, $%s, $%s, 1\n"%(VariableData[st.out][1])
+
+				elif(st.operator == Operator.EQUALS):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in1)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 - st.in2)
+
+
 			elif(st.instr_typ == InstrType.POP_STACK):
 				st.code_statement = st.code_statement + "addiu $sp, $sp, 4\n"
 
 			elif(st.instr_typ == InstrType.FUNC_LABEL):
 				st.code_statement = st.code_statement + "%s:\n"%(st.label)
 				readingfromstack[0]=0
+				curMethod = st.label
 
 			elif(st.instr_typ == InstrType.LABEL):
 				st.code_statement = st.code_statement + "%s:\n"%(st.label)
@@ -787,9 +848,7 @@ def main(SymbolTables):
 				st.code_statement += "move $fp, $sp\n"
 				st.code_statement += "addiu $sp, $sp, -%d\n"%(MethodSize[st.jump_tagret])
 				st.code_statement = st.code_statement + "jal %s\n"%(st.jump_tagret) # handle return register
-				st.code_statement += "lw $ra, ($sp)\naddiu $sp, $sp, 4\n"
-				st.code_statement += "lw $fp, ($sp)\naddiu $sp, $sp, 4\n"
-				st.code_statement += "move $%s, $v0\n"%(VariableData[st.out][1])
+				
 
 			
 			elif(st.instr_typ == InstrType.FUNC_PARAM):
@@ -808,6 +867,8 @@ def main(SymbolTables):
 				st.code_statement += "addiu $sp, $sp, -4\n"
 				st.code_statement += "sw $fp, ($sp)\n"
 
+				# st.code_statement += "addiu $sp, $sp, -4\n" # Space for returning
+
 
 			elif(st.instr_typ == InstrType.RETURN):
 				if(st.out_type == EntryType.INTEGER):
@@ -817,7 +878,8 @@ def main(SymbolTables):
 
 
 			elif(st.instr_typ == InstrType.FUNC_RETURN):
-				st.code_statement = st.code_statement + "lw $ra, ($sp)\nadd $sp, $sp, 4\n"
+				# st.code_statement = st.code_statement + "lw $ra, ($sp)\nadd $sp, $sp, 4\n"
+				st.code_statement += "addiu $sp, $sp, %d\n"%(MethodSize[curMethod])
 				st.code_statement = st.code_statement + "jr $ra\n"
 
 			elif(st.instr_typ == InstrType.INDEX_ASSIGN_L):
@@ -965,6 +1027,9 @@ def main(SymbolTables):
 			elif(st.instr_typ == InstrType.SPACE):
 				st.code_statement = st.code_statement + "jal space_func\n"
 
+			prevst = st
+			if(prevst == None):
+				print("!!!!!!!!!!", st)
 			# print("%s translated" %(st.linenum))
 		#print("-------------------------------------------------------------------")
 		#print(VariableData)
@@ -1000,7 +1065,10 @@ def main(SymbolTables):
 			else:
 				if(stmt.instr_typ in [InstrType.GOTO, InstrType.IFGOTO, InstrType.FUNC_CALL, InstrType.FUNC_RETURN, InstrType.EXIT, InstrType.RETURN]):
 					temp = stmt.code_statement.split('\n')
-					ne = temp[:len(temp)-2] + [block_codes[id(basic_block)]] + temp[len(temp)-2:]
+					if(stmt.instr_typ == InstrType.FUNC_CALL):
+						ne = temp[:len(temp)-4] + [block_codes[id(basic_block)]] + temp[len(temp)-4:]
+					else:
+						ne = temp[:len(temp)-2] + [block_codes[id(basic_block)]] + temp[len(temp)-2:]
 					res = ""
 					for line in ne:
 						res = res+line+'\n'

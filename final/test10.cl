@@ -1,10 +1,10 @@
 class Main inherits IO {
-   n : Int <- 1;
-   def fact : Int (n: Int){
+   n : Int <- 6;
+   def fib : Int (n: Int){
       if n<3 then
-         return n;
+         return 1;
       else
-         return n*fact(n-1) ;
+         return fib(n-1)+fib(n-2) ;
       
       fi
 
@@ -28,7 +28,7 @@ class Main inherits IO {
             }
 
          pool;*)
-         let prev : Int <-fact(n) in
+         let prev : Int <-fib(n) in
             out_int(prev)
          tel;
       }

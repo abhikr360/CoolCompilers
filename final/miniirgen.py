@@ -244,7 +244,8 @@ def p_feature_header_with_modifier(p):
   'feature_header : DEF modifier ID COLON type'
   code=[]
   if(not flag[0]):
-    code.append('GOTO,Main.main')
+    code.append('FUNC_CALL,Main.main')
+    code.append('EXIT')
     flag[0]=1
   codea.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3])
   p[0] = TREE.FeatureHeader(code=code, datatype=p[5].place)
@@ -259,7 +260,8 @@ def p_feature_header(p):
   'feature_header : DEF ID COLON type'
   code=[]
   if(not flag[0]):
-    code.append('GOTO,Main.main')
+    code.append('FUNC_CALL,Main.main')
+    code.append('EXIT')
     flag[0]=1
   code.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[2])
   p[0] = TREE.FeatureHeader(code=code, datatype=p[4].place)
@@ -608,7 +610,8 @@ def p_expression_function_call_with_arguments_2(p):
     t = newtemp()
 
     code = p[3].code
-    code.append('FUNC_CALL,'+met.parent_class + '.' + p[1] + ',' + get_expression_place(t))
+    code.append('FUNC_CALL,'+met.parent_class + '.' + p[1])
+    code.append('READ_STACK,' + get_expression_place(t))
     datatype = met.datatype
     p[0]=TREE.FunctionCall(code=code, datatype=datatype, place=get_expression_place(t))
 
@@ -620,8 +623,8 @@ def p_expression_function_call_2(p):
 
   t=newtemp()
   # print current_symbol_table[0].parent.scope_name
-  code = ['FUNC_CALL,'+met.parent_class +'.'+p[1]+','+get_expression_place(t)]
-  # quit()
+  code = ['FUNC_CALL,'+met.parent_class +'.'+p[1]]
+  code.append('READ_STACK,'+get_expression_place(t))
   datatype = met.datatype
   p[0] = TREE.Expression(code=code,place=get_expression_place(t), datatype=datatype)
 
@@ -996,6 +999,7 @@ def p_expression_arr(p):
 def p_expression_integer(p):
   'expression : INTEGER'
   rule.append(62)
+  # print("i want to break free")
 
   p[0] = TREE.Expression(code=[], place=str(p[1]), datatype='Int',isArray=False)
   # print("----", p[0].code, p[0].place,p[0])
@@ -1033,7 +1037,8 @@ def p_expression_return(p):
   	sys.exit("return type doesnot match for fucntion "+ func)
   changed_name = p[2].place
   if(p[2].datatype=='Int'):
-    changed_name = current_symbol_table[0].getVariable(p[2].place).parent_scope_name+'.'+p[2].place
+    if(current_symbol_table[0].getVariable(p[2].place)):
+      changed_name = current_symbol_table[0].getVariable(p[2].place).parent_scope_name+'.'+p[2].place
   code = p[2].code
   code.append('RETURN,'+changed_name)
   p[0] = TREE.Expression(code=code,datatype='continue',isArray=False,place=None)
@@ -1046,8 +1051,8 @@ def p_expression_function_call_with_arguments(p):
   code = p[1].code
   code.extend(p[5].code)
   # print(".................................", p[1].place)
-  code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
-  # print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
+  code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3])
+  code.append('READ_STACK,' + t)
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t,datatype=datatype,isArray=False)
 
@@ -1059,8 +1064,8 @@ def p_expression_function_call(p):
   # quit()
   
   code = p[1].code
-  code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3]+','+t)
-  # print("..........", current_symbol_table[0].getVariable(p[1].place).datatype)
+  code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3])
+  code.append('READ_STACK,' + t)
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t, datatype=datatype,isArray=False)
 
@@ -1069,14 +1074,16 @@ def p_expression_new(p):
   rule.append(70)
   t=newtemp()
   current_symbol_table[0].getVariable(t).datatype = p[2].place
-  code = ['FUNC_CALL,constructor,'+t]
+  code = ['FUNC_CALL,constructor']
+  code.append('READ_STACK,' + t)
   p[0] = TREE.Expression(code=code,place=t, datatype=p[2].place)
 
 def p_expression_isvoid(p):
   'expression : ISVOID expression'
   rule.append(71)
   t=newtemp()
-  code = ['FUNC_CALL,isvoid,'+t]
+  code = ['FUNC_CALL,isvoid']
+  code.append('READ_STACK,' + t)
   p[0] = TREE.Expression(code=code,place=t, datatype='isvoid')
 
 def p_expression_let_expression(p):

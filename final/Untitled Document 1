@@ -1,0 +1,197 @@
+.data
+space: .asciiz " "
+Main.n : .word 0
+.text
+main:
+move $fp, $sp
+
+
+j CLASS.Main
+
+#-----------------------------------block id: 140481669278968
+
+jal exit_func
+
+#-----------------------------------block id: 140481669279040
+CLASS.Main:
+
+lw $t5,Main.n
+li $t5, 4
+
+move $fp, $sp
+addiu $sp, $sp, -8
+sw $t5, Main.n
+
+jal Main.main
+
+#-----------------------------------block id: 140481669280184
+
+jal exit_func
+
+#-----------------------------------block id: 140481669280256
+Main.fib:
+
+lw $t5, -4($fp)
+lw $t7, 0($fp)
+sw $t7, -4($fp)
+move $t5, $t7
+
+lw $s6, -8($fp)
+sub $t7, $zero, $t5
+addi $s6, $t7, 3
+
+li $t7,0
+sw $t5, -4($fp)
+sw $s6, -8($fp)
+
+bgt $s6,$t7,label.1
+
+#-----------------------------------block id: 140481669278104
+lw $t5, -4($fp)
+lw $s6, -12($fp)
+addi $s6, $t5, -1
+
+addiu $sp, $sp, -4
+sw $ra, ($sp)
+addiu $sp, $sp, -4
+sw $fp, ($sp)
+
+addiu $sp, $sp, -4
+sw $s6, ($sp)
+
+move $fp, $sp // sw ke baad
+addiu $sp, $sp, -28 // sw ke baad
+sw $t5, -4($fp)
+sw $s6, -12($fp)
+
+jal Main.fib
+
+#-----------------------------------block id: 140481669278176
+lw $t5, -16($fp)
+lw $fp, ($sp)
+addiu $sp, $sp, 4
+lw $ra, ($sp)
+addiu $sp, $sp, 4
+move $t5, $v0
+
+lw $s6, -4($fp)
+lw $s5, -20($fp)
+addi $s5, $s6, -2
+
+addiu $sp, $sp, -4
+sw $ra, ($sp)
+addiu $sp, $sp, -4
+sw $fp, ($sp)
+
+addiu $sp, $sp, -4
+sw $s5, ($sp)
+
+move $fp, $sp
+addiu $sp, $sp, -28
+sw $s6, -4($fp)
+sw $s5, -20($fp)
+sw $t5, -16($fp)
+
+jal Main.fib
+
+#-----------------------------------block id: 140481669276664
+lw $t5, -24($fp)
+lw $fp, ($sp)
+addiu $sp, $sp, 4
+lw $ra, ($sp)
+addiu $sp, $sp, 4
+move $t5, $v0
+
+lw $s6, -16($fp)
+lw $s5, -28($fp)
+add $s5, $s6, $t5
+
+sw $s5, -28($fp)
+sw $t5, -24($fp)
+sw $s6, -16($fp)
+
+move $v0, $s5
+
+#-----------------------------------block id: 140481669276736
+
+j label.2
+
+#-----------------------------------block id: 140481669272856
+label.1:
+
+
+li $v0, 1
+
+#-----------------------------------block id: 140481669272928
+label.2:
+
+addiu $sp, $sp, 4
+
+addiu $sp, $sp, 28
+
+jr $ra
+
+#-----------------------------------block id: 140481669275016
+Main.main:
+
+
+#-----------------------------------block id: 140481669275088
+LET_BEGIN_Main.main.LET_1:
+
+addiu $sp, $sp, -4
+sw $ra, ($sp)
+addiu $sp, $sp, -4
+sw $fp, ($sp)
+
+lw $t5, Main.n
+addiu $sp, $sp, -4
+sw $t5, ($sp)
+
+move $fp, $sp
+addiu $sp, $sp, -28
+sw $t5, Main.n
+
+jal Main.fib
+
+#-----------------------------------block id: 140481669272568
+lw $t5, -4($fp)
+lw $fp, ($sp)
+addiu $sp, $sp, 4
+lw $ra, ($sp)
+addiu $sp, $sp, 4
+move $t5, $v0
+
+lw $s6, -8($fp)
+move $s6, $t5
+
+move $a0,$s6
+jal print_int
+
+sw $t5, -4($fp)
+sw $s6, -8($fp)
+
+#-----------------------------------block id: 140481669272640
+LET_OVER_LET_1:
+
+addiu $sp, $sp, 8
+
+jr $ra
+
+#-----------------------------------block id: 140481669274008
+exit_func:
+li $v0,10
+syscall
+print_int:
+li $v0,1
+syscall
+jr $ra
+scan_int:
+li $v0,5
+syscall
+jr $ra
+space_func:
+la $a0, space
+li $v0, 4
+syscall
+jr $ra
+
