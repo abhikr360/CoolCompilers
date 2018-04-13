@@ -772,64 +772,60 @@ def main(SymbolTables):
 					# st.code_statement = st.code_statement + "lw $%s, ($sp)\n"%(VariableData[st.out][1])
 
 
+
+				## Use Set Registers
 				elif(st.operator == Operator.LESS_THAN):
 					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in2][1], VariableData[st.in1][1])
+						st.code_statement = st.code_statement + "slt $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+						st.code_statement = st.code_statement + "sgei $%s, $%s, $%d\n"%(VariableData[st.out][1],VariableData[st.in2][1],st.in1)
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in1][1])
-						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in2)
+						st.code_statement = st.code_statement + "slti $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in2 - st.in1)
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 < st.in2 else 0)
 
 				elif(st.operator == Operator.LESS_THAN_EQUALS):
 					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in2][1], VariableData[st.in1][1])
+						st.code_statement = st.code_statement + "sle $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+						st.code_statement = st.code_statement + "sgti $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in1][1])
-						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in2)
+						st.code_statement = st.code_statement + "slei $%s, $%s, $%d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in2 - st.in1)
-					st.code_statement += "addi, $%s, $%s, 1\n"%(VariableData[st.out][1])
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 <= st.in2 else 0)
+					# st.code_statement += "addi, $%s, $%s, 1\n"%(VariableData[st.out][1])
 
 
 				elif(st.operator == operator.GREATER_THAN):
-					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
-					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
-					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in2][1])
-						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in1)
-					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 - st.in2)
-
+					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sgt $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "slei $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sgti $%s, $%s, $%d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 > st.in2 else 0)
+					
 				elif(st.operator == Operator.GREATER_THAN_EQUALS):
-					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
-					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
-					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in2][1])
-						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in1)
-					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 - st.in2)
-					st.code_statement += "addi, $%s, $%s, 1\n"%(VariableData[st.out][1])
-
+					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sge $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "slti $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "sgei $%s, $%s, $%d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 >= st.in2 else 0)
+					
 				elif(st.operator == Operator.EQUALS):
-					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
-					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "addi $%s, $%s, -%d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
-					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sub $t7, $zero, $%s\n"%(VariableData[st.in2][1])
-						st.code_statement = st.code_statement + "addi $%s, $t7, %d\n"%(VariableData[st.out][1], st.in1)
-					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 - st.in2)
-
+					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "seq $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "snei $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "seqi $%s, $%s, $%d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
+					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 == st.in2 else 0)
+					
 
 			elif(st.instr_typ == InstrType.POP_STACK):
 				st.code_statement = st.code_statement + "addiu $sp, $sp, 4\n"
