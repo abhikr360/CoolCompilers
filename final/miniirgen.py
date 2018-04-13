@@ -655,10 +655,10 @@ def p_argument_list_many(p):
   # else:
 		# expression_place = p[3].place
 
-  code = p[3].code
-  code.append('FUNC_START')
-  code.append('FUNC_PARAM,{}'.format(get_expression_place(p[1].place)))
-  code.extend(p[1].code)
+  code = p[1].code
+  # code.append('FUNC_START')
+  code.extend(p[3].code)
+  code.append('FUNC_PARAM,{}'.format(get_expression_place(p[3].place)))
 
   p[0]=TREE.ArgumentList(code=code,place = p[3].place)
 
