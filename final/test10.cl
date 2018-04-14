@@ -1,5 +1,6 @@
 class Main inherits IO {
-   n : Int <- 6;
+   n : Int;
+   m : Int;
    def fib : Int (n: Int){
       if n<3 then
          return 1;
@@ -28,6 +29,7 @@ class Main inherits IO {
             }
 
          pool;*)
+         n <- 3;
          let prev : Int <-fib(n) in
             out_int(prev)
          tel;
