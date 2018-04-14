@@ -28,6 +28,8 @@ SymbolTables = []
 current_symbol_table = [Symtab(parent=None, symtab_type='CLASS', scope_name='GLOBAL')]  #not a list only one symboltable
 ClassDict = {}
 
+ClassTable = {}
+
 basicDataType = ['Int','String','Bool']
 '''
      TO BE DONE
@@ -141,6 +143,8 @@ def p_class_header_with_inheritance(p):
   SymbolTables.append(new_sym_tab)
   current_symbol_table[0] = new_sym_tab
 
+  ClassTable[p[2]] = ClassObject(p[2])
+
 
   code = ['LABEL,CLASS.'+p[2]]
   # if(p[2]=='Main'):
@@ -160,11 +164,15 @@ def p_class_header(p):
   #   pass
   # else:
   #   code=["Class header code here without inheritance"]
+
   p[0] = TREE.ClassHeader(code=code)
+
 
   new_sym_tab = Symtab(parent=None, symtab_type="CLASS", scope_name=p[2])
   ClassDict[p[2]] = new_sym_tab
   current_symbol_table[0] = new_sym_tab
+
+  ClassTable[p[2]] = ClassObject(p[2])
 
 def p_class_body_empty(p):
   'class_body : LBRACE RBRACE'
@@ -255,6 +263,7 @@ def p_feature_header_with_modifier(p):
   current_symbol_table[0].enter_method(p[3],p[5].place,current_symbol_table[0].scope_name)
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
+  ClassTable[list(ClassTable)[len(ClassTable)-1]].functions[p[3]] = current_symbol_table[0].scope_name+'.'+p[3]
 
 def p_feature_header(p):
   'feature_header : DEF ID COLON type'
@@ -272,6 +281,7 @@ def p_feature_header(p):
   # current_symbol_table[0].methods.append(new_sym_tab,p[4])
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
+  ClassTable[list(ClassTable)[len(ClassTable)-1]].functions[p[2]] = current_symbol_table[0].scope_name+'.'+p[2]
 
 def p_feature_body_with_formal_parameter_list(p):
   'feature_body : LPAREN formal_parameter_list RPAREN LBRACE expression RBRACE'
@@ -481,7 +491,6 @@ def p_formal_with_assign(p):
 
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
-    # print ClassDict[p[3].place].scope_name
   else:
     sys.exit('No object found named ' + p[3].place)
 
@@ -501,6 +510,10 @@ def p_formal(p):
   
   current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
+  ClassTable[list(ClassTable)[len(ClassTable)-1]].variables[p[1]] = ClassTable[list(ClassTable)[len(ClassTable)-1]].size
+  ClassTable[list(ClassTable)[len(ClassTable)-1]].size += 4
+
+
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype)
 
 def p_formal_arr(p):
@@ -514,6 +527,9 @@ def p_formal_arr(p):
   else:
     sys.exit('No object found named ' + p[3].place)
   current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name + '.' + p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
+
+  ClassTable[list(ClassTable)[len(ClassTable)-1]].variables[p[1]] = ClassTable[list(ClassTable)[len(ClassTable)-1]].size
+  ClassTable[list(ClassTable)[len(ClassTable)-1]].size += 4
 
 
 #--------------------------------------------  Not DONE ----------------------------------------------
@@ -551,6 +567,7 @@ def p_block_list(p):
 def p_expression_assign(p):
   'expression : ID GETS expression'
   rule.append(38)
+
   var = current_symbol_table[0].getVariable(p[1])
   # print "datatype : ",var.datatype, p[3].datatype
   # print current_symbol_table[0].scope_name,p[1],var.parent_table.scope_name
@@ -1351,4 +1368,6 @@ print("===========")
 # for x in ClassDict:
 # 	print ClassDict[x].scope_name
 
-main(SymbolTables)
+for t in ClassTable:
+  print ClassTable[t].printClass()
+# main(SymbolTables)

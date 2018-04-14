@@ -7,6 +7,22 @@ def is_int(row):
 	except Exception as e:
 		return False
 
+class ClassObject:
+	"""docstring for ClassObject"""
+	def __init__(self,name):
+		self.name = name
+		self.variables = {}
+		self.functions = {}
+		self.parent = None
+		self.size = 0
+	def printClass(self):
+		print self.name
+		print self.variables
+		print self.functions
+		print self.parent
+		print "size = " ,self.size
+
+
 class Variable:
 	"""docstring for Variable"""
 	def __init__(self,name,changed_name ,datatype='Int', size=4,isArray=False,parent_scope_name = None):
