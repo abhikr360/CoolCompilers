@@ -247,7 +247,7 @@ def p_feature_header_with_modifier(p):
     code.append('FUNC_CALL,Main.main')
     code.append('EXIT')
     flag[0]=1
-  codea.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3])
+  code.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3])
   p[0] = TREE.FeatureHeader(code=code, datatype=p[5].place)
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[3])
