@@ -51,7 +51,7 @@ class Symtab:
 		self.scope_name = scope_name 	# name of class or method or let id
 		self.lets = []
 
-	def enter(self,name,changed_name, datatype='Int',size=4,isArray=False):
+	def enter(self, name, changed_name, datatype='Int',size=4,isArray=False):
 		# name = self.scope_name + '.' + name 
 		if(self.local_search(name)):
 			sys.exit("Variable %s already present in symbol table"%name)

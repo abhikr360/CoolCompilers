@@ -58,6 +58,7 @@ class InstrType(Enum):
 	FUNC_START=18
 	POP_STACK=19
 	RETURN=20
+	ALLOCATE=21
 
 
 class EntryType(Enum):
@@ -283,6 +284,16 @@ def set_inputs(row, curr_statement):
 				curr_statement.in2 = temp
 				curr_statement.in2_type = EntryType.VARIABLE
 
+	elif(curr_statement.instr_typ == InstrType.ALLOCATE):
+		curr_statement.out = row[2]
+		curr_statement.out_type = EntryType.VARIABLE
+		if(is_int(row[3])):
+			curr_statement.in1 = int(row[3])
+			curr_statement.in1_type = EntryType.INTEGER
+		else:
+			curr_statement.in1 = row[3]
+			curr_statement.in1_type = EntryType.VARIABLE
+
 
 
 
@@ -505,7 +516,7 @@ def UpdateVariableData(statement,block):
 					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
 			else:
 				if(l.dataType=="Array"):
-					statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
+					statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
 				else:
 					statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
 
@@ -540,7 +551,7 @@ def UpdateVariableData(statement,block):
 					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n" % (register, VariableData[statement.out][0])
 			else:
 				if(l.isArray ==True):
-					statement.code_statement = statement.code_statement + "la $%s, %s\n"%(VariableData[statement.out][1], statement.out)
+					statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.out][1], statement.out)
 				else:
 					statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
 
@@ -583,10 +594,10 @@ def main(SymbolTables):
 				VariableData[var.name] = [0,0]
 				s=LocalSymTabEntry(size=var.size, dataType=var.datatype,scope=Scope.GLOBAL, isArray=var.isArray)
 				insert_LocalSymbolTable(var.name, s)
-				if(var.datatype == 'Int'):
-					data_code = data_code + "%s : .word 0\n"%(var.name)
-				elif(var.datatype == "Array"):
-					data_code = data_code + "%s : .space %d\n"%(var.name, 4*int(size))
+				# if(not var.isArray):
+				data_code = data_code + "%s : .word 0\n"%(var.name)
+				# else:
+				# 	data_code = data_code + "%s : .word 0%d\n"%(var.name, 4*int(var.size))
 				i = i + var.size
 			MethodSize[name]=i-4
 
@@ -879,24 +890,23 @@ def main(SymbolTables):
 				st.code_statement = st.code_statement + "jr $ra\n"
 
 			elif(st.instr_typ == InstrType.INDEX_ASSIGN_L):
-				# st.print_stmt()
 				if(st.in1_type==EntryType.VARIABLE):
 					st.code_statement = st.code_statement+ "sll $t7, $%s, 2\n"%(VariableData[st.in1][1])
 					st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.out][1])
 					if(st.in2_type==EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sw $%s, 0($t8)"%(VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "sw $%s, 0($t8)\n"%(VariableData[st.in2][1])
 					else:
-						st.code_statement = st.code_statement + "li $t9, %d"%(st.in2)
-						st.code_statement = st.code_statement + "sw $t9, 0($t8)"
+						st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in2)
+						st.code_statement = st.code_statement + "sw $t9, 0($t8)\n"
 				else:
 					st.code_statement = st.code_statement + "li $t7, %d\n"%(st.in1)
 					st.code_statement = st.code_statement + "sll $t7, $t7, 2\n"
-					st.code_statement = st.code_statement + "add $t8, $%s,$t7"%(VariableData[st.out][1])
+					st.code_statement = st.code_statement + "add $t8, $%s,$t7\n"%(VariableData[st.out][1])
 					if(st.in2_type==EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sw $%s, 0($t8)"%(VariableData[st.in2][1])
+						st.code_statement = st.code_statement + "sw $%s, 0($t8)\n"%(VariableData[st.in2][1])
 					else:
-						st.code_statement = st.code_statement + "li $t9, %d"%(st.in2)
-						st.code_statement = st.code_statement + "sw $t9, 0($t8)"
+						st.code_statement = st.code_statement + "li $t9, %d\n"%(st.in2)
+						st.code_statement = st.code_statement + "sw $t9, 0($t8)\n"
 
 
 			elif(st.instr_typ == InstrType.INDEX_ASSIGN_R):
@@ -913,14 +923,11 @@ def main(SymbolTables):
 
 
 				if(st.out_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE and VariableData[st.out][1] == VariableData[st.in1][1] and st.out <> st.in1):
-					# print(VariableData[st.in1][1],VariableData[st.out][1],st.in1,st.out)
 					VariableData[st.in1][1] = 0
 				if(st.out_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE and VariableData[st.out][1] == VariableData[st.in2][1] and st.in2 <> st.out):
-					# print(VariableData[st.in2][1],VariableData[st.out][1],st.in1,st.out)
 					VariableData[st.in2][1] = 0
 
 			elif(st.instr_typ==InstrType.IFGOTO):
-				# st.print_stmt()
 
 				branch_instr = ""
 				if(st.operator == Operator.GREATER_THAN or st.operator == ''):
@@ -1023,12 +1030,21 @@ def main(SymbolTables):
 			elif(st.instr_typ == InstrType.SPACE):
 				st.code_statement = st.code_statement + "jal space_func\n"
 
+			elif(st.instr_typ == InstrType.ALLOCATE):
+				st.code_statement += "li $v0, 9\n"
+				if(st.in1_type == EntryType.VARIABLE):
+					st.code_statement += "move $a0, $%s\n"%(VariableData[st.in1][1])
+				else:
+					st.code_statement += "li $a0, %d\n"%(st.in1)
+				st.code_statement += "sll $a0, $a0, 2\n"
+				st.code_statement += 'syscall\n'
+				st.code_statement += 'move $%s, $v0\n'%(VariableData[st.out][1])
+
+
+
 			prevst = st
-			if(prevst == None):
-				print("!!!!!!!!!!", st)
-			# print("%s translated" %(st.linenum))
-		#print("-------------------------------------------------------------------")
-		#print(VariableData)
+			
+			
 
 		
 		block_code = ""
@@ -1042,15 +1058,10 @@ def main(SymbolTables):
 				UsableRegisters[VariableData[var][1]] = 0
 				VariableData[var][1] = 0
 
-		# print(UsableRegisters)
-
-		# print("block %d ended")%(id(x))
-		# print (UsableRegisters)
+		
 		block_codes[id(x)] = block_code
 
-		#print(VariableData)
-		#print(UsableRegisters)
-		#print("-------------------------------------------------------------------")
+		
 
 	for basic_block in basic_block_list:
 
@@ -1069,7 +1080,6 @@ def main(SymbolTables):
 					for line in ne:
 						res = res+line+'\n'
 					stmt.code_statement = res[:len(res)-1]
-					# print(block_codes[id(basic_block)])
 					assemblyfile.write(stmt.code_statement)
 					assemblyfile.write('\n')
 					assemblyfile.write("#-----------------------------------block id: %d\n"%(id(basic_block)))
@@ -1079,26 +1089,13 @@ def main(SymbolTables):
 					assemblyfile.write(block_codes[id(basic_block)])
 					assemblyfile.write('\n')
 					assemblyfile.write("#-----------------------------------block id: %d\n"%(id(basic_block)))
-#-----print utility  functions..----
 
 	assemblyfile.write(exit_func)
 	assemblyfile.write(print_int_func)
 	assemblyfile.write(scan_int_func)
 	assemblyfile.write(space_func)
 
-	#constructEvictionCandidate()
-	# #print(NextUse.keys())
-	#NextUse.sort()
-	#print("HERE")
-	##print(NextUse)
-	#temp = sorted(NextUse.iteritems(), key = lambda (k,v): (v,k))
-	#NextUse = temp
 	
-	# for x in NextUse:
-	# 	print x,NextUse[x].in1, NextUse[x].in2, NextUse[x].out, NextUse[x].in1nextuse, NextUse[x].in2nextuse, NextUse[x].outnextuse, NextUse[x].in1islive, NextUse[x].in2islive, NextUse[x].outislive
-
-
-	# print machine_code
 
 	assemblyfile.close()
 

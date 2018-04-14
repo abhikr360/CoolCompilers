@@ -1,7 +1,7 @@
 class Main inherits IO {
-   n : Int;
-   m : Int;
-   def fib : Int (n: Int){
+   n : Int [3];
+   m : Int [6];
+   (*def fib : Int (n: Int){
       if n<3 then
          return 1;
       else
@@ -9,7 +9,7 @@ class Main inherits IO {
       
       fi
 
-   };
+   }; *)
 
    def  main : SELF_TYPE () {
 
@@ -29,10 +29,25 @@ class Main inherits IO {
             }
 
          pool;*)
-         n <- 3;
-         let prev : Int <-fib(n) in
-            out_int(prev)
+         m[0] <- 5;
+        m[1] <- 1;
+         m[2] <- 2;
+         m[3] <- 3;
+         m[4] <- 4;
+         m[5] <- 3;
+         let a : Int [4] in
+         {
+            a[m[m[5]]] <- m[1];
+            out_int(a[3]);
+         }
          tel;
+
+         out_int(m[m[m[5]]]);
+
+
+
+
+
       }
 
    };
