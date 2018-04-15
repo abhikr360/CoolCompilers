@@ -46,10 +46,12 @@ def get_expression_place(name):
 
 flag=[0]
 tempCount=[0]
-def newtemp():
+
+
+def newtemp(datatype='Int'):
   tempCount[0] += 1
   temp_name = 't.' + str(tempCount[0])
-  current_symbol_table[0].enter(name = temp_name,changed_name=current_symbol_table[0].scope_name + '.' + temp_name,datatype='Int')
+  current_symbol_table[0].enter(name = temp_name,changed_name=current_symbol_table[0].scope_name + '.' + temp_name, datatype=datatype)
   
   return temp_name
 
@@ -171,6 +173,7 @@ def p_class_header(p):
 
   new_sym_tab = Symtab(parent=None, symtab_type="CLASS", scope_name=p[2])
   ClassDict[p[2]] = new_sym_tab
+  SymbolTables.append(new_sym_tab)
   current_symbol_table[0] = new_sym_tab
 
   ClassTable[p[2]] = ClassObject(p[2])
@@ -393,13 +396,18 @@ def p_formal_with_assign(p):
   current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name + '.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
 
-  code=['ASSIGN,%s,%s'%(get_expression_place(p[1]), get_expression_place(p[5].place))]
+  code = p[5].code
+  code.append('ASSIGN,%s,%s'%(get_expression_place(p[1]), get_expression_place(p[5].place)))
   p[0]=TREE.Formal(code=code)
 
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
   else:
     sys.exit('No object found named ' + p[3].place)
+
+  if(current_symbol_table[0].scope_name in ClassTable):
+    ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size
+    ClassTable[current_symbol_table[0].scope_name].size += 4
 
 
 def p_formal(p):
@@ -971,7 +979,9 @@ def p_expression_function_call(p):
 def p_expression_new(p):
   'expression : NEW type'
   rule.append(70)
-  t=newtemp()
+
+
+  t=newtemp(p[2].place)
   current_symbol_table[0].getVariable(t).datatype = p[2].place
 
   if(p[2].place not in ClassTable):
@@ -980,7 +990,7 @@ def p_expression_new(p):
 
 
   size = ClassTable[p[2].place].size
-  code = ['ALLOCATE,' + t + ',' + str(size)]
+  code = ['ALLOCATE,' + get_expression_place(t) + ',' + str(size)]
   p[0] = TREE.Expression(code=code,place=t, datatype=p[2].place)
 
 def p_expression_isvoid(p):
@@ -1219,8 +1229,29 @@ def p_formaldehyde_arr(p):
 
 
 
-  offset = ClassTable[p[1].datatype].variables[p[3]]
-  p[0] = TREE.Variable(code=[], datatype=SymbolTables[p[1].datatype].getVariable(p[3]).datatype, offset = offset, place =)
+
+
+def p_expression_objid(p):
+  'expression : expression PERIOD ID'
+
+  code=[]
+  t = newtemp()
+  datatype = ClassDict[p[1].datatype].getVariable(p[3]).datatype
+  offset = ClassTable[ p[1].datatype ].variables[p[3]]
+  code.append('INDEX_ASSIGN_R,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + str(offset))
+
+  p[0] = TREE.Expression(place = t, code = code, datatype=datatype,isArray=False)
+
+
+def p_expression_objid_expression(p):
+  'expression : expression PERIOD ID GETS expression'
+
+  code = p[5].code
+  offset = ClassTable[ p[1].datatype ].variables[p[3]]
+  code.append('INDEX_ASSIGN_L,'+ get_expression_place(p[1].place) +','+str(offset)+','+get_expression_place(p[5].place))
+  
+  p[0] = TREE.Expression(code=code,place=p[5].place, datatype=p[5].datatype)
+
 
 
 def p_error(p):
@@ -1252,6 +1283,10 @@ for s in SymbolTables:
 print("===========")
 
 
+
+print(len(SymbolTables))
 for t in ClassTable:
   print ClassTable[t].printClass()
+
+print(".... Parsing .... done ....")
 main(SymbolTables)
