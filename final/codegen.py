@@ -487,7 +487,11 @@ def GetReg(stmt, block):
 		l = lookup_LocalSymbolTable(useless_var)
 
 		if(l.dataType != 'Array'):
-			stmt.code_statement = stmt.code_statement +  "sw $%s, -%d($fp)\n"%(VariableData[useless_var][1], VariableData[useless_var][0])
+			if l.scope == Scope.LOCAL:
+				stmt.code_statement = stmt.code_statement +  "sw $%s, -%d($fp)\n"%(VariableData[useless_var][1], VariableData[useless_var][0])
+			else:
+				stmt.code_statement = stmt.code_statement +  "sw $%s, %s\n"%(VariableData[useless_var][1], useless_var)
+
 		UsableRegisters[empty_reg] = 0
 		VariableData[useless_var][1] = 0
 	
@@ -688,7 +692,6 @@ def main(SymbolTables):
 	for x in basic_block_list:
 		for st in x:
 			# infunction=['main']
-			
 			UpdateVariableData(st,x)
 
 

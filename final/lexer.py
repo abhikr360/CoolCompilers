@@ -77,7 +77,11 @@ tokens = (
    'COMMA',
 
    # At
-   'AT'
+   'AT',
+   'OUT_INT',
+   'OUT_STRING',
+   'SCAN_INT',
+   'SCAN_STRING'
 
    )
 # reserved Keyword
@@ -116,7 +120,11 @@ reserved = {
   'SELF_TYPE' : 'SELF_TYPE',
   'CLASS_TYPE' : 'CLASS_TYPE',
   'def' : 'DEF',
-  'return' : 'RETURN'
+  'return' : 'RETURN',
+  'out_int' : 'OUT_INT',
+  'out_string' : 'OUT_STRING',
+  'scan_int' : 'SCAN_INT',
+  'scan_string' : 'SCAN_STRING'
 
 }
 
