@@ -605,7 +605,6 @@ def main(SymbolTables):
 				i = i + var.size
 			MethodSize[name]=i-4
 
-	data_code += "SELF : .word 0\n"
 
 
 
@@ -631,7 +630,6 @@ def main(SymbolTables):
 	assemblyfile.write(data_code)
 	assemblyfile.write(machine_code)
 	assemblyfile.write("main:\n")
-	assemblyfile.write("move $fp, $sp\n\n")
 	# assemblyfile.write("addiu $sp, $sp, -%d\n\n"%(MethodSize['Main']))
 
 	with open(sys.argv[2], 'rb') as codefile:

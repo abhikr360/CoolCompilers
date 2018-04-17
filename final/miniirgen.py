@@ -150,6 +150,10 @@ def p_class_header_with_inheritance(p):
 
   currentClass[0]=p[2]
   code = ['LABEL,CLASS.'+p[2]]
+  if p[2] == 'Main' :
+    code.append('FUNC_START')
+    code.append('FUNC_CALL,Main.main')
+    code.append('EXIT')
   # if(p[2]=='Main'):
   #   pass
   # else:
@@ -163,6 +167,11 @@ def p_class_header(p):
   'class_header : CLASS CLASS_TYPE'
 
   code = ['LABEL,CLASS.' + p[2]]
+  if p[2] == 'Main' :
+    code.append('FUNC_START')
+    code.append('FUNC_CALL,Main.main')
+    code.append('EXIT')
+
   # if(p[2]=='Main'):
   #   pass
   # else:
@@ -216,10 +225,10 @@ def p_feature_header_body(p):
 def p_feature_header_with_modifier(p):
   'feature_header : DEF modifier ID COLON type'
   code=[]
-  if(not flag[0]):
-    code.append('FUNC_CALL,Main.main')
-    code.append('EXIT')
-    flag[0]=1
+  # if(not flag[0]):
+  #   code.append('FUNC_CALL,Main.main')
+  #   code.append('EXIT')
+  #   flag[0]=1
   code.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3])
   p[0] = TREE.FeatureHeader(code=code, datatype=p[5].place)
 
@@ -235,10 +244,10 @@ def p_feature_header_with_modifier(p):
 def p_feature_header(p):
   'feature_header : DEF ID COLON type'
   code=[]
-  if(not flag[0]):
-    code.append('FUNC_CALL,Main.main')
-    code.append('EXIT')
-    flag[0]=1
+  # if(not flag[0]):
+  #   code.append('FUNC_CALL,Main.main')
+  #   code.append('EXIT')
+  #   flag[0]=1
   code.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[2])
   p[0] = TREE.FeatureHeader(code=code, datatype=p[4].place)
 
@@ -257,8 +266,9 @@ def p_feature_body_with_formal_parameter_list(p):
   code = p[2].code
   code = list(reversed(code))
   code.extend(p[5].code)
-  for i in range(p[2].nargs+1):
+  for i in range(p[2].nargs):
   	code.append('POP_STACK')
+
   code.append('FUNC_RETURN')
   p[0]=TREE.FeatureBody(code=code)
 
@@ -267,8 +277,14 @@ def p_feature_body_with_formal_parameter_list(p):
 def p_feature_body(p):
   'feature_body : LPAREN RPAREN LBRACE expression RBRACE'
   code = p[4].code
-  code.append('FUNC_RETURN')
+
+  if current_symbol_table[0].scope_name == 'Main.main':
+    code.append('EXIT')
+  else:
+    code.append('FUNC_RETURN')
+    
   p[0]=TREE.FeatureBody(code=code)
+
 
 
 

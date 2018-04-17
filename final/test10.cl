@@ -1,4 +1,4 @@
-class WHATSUP{
+(*class WHATSUP{
    w1 : Int;
    w2 : Int;
    def printme : Int ( n: Int, m:Int, self : WHATSUP){
@@ -9,7 +9,7 @@ class WHATSUP{
       }
 
    };
-};
+}; *)
 
 class Fibonacci{
    def fibonacci : Int (n : Int, self : Fibonacci){
