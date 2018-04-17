@@ -29,7 +29,7 @@ current_symbol_table = [Symtab(parent=None, symtab_type='CLASS', scope_name='GLO
 ClassDict = {}
 
 ClassTable = {}
-
+currentClass=['Main']
 basicDataType = ['Int','String','Bool']
 '''
      TO BE DONE
@@ -148,7 +148,7 @@ def p_class_header_with_inheritance(p):
   ClassTable[p[2]] = ClassObject(p[2])
   ClassTable[p[2]].parent = p[4]
 
-
+  currentClass[0]=p[2]
   code = ['LABEL,CLASS.'+p[2]]
   # if(p[2]=='Main'):
   #   pass
@@ -176,6 +176,7 @@ def p_class_header(p):
   SymbolTables.append(new_sym_tab)
   current_symbol_table[0] = new_sym_tab
 
+  currentClass[0]=p[2]
   ClassTable[p[2]] = ClassObject(p[2])
 
 def p_class_body_empty(p):
@@ -254,8 +255,9 @@ def p_feature_header(p):
 def p_feature_body_with_formal_parameter_list(p):
   'feature_body : LPAREN formal_parameter_list RPAREN LBRACE expression RBRACE'
   code = p[2].code
+  code = list(reversed(code))
   code.extend(p[5].code)
-  for i in range(p[2].nargs):
+  for i in range(p[2].nargs+1):
   	code.append('POP_STACK')
   code.append('FUNC_RETURN')
   p[0]=TREE.FeatureBody(code=code)
@@ -915,16 +917,6 @@ def p_expression_paren(p):
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[2].datatype,isArray=p[2].isArray)
 
-
-# ---------------------------------------------------------------------------
-def p_expression_self(p):
-  'expression : SELF'
-  rule.append(59)
-
-  p[0] = TREE.Expression(code = ['SELF'],place='SELF_TYPE',datatype='SELF_TYPE',isArray=False)
-# ---------------------------------------------------------------------------
-
-
 def p_expression_id(p):
   'expression : ID'
   rule.append(60)
@@ -941,8 +933,7 @@ def p_expression_arr(p):
   # print p[1].datatype,p[1].place,var.datatype
   # quit()
   t = newtemp(p[1].datatype)
-  if t == 't.19':
-    print t,p[1].datatype,current_symbol_table[0].getVariable(t).datatype,var.datatype,p[1].datatype
+  
   code = p[1].code
   code.extend(p[3].code)
   code.append('INDEX_ASSIGN_R,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
@@ -999,11 +990,19 @@ def p_expression_return(p):
 def p_expression_function_call_with_arguments(p):
   'expression : expression PERIOD ID LPAREN argument_list RPAREN'
   rule.append(68)
+
+
   t=newtemp()
   code = p[1].code
   code.extend(p[5].code)
-  code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3])
-  code.append('READ_STACK,' + t)
+  func_label = ClassTable[p[1].datatype].searchFunction(p[3])
+  if(func_label == None):
+    print("TYPE Check error, %s.%s function not defined"%(p[1].datatype, p[3]))
+    exit()
+
+  code.append('FUNC_PARAM,' + get_expression_place(p[1].place))
+  code.append('FUNC_CALL,'+func_label)
+  code.append('READ_STACK,' + get_expression_place(t))
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t,datatype=datatype,isArray=False)
 
@@ -1013,8 +1012,16 @@ def p_expression_function_call(p):
   t=newtemp()
   
   code = p[1].code
-  code.append('FUNC_CALL,'+current_symbol_table[0].getVariable(p[1].place).datatype+'.'+p[3])
-  code.append('READ_STACK,' + t)
+
+
+  func_label = ClassTable[p[1].datatype].searchFunction(p[3])
+  if(func_label == None):
+    print("TYPE Check error, %s.%s function not defined"%(p[1].datatype, p[3]))
+    exit()
+
+  code.append('FUNC_PARAM,' + get_expression_place( p[1].place))
+  code.append('FUNC_CALL,'+func_label)
+  code.append('READ_STACK,' + get_expression_place( t))
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t, datatype=datatype,isArray=False)
 
@@ -1305,6 +1312,13 @@ def p_expression_objid_expression(p):
   
   p[0] = TREE.Expression(code=code,place=p[5].place, datatype=p[5].datatype)
 
+
+
+# def p_expression_self(p):
+#   'expression : SELF'
+#   rule.append(59)
+
+#   p[0] = TREE.Expression(code=[], place='self', datatype=currentClass[0])
 
 
 def p_error(p):

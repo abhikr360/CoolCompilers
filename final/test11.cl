@@ -8,6 +8,10 @@ class Randi{
 	diameter : Int;
 	customers : Int[5];
 	address : Kotha[4];
+
+	def printPrice : SELF_TYPE(self, a:Int){
+		out_int(self.price*a)
+	};
 };
 
 class Main{

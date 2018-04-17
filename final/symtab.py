@@ -22,6 +22,15 @@ class ClassObject:
 		print self.parent
 		print "size = " ,self.size
 
+	def searchFunction(self, func_name):
+		if(func_name in self.functions ):
+			return self.functions[func_name]
+		else:
+			if(parent == None or parent == -1):
+				return None
+			else:
+				return self.parent(searchFunction(func_name))
+
 
 class Variable:
 	"""docstring for Variable"""

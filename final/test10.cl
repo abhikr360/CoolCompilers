@@ -1,20 +1,59 @@
+class WHATSUP{
+   w1 : Int;
+   w2 : Int;
+   def printme : Int ( n: Int, m:Int, self : WHATSUP){
+      {
+         self.w1 <- n;
+         out_int(self.w2 + m);
+         out_int(self.w1);
+      }
+
+   };
+};
+
+class Fibonacci{
+   def fibonacci : Int (n : Int, self : Fibonacci){
+      {
+         if(n < 3) then
+            return n;
+         else
+            return self.fibonacci(n-1) + self.fibonacci(n-2);
+         fi;
+      }
+   };
+};
+
 class Main inherits IO {
-   n : Int [3];
-   m : Int [6];
-   (*def fib : Int (n: Int){
-      if n<3 then
-         return 1;
-      else
-         return fib(n-1)+fib(n-2) ;
-      
-      fi
-
-   }; *)
-
    def  main : SELF_TYPE () {
 
       {
-         (*for (i<-0 ; i<10 ; i<- i+1)loop
+         (*let a : WHATSUP  in
+         {
+            a<- new WHATSUP;
+            a.w2 <- 4;
+            a.printme(8, 12);
+         }
+         tel;*)
+
+
+         let f : Fibonacci, n : Int in 
+         {
+            f <- new Fibonacci;
+            n <- 3;
+            out_int(f.fibonacci(n));
+         }
+         tel;
+
+
+
+      }
+
+   };
+
+   
+};
+
+ (*for (i<-0 ; i<10 ; i<- i+1)loop
             out_int(i)
             {
                (*let var1 : Int <-10, var2 : Int<-9 in
@@ -29,29 +68,3 @@ class Main inherits IO {
             }
 
          pool;*)
-         m[0] <- 5;
-        m[1] <- 1;
-         m[2] <- 2;
-         m[3] <- 3;
-         m[4] <- 4;
-         m[5] <- 3;
-         let a : Int [4] in
-         {
-            a[m[m[5]]] <- m[1];
-            out_int(a[3]);
-         }
-         tel;
-
-         out_int(m[m[m[5]]]);
-
-
-
-
-
-      }
-
-   };
-
-   
-};
-
