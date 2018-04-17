@@ -150,10 +150,6 @@ def p_class_header_with_inheritance(p):
 
   currentClass[0]=p[2]
   code = ['LABEL,CLASS.'+p[2]]
-  if p[2] == 'Main' :
-    code.append('FUNC_START')
-    code.append('FUNC_CALL,Main.main')
-    code.append('EXIT')
   # if(p[2]=='Main'):
   #   pass
   # else:
@@ -167,10 +163,7 @@ def p_class_header(p):
   'class_header : CLASS CLASS_TYPE'
 
   code = ['LABEL,CLASS.' + p[2]]
-  if p[2] == 'Main' :
-    code.append('FUNC_START')
-    code.append('FUNC_CALL,Main.main')
-    code.append('EXIT')
+
 
   # if(p[2]=='Main'):
   #   pass
@@ -193,6 +186,12 @@ def p_class_body_empty(p):
 
 def p_class_body(p):
   'class_body : LBRACE features_list RBRACE'
+  if current_symbol_table[0].scope_name == 'Main':
+    if p[2] == 'Main' :
+      code.append('FUNC_START')
+      code.append('FUNC_CALL,Main.main')
+      code.append('EXIT')
+
   p[0] = TREE.Class(code=p[2].code)
 
 
@@ -282,7 +281,7 @@ def p_feature_body(p):
     code.append('EXIT')
   else:
     code.append('FUNC_RETURN')
-    
+
   p[0]=TREE.FeatureBody(code=code)
 
 

@@ -8,11 +8,11 @@ class Main
 			n1 <- m - l + 1;
 			n2 <- r - m;
 
-			let l : Int[5], r : Int[5], i : Int, j : Int, k : Int in 
+			let l1 : Int[5], r : Int[5], i : Int, j : Int, k : Int in 
 			{
 
 				for (i<-0; i<n1; i<-i+1) loop
-					l[i] <- arr[l+i]
+					l1[i] <- arr[l+i]
 				pool;
 
 				for (j<-0; j<n2; j<-j+1) loop
@@ -25,7 +25,7 @@ class Main
 
 				while (i < n1 and j < n2) loop
 				{
-					if (l[i] <= r[j]) then
+					if (l1[i] <= r[j]) then
 					{
 						arr[k] <- l[i];
 						i <- i+1;
@@ -42,7 +42,7 @@ class Main
 
 				while (i < n1) loop
 				{
-					arr[k] <- l[i];
+					arr[k] <- l1[i];
 					i <- i+1;
 					k <- k+1;
 				}
@@ -77,16 +77,6 @@ class Main
 		fi
 	};
 
-	def out_int : Int (a : Int)
-	{
-		1
-	};
-
-	def out_string : Int (a : Int)
-	{
-		1
-	};
-
 	def main : Int ()
 	{
 		{
@@ -102,7 +92,6 @@ class Main
 				for (i <- 0; i < 5; i <- i+1) loop
 				{
 					out_int(arr[i]);
-					out_string("\n");
 				}	
 				pool
 			tel;

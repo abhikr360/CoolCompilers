@@ -35,12 +35,6 @@ class Main{
 		out_int(a);
 
 		(khetan.customers)[0] <- 1;
-		(*(khetan.customers)[1] <- khetan.customers[0] + 1;
-		(khetan.customers)[2] <- khetan.customers[1] + 1;
-		(khetan.customers)[3] <- khetan.customers[2] + 1;
-		(khetan.customers)[4] <- khetan.customers[3] + 1;
-		khetan.price <- 11;*)
-
 
 		out_int(khetan.customers[0]);
 		khetan.numfucks <- 999;
