@@ -39,7 +39,7 @@ class Main inherits IO {
          let f : Fibonacci, n : Int in 
          {
             f <- new Fibonacci;
-            n <- 3;
+            n <- 15;
             out_int(f.fibonacci(n));
          }
          tel;

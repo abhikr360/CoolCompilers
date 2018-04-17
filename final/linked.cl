@@ -7,7 +7,13 @@ class Node{
 	};
 
 	def set_next : SELF_TYPE(next_node : Node, self : Node){
-		self.next <- next_node
+		{
+			self.next <- new Node;
+			self.next <- next_node;
+		}
+	};
+	def print_data : SELF_TYPE(self : Node){
+		out_int(self.data)
 	};
 };
 
@@ -20,22 +26,24 @@ class Main{
 
 	def main : Int (){
 		{
-			out_int(7);
+			
 			n <- 6;
 			no <- new Node;
-			list[0] <- new Node;
-			(*for (i <- 0;i<n;i<-i+1) loop
+			for (i <- 0;i<n;i<-i+1) loop
 			{
+				out_int(i);
 				list[i] <- new Node;
 				list[i].set_data(i);
 				if(i>0) then
 					list[i].set_next(list[i-1])
 				else
-					list[i].set_next(list[i-1])
+					1
 				fi;
+				list[i].print_data();
 				out_int(i);
+				
 			}
-			pool;*)
+			pool;
 
 		}
 	};

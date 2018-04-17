@@ -803,7 +803,8 @@ def main(SymbolTables):
 					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "sle $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "sgti $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in1
+						st.code_statement = st.code_statement + "sle $%s, $t7, %d\n"%(VariableData[st.out][1],VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "slei $%s, $%s, %d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
@@ -817,7 +818,8 @@ def main(SymbolTables):
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "slei $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sgti $%s, $%s, %d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in2
+						st.code_statement = st.code_statement + "sgt $%s, $%s, $t7\n"%(VariableData[st.out][1],VariableData[st.in1][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 > st.in2 else 0)
 					
@@ -880,7 +882,7 @@ def main(SymbolTables):
 				st.code_statement += "addiu $sp, $sp, -4\n"
 				st.code_statement += "sw $fp, ($sp)\n"
 
-				
+
 
 				# st.code_statement += "addiu $sp, $sp, -4\n" # Space for returning
 
@@ -984,7 +986,8 @@ def main(SymbolTables):
 			elif(st.instr_typ == InstrType.GOTO):
 				st.code_statement = st.code_statement + "j %s\n" % (st.jump_tagret)
 			elif(st.instr_typ == InstrType.PRINT_INT):
-				if(st.in2 == None):	
+				st.code_statement += "move $t9, $ra\n"
+				if(st.in2 == None):
 					if(st.in1_type ==EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "move $a0,$%s\n" % (VariableData[st.in1][1])
 						st.code_statement = st.code_statement + "jal print_int\n"
@@ -1009,7 +1012,11 @@ def main(SymbolTables):
 							# st.code_statement = st.code_statement + "lw "
 							st.code_statement = st.code_statement + "lw $a0,0($t8)\n" 
 							st.code_statement = st.code_statement + "jal print_int\n"
+				st.code_statement += "move $ra, $t9\n"
+
+
 			elif(st.instr_typ == InstrType.SCAN_INT):
+				st.code_statement += "move $t9, $ra\n"
 				if(st.in2 == None):	
 					if(st.in1_type ==EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "jal scan_int\n"
@@ -1031,7 +1038,8 @@ def main(SymbolTables):
 							st.code_statement = st.code_statement + "sll $t7, $t7, 2\n"
 							st.code_statement = st.code_statement + "add $t8, $%s, $t7\n"%(VariableData[st.in1][1])
 							# st.code_statement = st.code_statement + "lw "
-							st.code_statement = st.code_statement + "sw $v0,0($t8)\n" 
+							st.code_statement = st.code_statement + "sw $v0,0($t8)\n"
+				st.code_statement += "move $ra, $t9\n"
 	
 			elif(st.instr_typ == InstrType.EXIT):
 				st.code_statement = st.code_statement + "jal exit_func\n"
