@@ -159,6 +159,7 @@ def p_class_header_with_inheritance(p):
   ClassTable[p[2]].variables = deepcopy(ClassTable[p[4]].variables)
   ClassTable[p[2]].size = ClassTable[p[4]].size
   ClassTable[p[2]].parentprivatevariables = ClassTable[p[4]].private[:]
+  ClassTable[p[2]].parentprivatevariables.extend(ClassTable[p[4]].parentprivatevariables)
   ClassTable[p[2]].privateFunctions = ClassTable[p[4]].privateFunctions[:]
 
 
@@ -538,6 +539,7 @@ def p_expression_assign_arr(p):
   rule.append(39)
   var = current_symbol_table[0].getVariable(p[1].place)
  
+
 
   if(p[3].datatype <> 'Int'):
     sys.exit('Array index should be ineteger not '+p[3].datatype)
@@ -953,6 +955,7 @@ def p_expression_arr(p):
   'expression : expression LSQRBRACKET expression RSQRBRACKET'
   rule.append(61)
   var = current_symbol_table[0].getVariable(p[1].place)
+
 
   t = newtemp(p[1].datatype)
   

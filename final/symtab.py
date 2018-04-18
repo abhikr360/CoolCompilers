@@ -19,13 +19,14 @@ class ClassObject:
 		self.parent = None
 		self.size = 0
 	def printClass(self):
-		print self.name
-		print self.variables
-		print self.private
-		print self.functions
-		print self.privateFunctions
-		print self.parent
-		print "size = " ,self.size
+		print ('name', self.name)
+		print ('variables', self.variables)
+		print ('private variables', self.private)
+		print ('parentprivatevariables', self.parentprivatevariables)
+		print ('functions', self.functions)
+		print ('private funtions', self.privateFunctions)
+		print ('parent', self.parent)
+		print ( 'size =' ,self.size)
 
 	def searchFunction(self, func_name):
 		if(func_name in self.functions ):
