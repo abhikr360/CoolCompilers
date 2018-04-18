@@ -142,7 +142,7 @@ def p_class_header_body(p):
 def p_class_header_with_inheritance(p):
   'class_header : CLASS CLASS_TYPE INHERITS CLASS_TYPE'
 
-  new_sym_tab = Symtab(parent=p[4], symtab_type="CLASS", scope_name=p[2])
+  new_sym_tab = Symtab(parent=ClassDict[p[4]], symtab_type="CLASS", scope_name=p[2])
   ClassDict[p[2]] = new_sym_tab
   SymbolTables.append(new_sym_tab)
   current_symbol_table[0] = new_sym_tab
@@ -1023,6 +1023,9 @@ def p_expression_function_call_with_arguments(p):
   code.append('FUNC_PARAM,' + get_expression_place(p[1].place))
   code.append('FUNC_CALL,'+func_label)
   code.append('READ_STACK,' + get_expression_place(t))
+
+  # print "@@1", ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype]
+
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t,datatype=datatype,isArray=False)
 
@@ -1126,20 +1129,38 @@ def p_expression_at_function_with_arguments(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN argument_list RPAREN'
   rule.append(74)
   t=newtemp()
-
   code = p[1].code
   code.extend(p[7].code)
-  code=['to handle AT']
-  p[0] = TREE.Expression(code=code,place=t)
+  func_label = ClassTable[p[3]].searchFunction(p[5])
+  if(func_label == None):
+    print("TYPE Check error, %s.%s function not defined"%(p[1].datatype, p[3]))
+    exit()
+
+  code.append('FUNC_PARAM,' + get_expression_place(p[1].place))
+  code.append('FUNC_CALL,'+func_label)
+  code.append('READ_STACK,' + get_expression_place(t))
+
+  datatype = (ClassDict[p[3]].getMethod(p[5])).datatype
+  p[0] = TREE.Expression(code=code,place=t,datatype=datatype,isArray=False)
 
 def p_expression_at_function(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN'
   rule.append(75)
 
   t=newtemp()
-  ode = p[1].code
-  code=['to handle AT']
-  p[0] = TREE.Expression(code=code,place=t)
+  code = p[1].code
+  # code.extend(p[7].code)
+  func_label = ClassTable[p[3]].searchFunction(p[5])
+  if(func_label == None):
+    print("TYPE Check error, %s.%s function not defined"%(p[1].datatype, p[3]))
+    exit()
+
+  code.append('FUNC_PARAM,' + get_expression_place(p[1].place))
+  code.append('FUNC_CALL,'+func_label)
+  code.append('READ_STACK,' + get_expression_place(t))
+
+  datatype = (ClassDict[p[3]].getMethod(p[5])).datatype
+  p[0] = TREE.Expression(code=code,place=t,datatype=datatype,isArray=False)
 
 
 def p_expression_if_then_else(p):
