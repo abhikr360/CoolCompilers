@@ -515,7 +515,7 @@ def UpdateVariableData(statement,block):
 
 			if(l.scope == Scope.LOCAL):
 				if(l.isArray==True):
-					statement.code_statement = statement.code_statement + "la $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
+					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
 				else:
 					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
 			else:
@@ -550,7 +550,7 @@ def UpdateVariableData(statement,block):
 			# else:
 			if(l.scope == Scope.LOCAL):
 				if(l.isArray==True):
-					statement.code_statement = statement.code_statement + "la $%s, -%d($fp)\n"%(VariableData[statement.out][1], VariableData[statement.out][0])
+					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.out][1], VariableData[statement.out][0])
 				else:
 					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n" % (register, VariableData[statement.out][0])
 			else:
@@ -784,6 +784,7 @@ def main(SymbolTables):
 						st.code_statement += "sw $t7, -%d($fp)\n"%(readingfromstack[0]+4)
 						st.code_statement += "move $%s, $t7\n"%(VariableData[st.out][1])
 						readingfromstack[0] += 4
+						VariableData[st.out][0] = readingfromstack[0]
 					# st.code_statement = st.code_statement + "lw $%s, ($sp)\n"%(VariableData[st.out][1])
 
 
@@ -980,7 +981,7 @@ def main(SymbolTables):
 					temp_instr = "li $t7,%d\n" % st.in1
 					temp_instr = temp_instr + "li $t8,%d\n" % st.in2
 					branch_instr = temp_instr + branch_instr + " $t7,$t8,%s\n" % (st.jump_tagret)
-					
+
 				st.code_statement = st.code_statement + branch_instr
 
 

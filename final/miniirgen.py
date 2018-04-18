@@ -773,6 +773,7 @@ def p_expression_lteq(p):
   if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool']):
     sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
   if(p[1].isArray or p[3].isArray):
+    print "I am here"
     sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
 
   t = newtemp()
@@ -1111,6 +1112,7 @@ def p_let_expression(p):
 
   code = p[1].code
   code.extend(p[2].code)
+
   code.extend(p[4].code)
   code.append('LABEL,LET_OVER_'+str(p[1].let_id))
   p[0] = TREE.Let(code = code, datatype=p[4].datatype)
@@ -1243,7 +1245,8 @@ def p_formaldehyde_with_assign_many(p):
 def p_formaldehyde_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type'
   # rule.append(32)
-  p[0]=TREE.Formal(code=[])
+  code = p[1].code
+  p[0]=TREE.Formal(code=code)
   # quit()
   if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
@@ -1258,7 +1261,8 @@ def p_formaldehyde_arr_many(p):
   # rule.append(33)
   current_symbol_table[0].enter(name= p[3],changed_name=current_symbol_table[0].scope_name +'.' +p[3],datatype=p[5].place, size=4*int(p[7].place), isArray =True)
 
-  code=p[7].code
+  code = p[1].code
+  code.extend(p[7].code)
   code.append('ALLOCATE,' + current_symbol_table[0].scope_name + '.' + p[3] + ',' + get_expression_place(p[7].place))
   p[0]=TREE.Formal(code=code)
   if p[5].place in ClassDict or p[5].place in basicDataType:
