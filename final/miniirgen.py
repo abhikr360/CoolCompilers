@@ -509,8 +509,8 @@ def p_expression_assign(p):
   else:
   	expression_place = p[3].place
 
-  s = 'ASSIGN,' + get_expression_place(p[1]) +',' + get_expression_place(p[3].place)
-  code.append(s)
+
+  code.append('ASSIGN,' + get_expression_place(p[1]) +',' + get_expression_place(p[3].place))
   p[0] = TREE.Expression(code=code, datatype=p[3].datatype,place=p[3].place)
 
 def p_expression_assign_arr(p):
@@ -535,7 +535,7 @@ def p_expression_assign_arr(p):
 def p_expression_outint(p):
   'expression : OUT_INT LPAREN expression RPAREN'
   code = p[3].code
-  if p[3].datatype <> 'Int':
+  if p[3].datatype not in  ['Int','Bool']:
     sys.exit("Type Check Error : out_int takes integer")
   code.append('PRINT_INT,'+get_expression_place(p[3].place))
   p[0]=TREE.FunctionCall(code=code)
@@ -545,7 +545,8 @@ def p_expression_outstring(p):
   code = p[3].code
   if p[3].datatype <> 'String':
     sys.exit("Type Check Error : out_string takes string")
-  code.append('PRINT_STRING,'+get_expression_place(p[3].place))
+  code.append('SPACE')
+  # code.append('PRINT_STRING,'+get_expression_place(p[3].place))
   p[0]=TREE.FunctionCall(code=code)
 
 def p_expression_scanint(p):
@@ -577,8 +578,8 @@ def p_expression_function_call_with_arguments_2(p):
 
 
   # else:
-  print p[1]
-  print current_symbol_table[0].printsymtab()
+  # print p[1]
+  # print current_symbol_table[0].printsymtab()
 
   met = current_symbol_table[0].getMethod(p[1])
 
@@ -821,7 +822,7 @@ def p_expression_equal(p):
   rule.append(53)
   
   if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool']):
-    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool/Int Type")
 
   if(p[1].isArray or p[3].isArray):
     sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
@@ -846,7 +847,7 @@ def p_expression_or(p):
   'expression : expression OR expression'
   rule.append(54)
   if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Bool'):
-    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool/Int Type")
   
 
 
@@ -954,7 +955,7 @@ def p_expression_arr(p):
   code = p[1].code
   code.extend(p[3].code)
   code.append('INDEX_ASSIGN_R,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
-
+  # print code
   p[0] = TREE.Expression(place = t, code = code, datatype=var.datatype,isArray=False)
 
 
@@ -1037,8 +1038,8 @@ def p_expression_function_call(p):
     print("TYPE Check error, %s.%s function not defined"%(p[1].datatype, p[3]))
     exit()
 
-  code.append('FUNC_PARAM,' + get_expression_place( p[1].place))
   code.append('FUNC_START')
+  code.append('FUNC_PARAM,' + get_expression_place( p[1].place))
   code.append('FUNC_CALL,'+func_label)
   code.append('READ_STACK,' + get_expression_place( t))
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
@@ -1074,10 +1075,15 @@ def p_expression_new(p):
 def p_expression_isvoid(p):
   'expression : ISVOID expression'
   rule.append(71)
-  t=newtemp()
-  code = ['FUNC_CALL,isvoid']
-  code.append('READ_STACK,' + t)
-  p[0] = TREE.Expression(code=code,place=t, datatype='isvoid')
+  # t=newtemp()
+  # code = ['FUNC_CALL,isvoid']
+  # code.append('READ_STACK,' + t)
+  # p[0] = TREE.Expression(code=code,place=t, datatype='isvoid')
+  code = p[2].code
+  t = newtemp()
+  code.append('EQUALS,'+get_expression_place(t)+',0,'+get_expression_place(p[2].place))
+  p[0] = TREE.Expression(code=code,place=t, datatype='Bool')
+
 
 def p_expression_let_expression(p):
   'expression : let_expression'
@@ -1302,7 +1308,7 @@ def p_formaldehyde_arr(p):
     sys.exit('No object found named ' + p[3].place)
 
 
-  print(p[1])
+  # print(p[1])
   current_symbol_table[0].enter(name=p[1],changed_name=current_symbol_table[0].scope_name +'.' +p[1],datatype=p[3].place,size=4, isArray =True)
 
 
@@ -1325,11 +1331,14 @@ def p_expression_objid(p):
 def p_expression_objid_expression(p):
   'expression : expression PERIOD ID GETS expression'
 
-  code = p[5].code
+  code = p[1].code
+  code.extend(p[5].code)
   offset = ClassTable[ p[1].datatype ].variables[p[3]]
   code.append('INDEX_ASSIGN_L,'+ get_expression_place(p[1].place) +','+str(offset)+','+get_expression_place(p[5].place))
   
   p[0] = TREE.Expression(code=code,place=p[5].place, datatype=p[5].datatype)
+
+
 
 
 

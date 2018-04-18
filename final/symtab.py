@@ -85,7 +85,7 @@ class Symtab:
 			for variable_entry in current_sym_tab.variables:
 				if(variable_entry.name == name):
 					return variable_entry
-			current_sym_tab.printsymtab()
+			# current_sym_tab.printsymtab()
 			current_sym_tab = current_sym_tab.parent
 		if(is_int(name)):
 			return None

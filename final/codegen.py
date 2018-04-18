@@ -971,7 +971,7 @@ def main(SymbolTables):
 
 
 			elif(st.instr_typ == InstrType.IFFALSE ):
-				branch_instr = "blt"
+				branch_instr = "ble"
 
 				if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
 					temp_instr = "li $t7,%d\n" % st.in2
@@ -980,6 +980,8 @@ def main(SymbolTables):
 					temp_instr = "li $t7,%d\n" % st.in1
 					temp_instr = temp_instr + "li $t8,%d\n" % st.in2
 					branch_instr = temp_instr + branch_instr + " $t7,$t8,%s\n" % (st.jump_tagret)
+					
+				st.code_statement = st.code_statement + branch_instr
 
 
 
@@ -1044,7 +1046,7 @@ def main(SymbolTables):
 			elif(st.instr_typ == InstrType.EXIT):
 				st.code_statement = st.code_statement + "jal exit_func\n"
 			elif(st.instr_typ == InstrType.SPACE):
-				st.code_statement = st.code_statement + "jal space_func\n"
+				st.code_statement = st.code_statement + "move $t9,$ra\njal space_func\nmove $ra,$t9\n"
 
 			elif(st.instr_typ == InstrType.ALLOCATE):
 				st.code_statement += "li $v0, 9\n"
