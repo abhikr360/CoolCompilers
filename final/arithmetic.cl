@@ -60,14 +60,14 @@ class Arith
 
 };
 
-class Main inherits IO {
+class Main{
    n : Int <- 10000;
    m : Int <- 10;
    arith : Arith <- new Arith;
 
    def  main : SELF_TYPE () {
          {
-            out_int(arith.add(n, m));
+            out_int(arith.power(n, m));
             let k : Int in 
             {
                scan_int(k);

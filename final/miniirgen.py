@@ -6,7 +6,7 @@ from lexer import tokens
 import tree as TREE
 from symtab import *
 from codegen import main
-
+from copy import deepcopy
 
 precedence = (
         ('right', 'GETS'),
@@ -142,23 +142,24 @@ def p_class_header_body(p):
 def p_class_header_with_inheritance(p):
   'class_header : CLASS CLASS_TYPE INHERITS CLASS_TYPE'
 
-  new_sym_tab = Symtab(parent=None, symtab_type="CLASS", scope_name=p[2])
+  new_sym_tab = Symtab(parent=p[4], symtab_type="CLASS", scope_name=p[2])
   ClassDict[p[2]] = new_sym_tab
   SymbolTables.append(new_sym_tab)
   current_symbol_table[0] = new_sym_tab
 
   ClassTable[p[2]] = ClassObject(p[2])
-  ClassTable[p[2]].parent = p[4]
+  ClassTable[p[2]].parent = ClassTable[p[4]]
+
+
 
   currentClass[0]=p[2]
-  code = ['LABEL,CLASS.'+p[2]]
-  # if(p[2]=='Main'):
-  #   pass
-  # else:
-  #   code=["Class header code here with inheritance"]
+
+  ClassTable[p[2]].variables = deepcopy(ClassTable[p[4]].variables)
+  # ClassTable[p[2]].functions = deepcopy(ClassTable[p[4]].functions)
+  ClassTable[p[2]].size = ClassTable[p[4]].size
 
 
-  p[0] = TREE.ClassHeader(code=code)
+  p[0] = TREE.ClassHeader(code=[])
 
 
 def p_class_header(p):
@@ -166,11 +167,6 @@ def p_class_header(p):
 
   code = ['LABEL,CLASS.' + p[2]]
 
-
-  # if(p[2]=='Main'):
-  #   pass
-  # else:
-  #   code=["Class header code here without inheritance"]
 
   p[0] = TREE.ClassHeader(code=code)
 
@@ -402,7 +398,7 @@ def p_formal_parameter_arr(p):
     sys.exit('No object found named ' + p[3].place)
 
 
-  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[5].place, size=4*1000, isArray=True)
+  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[5].place, size=4, isArray=True)
 
 
 def p_formal_with_assign(p):
@@ -581,7 +577,11 @@ def p_expression_function_call_with_arguments_2(p):
 
 
   # else:
+  print p[1]
+  print current_symbol_table[0].printsymtab()
+
   met = current_symbol_table[0].getMethod(p[1])
+
   
   t = newtemp()
 
@@ -589,7 +589,7 @@ def p_expression_function_call_with_arguments_2(p):
   code.append('FUNC_CALL,'+met.parent_class + '.' + p[1])
   code.append('READ_STACK,' + get_expression_place(t))
   datatype = met.datatype
-  p[0]=TREE.FunctionCall(code=code, datatype=datatype, place=get_expression_place(t))
+  p[0]=TREE.FunctionCall(code=code, datatype=datatype, place=t)
 
 
 def p_expression_function_call_2(p):
@@ -601,7 +601,7 @@ def p_expression_function_call_2(p):
   code = ['FUNC_CALL,'+met.parent_class +'.'+p[1]]
   code.append('READ_STACK,'+get_expression_place(t))
   datatype = met.datatype
-  p[0] = TREE.Expression(code=code,place=get_expression_place(t), datatype=datatype)
+  p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
 
 
 def p_argument_list(p):
@@ -648,8 +648,9 @@ def p_expression_plus(p):
   code.extend(p[3].code)
   code.append('ADD,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
-  p[0] = TREE.Expression(place = get_expression_place(t), code = code, datatype = p[1].datatype)
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
+  # print(code)
 
 
 
@@ -666,7 +667,7 @@ def p_expression_minus(p):
   code.extend(p[3].code)
   code.append('SUB,' + get_expression_place(t) + ',' +  get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
-  p[0] = TREE.Expression(place = get_expression_place(t), code = code, datatype = p[1].datatype)
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
 def p_expression_times(p):
   'expression : expression TIMES expression'
@@ -696,7 +697,7 @@ def p_expression_divide(p):
   code.extend(p[3].code)
   code.append('DIV,' + get_expression_place(t) + ',' +  get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
-  p[0] = TREE.Expression(place = get_expression_place(t), code = code, datatype = p[1].datatype)
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
 def p_expression_mod(p):
   'expression : expression MOD expression'
@@ -711,7 +712,7 @@ def p_expression_mod(p):
   code.extend(p[3].code)
   code.append('MOD,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
-  p[0] = TREE.Expression(place = get_expression_place(t), code = code, datatype = p[1].datatype)
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
 def p_expression_lt(p):
   'expression : expression LT expression'
@@ -994,6 +995,7 @@ def p_expression_return(p):
   	sys.exit("return type doesnot match for fucntion "+ func)
   changed_name = p[2].place
   if(p[2].datatype=='Int'):
+    # print("@@", p[2].place)
     if(current_symbol_table[0].getVariable(p[2].place)):
       changed_name = current_symbol_table[0].getVariable(p[2].place).parent_scope_name+'.'+p[2].place
   code = p[2].code

@@ -79,7 +79,7 @@
    
 };*)
 
-class Main inherits IO {
+class Main {
    n : Int <- 4;
    m : Int <- 1;
    def fact : Int (n: Int, m: Int){

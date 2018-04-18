@@ -26,10 +26,10 @@ class ClassObject:
 		if(func_name in self.functions ):
 			return self.functions[func_name]
 		else:
-			if(parent == None or parent == -1):
+			if(self.parent == None or self.parent == -1):
 				return None
 			else:
-				return self.parent(searchFunction(func_name))
+				return self.parent.searchFunction(func_name)
 
 
 class Variable:
@@ -79,11 +79,13 @@ class Symtab:
 		# name = self.scope_name + '.' + name
 		current_sym_tab = self
 
+
+
 		while current_sym_tab <> None:
 			for variable_entry in current_sym_tab.variables:
 				if(variable_entry.name == name):
 					return variable_entry
-
+			current_sym_tab.printsymtab()
 			current_sym_tab = current_sym_tab.parent
 		if(is_int(name)):
 			return None
