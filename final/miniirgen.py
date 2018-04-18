@@ -598,7 +598,9 @@ def p_expression_function_call_2(p):
   met = current_symbol_table[0].getMethod(p[1])
 
   t=newtemp()
-  code = ['FUNC_CALL,'+met.parent_class +'.'+p[1]]
+
+  code = ['FUNC_START']
+  code.append('FUNC_CALL,'+met.parent_class +'.'+p[1])
   code.append('READ_STACK,'+get_expression_place(t))
   datatype = met.datatype
   p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
@@ -1036,6 +1038,7 @@ def p_expression_function_call(p):
     exit()
 
   code.append('FUNC_PARAM,' + get_expression_place( p[1].place))
+  code.append('FUNC_START')
   code.append('FUNC_CALL,'+func_label)
   code.append('READ_STACK,' + get_expression_place( t))
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
