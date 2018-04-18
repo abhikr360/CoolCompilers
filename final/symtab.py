@@ -96,7 +96,9 @@ class Symtab:
 		current_sym_tab = self
 
 		while current_sym_tab <> None:
+			print current_sym_tab, "--------------------------------------1"
 			for method_entry in current_sym_tab.methods:
+				print current_sym_tab, "--------------------------------------"
 				if(method_entry.name == name):
 					return method_entry
 
