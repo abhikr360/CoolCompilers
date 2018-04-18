@@ -12,13 +12,18 @@ class ClassObject:
 	def __init__(self,name):
 		self.name = name
 		self.variables = {}
+		self.private = []
+		self.parentprivatevariables=[]
 		self.functions = {}
+		self.privateFunctions=[]
 		self.parent = None
 		self.size = 0
 	def printClass(self):
 		print self.name
 		print self.variables
+		print self.private
 		print self.functions
+		print self.privateFunctions
 		print self.parent
 		print "size = " ,self.size
 
@@ -96,9 +101,7 @@ class Symtab:
 		current_sym_tab = self
 
 		while current_sym_tab <> None:
-			print current_sym_tab, "--------------------------------------1"
 			for method_entry in current_sym_tab.methods:
-				print current_sym_tab, "--------------------------------------"
 				if(method_entry.name == name):
 					return method_entry
 
