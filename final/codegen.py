@@ -18,9 +18,9 @@ NextUse={}
 
 UsableRegistersTemp = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0}
 UsableRegistersGlobal = {'s0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
-UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 't6' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
+UsableRegisters = {'t0' : 0, 't1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0, 's0' : 0, 's1' : 0, 's2' : 0, 's3' : 0, 's4' : 0, 's5' : 0, 's6' : 0}
 
-TempRegisters = {'t7' : 0, 't8' : 0, 't9' : 0}
+TempRegisters = {'$t6' : 0,'t7' : 0, 't8' : 0, 't9' : 0}
 VariableData = {}
 block_codes = {}
 
@@ -66,6 +66,8 @@ class InstrType(Enum):
 	POP_STACK=19
 	RETURN=20
 	ALLOCATE=21
+	READ_FILE=22
+	WRITE_FILE=23
 
 
 class EntryType(Enum):
@@ -318,8 +320,33 @@ def set_inputs(row, curr_statement):
 			curr_statement.in1 = row[3]
 			curr_statement.in1_type = EntryType.VARIABLE
 
+	elif(curr_statement.instr_typ == InstrType.READ_FILE):
+		curr_statement.out = row[2]
+		curr_statement.out_type = EntryType.VARIABLE
+
+		if(is_string(row[3])):
+			curr_statement.in1 = row[3]
+			curr_statement.in1_type = EntryType.STRING
+		else:
+			curr_statement.in1 = row[3]
+			curr_statement.in1_type = EntryType.VARIABLE
 
 
+	elif(curr_statement.instr_typ == InstrType.WRITE_FILE):
+
+		if(is_string(row[2])):
+			curr_statement.in1 = row[2]
+			curr_statement.in1_type = EntryType.STRING
+		else:
+			curr_statement.in1 = row[2]
+			curr_statement.in1_type = EntryType.VARIABLE
+
+		if(is_string(row[3])):
+			curr_statement.in2 = row[3]
+			curr_statement.in2_type = EntryType.STRING
+		else:
+			curr_statement.in2 = row[3]
+			curr_statement.in2_type = EntryType.VARIABLE
 
 
 	#-------------------row 2 end -------------------
@@ -729,6 +756,14 @@ def main(SymbolTables, StringDict):
 	exit_func="exit_func:\nli $v0,10\nsyscall\n"
 	space_func="space_func:\nla $a0, space\nli $v0, 4\nsyscall\njr $ra\n"
 
+	file_open_func="file_open:\nli $v0, 13\nli $a2, 0\nsyscall\nmove $t8, $v0\njr $ra\n"
+	file_read_func="file_read:\nli $v0, 14\nmove $a0, $t8\nli $a2, 100\nsyscall\njr $ra\n"
+	file_close_func="file_close:\nli $v0, 16\nmove $a0, $t8\nsyscall\njr $ra\n"
+
+	file_write_func="file_write:\nli $v0, 15\nmove $a0, $t8\nmove $t6, $ra\njal strlen\nmove $ra, $t6\nsyscall\njr $ra\n"
+
+	strlen_func="strlen:\nmove $a3, $a1\nli $a2, 0\nj strlen.test\nstrlen.loop:\naddi $a3, $a3, 1\naddi $a2, $a2, 1\nstrlen.test:\nlb $t7, 0($a3)\nbnez $t7, strlen.loop\njr $ra\n"
+
 # ---------------------------------------------------------------Translation -----------------------------
 	prevst = None
 	curMethod = None
@@ -1041,6 +1076,59 @@ def main(SymbolTables, StringDict):
 
 			elif(st.instr_typ == InstrType.GOTO):
 				st.code_statement = st.code_statement + "j %s\n" % (st.jump_tagret)
+
+
+			elif(st.instr_typ == InstrType.READ_FILE):
+				st.code_statement += "move $t9, $ra\n"
+				st.code_statement += "li $a1, 0\n"
+
+
+				if(st.in1_type == EntryType.VARIABLE):
+					st.code_statement += "move $a0,$%s\n" % (VariableData[st.in1][1])
+					st.code_statement += "jal file_open\n"
+					st.code_statement += "move $a0, $t8\n"
+					st.code_statement += "move $a1, $%s\n"%(VariableData[st.out][1])
+					st.code_statement += "jal file_read\n"
+					st.code_statement += "jal file_close\n"
+
+				elif(st.in1_type == EntryType.STRING):
+					st.code_statement += "la $a0,%s\n" % searchString(StringDict, st.in1)
+					st.code_statement += "jal file_open\n"
+					st.code_statement += "move $a0, $t8\n"
+					st.code_statement += "move $a1, $%s\n"%(VariableData[st.out][1])
+					st.code_statement += "jal file_read\n"
+					st.code_statement += "jal file_close\n"
+
+
+				st.code_statement += "move $ra, $t9\n"
+
+			elif(st.instr_typ == InstrType.WRITE_FILE):
+				st.code_statement += "move $t9, $ra\n"
+				st.code_statement += "li $a1, 1\n"
+
+				if(st.in1_type == EntryType.VARIABLE):
+					st.code_statement += "move $a0,$%s\n" % (VariableData[st.in1][1])
+					st.code_statement += "jal file_open\n"
+					st.code_statement += "move $a0, $t8\n"
+					
+
+				elif(st.in1_type == EntryType.STRING):
+					st.code_statement += "la $a0,%s\n" % searchString(StringDict, st.in1)
+					st.code_statement += "jal file_open\n"
+					st.code_statement += "move $a0, $t8\n"
+
+				if(st.in2_type == EntryType.VARIABLE):
+					st.code_statement += "move $a1, $%s\n"%(VariableData[st.in2][1])
+					st.code_statement += "jal file_write\n"
+					st.code_statement += "jal file_close\n"
+
+				if(st.in2_type == EntryType.STRING):
+					st.code_statement += "la $a1, %s\n"%searchString(StringDict,st.in2)
+					st.code_statement += "jal file_write\n"
+					st.code_statement += "jal file_close\n"
+
+				st.code_statement += "move $ra, $t9\n"
+
 			elif(st.instr_typ == InstrType.PRINT_INT):
 				st.code_statement += "move $t9, $ra\n"
 				if(st.in2 == None):
@@ -1183,6 +1271,11 @@ def main(SymbolTables, StringDict):
 	assemblyfile.write(space_func)
 	assemblyfile.write(print_string_func)
 	assemblyfile.write(scan_string_func)
+	assemblyfile.write(file_open_func)
+	assemblyfile.write(file_read_func)
+	assemblyfile.write(file_close_func)
+	assemblyfile.write(file_write_func)
+	assemblyfile.write(strlen_func)
 
 	
 
