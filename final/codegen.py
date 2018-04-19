@@ -90,6 +90,8 @@ class Operator(Enum):
 	DIV = 10
 	MOD = 11
 	READ_STACK=12
+	BITWISEAND=13
+	BITWISEOR=14
 
 class statement:
 	''' A instruction in three address code'''
@@ -115,7 +117,7 @@ def set_inputs(row, curr_statement):
 	'''Reads input stores it in a list of classes'''
 	curr_statement.linenum = int(row[0])
 	#------------------------------------------------
-	assign_list = ["LESS_THAN", "GREATER_THAN", "LESS_THAN_EQUALS", "GREATER_THAN_EQUALS", "EQUALS", "NOT_EQUALS", "ADD", "SUB", "MUL", "DIV", "MOD", "READ_STACK"]
+	assign_list = ["LESS_THAN", "GREATER_THAN", "LESS_THAN_EQUALS", "GREATER_THAN_EQUALS", "EQUALS", "NOT_EQUALS", "ADD", "SUB", "MUL", "DIV", "MOD", "READ_STACK", "BITWISEAND","BITWISEOR"]
 	if(row[1] == "ASSIGN" or row[1] in assign_list):
 		curr_statement.instr_typ = InstrType.ASSIGN
 		if(row[1] in assign_list):
@@ -868,6 +870,25 @@ def main(SymbolTables, StringDict):
 						readingfromstack[0] += 4
 						VariableData[st.out][0] = readingfromstack[0]
 					# st.code_statement = st.code_statement + "lw $%s, ($sp)\n"%(VariableData[st.out][1])
+				elif(st.operator == Operator.BITWISEAND):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "and $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "andi $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "andi $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 & st.in2)
+
+				elif(st.operator == Operator.BITWISEOR):
+					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "or $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
+					elif(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "ori $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.VARIABLE):
+						st.code_statement = st.code_statement + "ori $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+					elif(st.in1_type == EntryType.INTEGER and st.in2_type == EntryType.INTEGER):
+						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1 | st.in2)
 
 
 

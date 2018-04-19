@@ -74,6 +74,8 @@ tokens = (
    'TIMES',
    'DIVIDE',
    'COMMA',
+   'BITWISEAND',
+   'BITWISEOR',
 
    # At
    'AT',
@@ -82,7 +84,7 @@ tokens = (
    'SCAN_INT',
    'SCAN_STRING',
    'READ_FILE',
-   'WRITE_FILE'
+   'WRITE_FILE',
 
    )
 # reserved Keyword
@@ -126,7 +128,7 @@ reserved = {
   'scan_int' : 'SCAN_INT',
   'scan_string' : 'SCAN_STRING',
   'read_file' : 'READ_FILE',
-  'write_file' : 'WRITE_FILE'
+  'write_file' : 'WRITE_FILE',
 
 }
 
@@ -154,6 +156,8 @@ t_GETS = r'<-'
 t_PERIOD = r'\.'
 t_COMMA = r','
 t_AT = r'@'
+t_BITWISEAND = r'&'
+t_BITWISEOR = r'\|'
 
 
 # A regular expression rule with some action code
