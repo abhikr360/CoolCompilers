@@ -1442,6 +1442,30 @@ def p_expression_objid_expression(p):
   p[0] = TREE.Expression(code=code,place=p[5].place, datatype=p[5].datatype)
 
 
+def p_read_file(p):
+  'expression : READ_FILE LPAREN ID COMMA expression RPAREN'
+
+  if(p[5].datatype != 'String'):
+    sys.exit('Invalid File name')
+
+
+  code = p[5].code
+  code.append('READ_FILE,' + get_expression_place(p[3]) + ',' + get_expression_place(p[5].place))
+  p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
+
+
+def p_write_file(p):
+  'expression : WRITE_FILE LPAREN expression COMMA expression RPAREN'
+
+  if(p[5].datatype != 'String'):
+    sys.exit('Invalid File name')
+
+  if(p[3].datatype != 'String'):
+    sys.exit('Can only write strings in file')
+
+  code = p[5].code
+  code.append('WRITE_FILE,' + get_expression_place(p[3].place) + ',' + get_expression_place(p[5].place))
+  p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
 
 
 

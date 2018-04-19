@@ -80,7 +80,9 @@ tokens = (
    'OUT_INT',
    'OUT_STRING',
    'SCAN_INT',
-   'SCAN_STRING'
+   'SCAN_STRING',
+   'READ_FILE',
+   'WRITE_FILE'
 
    )
 # reserved Keyword
@@ -122,7 +124,9 @@ reserved = {
   'out_int' : 'OUT_INT',
   'out_string' : 'OUT_STRING',
   'scan_int' : 'SCAN_INT',
-  'scan_string' : 'SCAN_STRING'
+  'scan_string' : 'SCAN_STRING',
+  'read_file' : 'READ_FILE',
+  'write_file' : 'WRITE_FILE'
 
 }
 

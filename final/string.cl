@@ -17,6 +17,16 @@ class Main
 	b : String;
 	c : Do <- new Do;
 
+	def len : Int(s : String)
+	{
+		{
+			let i : Int <- 0, temp : String <- s in
+			{
+				while (s > )
+			}tel;
+		}
+	};
+
 	def main : Int ()
 	{
 		{
