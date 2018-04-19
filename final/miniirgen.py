@@ -1055,7 +1055,7 @@ def p_expression_function_call_with_arguments(p):
 
   # if(p[3] == 'printdataSecure'):
   # exit()
-  if( p[3] in ClassTable[p[1].datatype].privateFunctions):
+  if( p[3] in ClassTable[p[1].datatype].privateFunctions and (currentClass[0] != p[1].datatype)):
     sys.exit("Call to private function......ERROR")
 
   t=newtemp()
@@ -1079,7 +1079,7 @@ def p_expression_function_call(p):
   rule.append(69)
   t=newtemp()
   
-  if( p[3] in ClassTable[p[1].datatype].privateFunctions ):
+  if( p[3] in ClassTable[p[1].datatype].privateFunctions and (currentClass[0] != p[1].datatype)):
     sys.exit("Call to private function......ERROR")
 
   code = p[1].code

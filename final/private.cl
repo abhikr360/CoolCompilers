@@ -55,6 +55,12 @@ class Shukla inherits Secure {
 
       }
    };
+
+   def alt : Int(self : Shukla){
+      {
+      self.printdata();
+      }
+   };
 };
 
 class Sec_course inherits Shukla{
@@ -84,8 +90,8 @@ class Main {
             nv <- new Shukla;
             obj.set(4,5);
             obj.woo();
-            out_int((obj.ll)[0]);
             out_int((obj.ii)[1]);
+            obj.alt();
 
          }tel;
       }
