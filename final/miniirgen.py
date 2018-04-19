@@ -650,7 +650,7 @@ def p_expression_function_call_with_arguments_2(p):
   code = p[3].code
   function_args = ClassTable[met.parent_class].function_parameters[p[1]]
   if function_args <> p[3].nargs:
-    sys.exit(met.name + " function takes %d"%met.nargs + " argument : Given %d"%p[3].nargs)
+    sys.exit(met.name + " function takes %d"%function_args + " argument : Given %d"%p[3].nargs)
   code.append('FUNC_CALL,'+met.parent_class + '.' + p[1])
   code.append('READ_STACK,' + get_expression_place(t))
   datatype = met.datatype
@@ -666,7 +666,7 @@ def p_expression_function_call_2(p):
 
   function_args = ClassTable[met.parent_class].function_parameters[p[1]]
   if function_args <> 0:
-    sys.exit(met.name + " function takes %d"%met.nargs + " argument : Given 0")
+    sys.exit(met.name + " function takes %d"%function_args + " argument : Given 0")
 
   code = ['FUNC_START']
   code.append('FUNC_CALL,'+met.parent_class +'.'+p[1])
@@ -1079,7 +1079,7 @@ def p_expression_function_call_with_arguments(p):
 
   # if(p[3] == 'printdataSecure'):
   # exit()
-  num = ClassTable[p[1].datatype].function_parameters[p[3]]
+  num = ClassTable[p[1].datatype].searchFunctionParameter(p[3])
   if p[5].nargs + 1 <> num:
     sys.exit(p[3] + " takes %d"%(num) + " argument, Given %d"%p[5].nargs)
   if p[1].datatype not in ClassDict:
@@ -1107,7 +1107,7 @@ def p_expression_function_call(p):
   'expression : expression PERIOD ID LPAREN RPAREN'
   rule.append(69)
   t=newtemp()
-  num = ClassTable[p[1].datatype].function_parameters[p[3]]
+  num = ClassTable[p[1].datatype].searchFunctionParameter(p[3])
   if 1 <> num:
     sys.exit(p[3] + " takes %d"%(num) + " argument, Given 1")
   
@@ -1210,7 +1210,13 @@ def p_expression_at_function_with_arguments(p):
   code.extend(p[7].code)
   func_label = ClassTable[p[3]].searchFunction(p[5])
 
-  if( p[5] in ClassTable[p[3].datatype].privateFunctions):
+  num = ClassTable[p[3]].searchFunctionParameter(p[5])
+
+  if p[7].nargs + 1 <> num:
+    sys.exit(p[5] + " takes %d"%num + " arguments Given %d"%p[7].nargs)
+
+  print p[3]
+  if( p[5] in ClassTable[p[3]].privateFunctions):
     sys.exit("Call to private function......ERROR")
 
   if(func_label == None):
@@ -1228,9 +1234,13 @@ def p_expression_at_function(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN'
   rule.append(75)
 
-  if( p[5] in ClassTable[p[3].datatype].privateFunctions):
+  if( p[5] in ClassTable[p[3]].privateFunctions):
     sys.exit("Call to private function......ERROR")
 
+  num = ClassTable[p[3]].searchFunctionParameter(p[5])
+
+  if 1 <> num:
+    sys.exit(p[5] + " takes %d"%num + " arguments Given 0")
 
   t=newtemp()
   code = p[1].code

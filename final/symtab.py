@@ -39,6 +39,15 @@ class ClassObject:
 			else:
 				return self.parent.searchFunction(func_name)
 
+	def searchFunctionParameter(self, func_name):
+		if(func_name in self.function_parameters ):
+			return self.function_parameters[func_name]
+		else:
+			if(self.parent == None or self.parent == -1):
+				return None
+			else:
+				return self.parent.searchFunctionParameter(func_name)
+
 
 class Variable:
 	"""docstring for Variable"""
