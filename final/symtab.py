@@ -12,15 +12,21 @@ class ClassObject:
 	def __init__(self,name):
 		self.name = name
 		self.variables = {}
+		self.private = []
+		self.parentprivatevariables=[]
 		self.functions = {}
+		self.privateFunctions=[]
 		self.parent = None
 		self.size = 0
 	def printClass(self):
-		print self.name
-		print self.variables
-		print self.functions
-		print self.parent
-		print "size = " ,self.size
+		print ('name', self.name)
+		print ('variables', self.variables)
+		print ('private variables', self.private)
+		print ('parentprivatevariables', self.parentprivatevariables)
+		print ('functions', self.functions)
+		print ('private funtions', self.privateFunctions)
+		print ('parent', self.parent)
+		print ( 'size =' ,self.size)
 
 	def searchFunction(self, func_name):
 		if(func_name in self.functions ):
@@ -96,9 +102,7 @@ class Symtab:
 		current_sym_tab = self
 
 		while current_sym_tab <> None:
-			print current_sym_tab, "--------------------------------------1"
 			for method_entry in current_sym_tab.methods:
-				print current_sym_tab, "--------------------------------------"
 				if(method_entry.name == name):
 					return method_entry
 

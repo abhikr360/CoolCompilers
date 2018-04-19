@@ -108,9 +108,10 @@ class BlockList:
 
 class Formal:
 	"""docstring for Formal"""
-	def __init__(self, code, datatype='Int'):
+	def __init__(self, code,name, datatype='Int'):
 		self.code = code
 		self.datatype = datatype
+		self.name = name
 		
 class FormalParameterList(object):
 	"""docstring for FormalParameterList"""
@@ -151,6 +152,12 @@ class Id:
 	"""docstring for Id"""
 	def __init__(self,place = ''):
 		self.place = place 
+
+class Modifier:
+	"""docstring for Modifier"""
+	def __init__(self, name):
+		self.name = name
+		
 
 		
 

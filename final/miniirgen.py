@@ -173,9 +173,13 @@ def p_class_header_with_inheritance(p):
 
   currentClass[0]=p[2]
 
+
+
   ClassTable[p[2]].variables = deepcopy(ClassTable[p[4]].variables)
-  # ClassTable[p[2]].functions = deepcopy(ClassTable[p[4]].functions)
   ClassTable[p[2]].size = ClassTable[p[4]].size
+  ClassTable[p[2]].parentprivatevariables = ClassTable[p[4]].private[:]
+  ClassTable[p[2]].parentprivatevariables.extend(ClassTable[p[4]].parentprivatevariables)
+  ClassTable[p[2]].privateFunctions = ClassTable[p[4]].privateFunctions[:]
 
 
   p[0] = TREE.ClassHeader(code=[])
@@ -235,6 +239,9 @@ def p_feature_header_body(p):
 
 def p_feature_header_with_modifier(p):
   'feature_header : DEF modifier ID COLON type'
+
+  if p[2].name == 'PRIVATE':
+    ClassTable[currentClass[0]].privateFunctions.append(p[3])
   code=[]
   if current_symbol_table[0].scope_name == 'Main':
     if(not flag[0]):
@@ -261,6 +268,9 @@ def p_feature_header(p):
       code.append('FUNC_CALL,Main.main')
       code.append('EXIT')
       flag[0]=1
+
+  if(p[2] in ClassTable[currentClass[0]].privateFunctions ):
+    ClassTable[currentClass[0]].privateFunctions.remove(p[2])
   code.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[2])
   p[0] = TREE.FeatureHeader(code=code, datatype=p[4].place)
 
@@ -305,7 +315,10 @@ def p_feature_modifier_formal(p):
   'feature : modifier formal'
   rule.append(17)
 
-  # modifier not implemented
+  if p[1].name == 'PRIVATE':
+    ClassTable[currentClass[0]].private.append(p[2].name)
+
+
   p[0] = TREE.Feature(code=p[2].code, datatype=p[2].datatype)
 
 def p_feature_formal(p):
@@ -318,13 +331,14 @@ def p_modifier_public(p):
   'modifier : PUBLIC'
   rule.append(19)
 
-  # modifier not implemented
+  p[0] = TREE.Modifier(name = 'PUBLIC')
+
 
 def p_modifier_private(p):
   'modifier : PRIVATE'
   rule.append(20)
+  p[0] = TREE.Modifier(name = 'PRIVATE')
 
-  # modifier not implemented
 
 
 def p_type_class_type(p):
@@ -432,7 +446,7 @@ def p_formal_with_assign(p):
     current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
   code.append('ASSIGN,%s,%s'%(get_expression_place(p[1]), get_expression_place(p[5].place)))
-  p[0]=TREE.Formal(code=code)
+  p[0]=TREE.Formal(code=code,name = p[1])
 
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
@@ -442,8 +456,11 @@ def p_formal_with_assign(p):
 
 
   if(current_symbol_table[0].scope_name in ClassTable):
-    ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size/4
-    ClassTable[current_symbol_table[0].scope_name].size += 4
+    if(p[1] in ClassTable[current_symbol_table[0].scope_name].variables):
+      sys.exit("Variable already present in ancestor")
+    else:
+      ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size/4
+      ClassTable[current_symbol_table[0].scope_name].size += 4
 
 
 def p_formal(p):
@@ -459,7 +476,7 @@ def p_formal(p):
   else:
     current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
-  p[0]=TREE.Formal(code=code)
+  p[0]=TREE.Formal(code=code,name = p[1])
 
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
@@ -469,8 +486,11 @@ def p_formal(p):
   # current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
   if(current_symbol_table[0].scope_name in ClassTable):
-    ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size/4
-    ClassTable[current_symbol_table[0].scope_name].size += 4
+    if(p[1] in ClassTable[current_symbol_table[0].scope_name].variables):
+      sys.exit("Variable already present in ancestor")
+    else:
+      ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size/4
+      ClassTable[current_symbol_table[0].scope_name].size += 4
 
 
 
@@ -483,7 +503,7 @@ def p_formal_arr(p):
   code = p[5].code
   code.append('ALLOCATE,' +current_symbol_table[0].scope_name + '.' + p[1] + ',' + p[5].place)
 
-  p[0]=TREE.Formal(code=code)
+  p[0]=TREE.Formal(code=code,name = p[1])
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
   else:
@@ -491,12 +511,13 @@ def p_formal_arr(p):
   current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name + '.' + p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
 
   if(current_symbol_table[0].scope_name in ClassTable):
-    ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size/4
-    ClassTable[current_symbol_table[0].scope_name].size += 4
+    if(p[1] in ClassTable[current_symbol_table[0].scope_name].variables):
+      sys.exit("Variable already present in ancestor")
+    else:
+      ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size/4
+      ClassTable[current_symbol_table[0].scope_name].size += 4
 
 
-#--------------------------------------------  Not DONE ----------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------
 
 def p_expression_block_expression(p):
   'expression : block_expression'
@@ -554,6 +575,7 @@ def p_expression_assign_arr(p):
   var = current_symbol_table[0].getVariable(p[1].place)
  
 
+
   if(p[3].datatype <> 'Int'):
     sys.exit('Array index should be ineteger not '+p[3].datatype)
 
@@ -604,18 +626,6 @@ def p_expression_function_call_with_arguments_2(p):
   'expression : ID LPAREN argument_list RPAREN'
   rule.append(40)
 
-  # if(p[1] == 'out_int'):
-  #   code = p[3].code
-  #   # code = []
-  #   code.append('PRINT_INT,' + get_expression_place(p[3].place))
-  #   p[0]=TREE.FunctionCall(code=code)
-
-
-
-  # else:
-  # print p[1]
-  # print current_symbol_table[0].printsymtab()
-
   met = current_symbol_table[0].getMethod(p[1])
 
   
@@ -653,7 +663,6 @@ def p_argument_list(p):
 		# expression_place = p[1].place
 
   code = p[1].code
-  # print current_symbol_table[0].scope_name
 
   code.append('FUNC_START')
   code.append('FUNC_PARAM,{}'.format(get_expression_place(p[1].place)))
@@ -688,7 +697,6 @@ def p_expression_plus(p):
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
 
-  # print(code)
 
 
 
@@ -808,7 +816,6 @@ def p_expression_lteq(p):
   if(p[1].datatype <> p[3].datatype or p[1].datatype not in  ['Int','Bool']):
     sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Bool Type")
   if(p[1].isArray or p[3].isArray):
-    print "I am here"
     sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
 
   t = newtemp()
@@ -984,14 +991,12 @@ def p_expression_arr(p):
   rule.append(61)
   var = current_symbol_table[0].getVariable(p[1].place)
 
-  # print p[1].datatype,p[1].place,var.datatype
-  # quit()
+
   t = newtemp(p[1].datatype)
   
   code = p[1].code
   code.extend(p[3].code)
   code.append('INDEX_ASSIGN_R,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
-  # print code
   p[0] = TREE.Expression(place = t, code = code, datatype=var.datatype,isArray=False)
 
 
@@ -1036,7 +1041,6 @@ def p_expression_return(p):
   	sys.exit("return type doesnot match for fucntion "+ func)
   changed_name = p[2].place
   if(p[2].datatype=='Int'):
-    # print("@@", p[2].place)
     if(current_symbol_table[0].getVariable(p[2].place)):
       changed_name = current_symbol_table[0].getVariable(p[2].place).parent_scope_name+'.'+p[2].place
   code = p[2].code
@@ -1048,6 +1052,11 @@ def p_expression_function_call_with_arguments(p):
   'expression : expression PERIOD ID LPAREN argument_list RPAREN'
   rule.append(68)
 
+
+  # if(p[3] == 'printdataSecure'):
+  # exit()
+  if( p[3] in ClassTable[p[1].datatype].privateFunctions):
+    sys.exit("Call to private function......ERROR")
 
   t=newtemp()
   code = p[1].code
@@ -1061,7 +1070,6 @@ def p_expression_function_call_with_arguments(p):
   code.append('FUNC_CALL,'+func_label)
   code.append('READ_STACK,' + get_expression_place(t))
 
-  # print "@@1", ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype]
 
   datatype = (ClassDict[current_symbol_table[0].getVariable(p[1].place).datatype].getMethod(p[3])).datatype
   p[0] = TREE.Expression(code=code,place=t,datatype=datatype,isArray=False)
@@ -1071,6 +1079,9 @@ def p_expression_function_call(p):
   rule.append(69)
   t=newtemp()
   
+  if( p[3] in ClassTable[p[1].datatype].privateFunctions ):
+    sys.exit("Call to private function......ERROR")
+
   code = p[1].code
 
 
@@ -1100,13 +1111,10 @@ def p_expression_new(p):
 
 
   size = ClassTable[p[2].place].size
-  # print ClassTable[p[2].place].variables
   code = ['ALLOCATE,' + get_expression_place(t) + ',' + str(size)]
   for name in ClassTable[p[2].place].variables:
     var = ClassDict[p[2].place].getVariable(name)
-    if var.isArray:# '''or var.datatype <> 'Int':'''
-      print var.size
-
+    if var.isArray:
       t2  = newtemp()
       code.append('ALLOCATE,%s,'%get_expression_place(t2) + str(var.size))
       code.append('INDEX_ASSIGN_L,%s,%d,%s'%(get_expression_place(t),ClassTable[p[2].place].variables[name],get_expression_place(t2)))
@@ -1169,6 +1177,10 @@ def p_expression_at_function_with_arguments(p):
   code = p[1].code
   code.extend(p[7].code)
   func_label = ClassTable[p[3]].searchFunction(p[5])
+
+  if( p[5] in ClassTable[p[3].datatype].privateFunctions):
+    sys.exit("Call to private function......ERROR")
+
   if(func_label == None):
     print("TYPE Check error, %s.%s function not defined"%(p[1].datatype, p[3]))
     exit()
@@ -1183,6 +1195,10 @@ def p_expression_at_function_with_arguments(p):
 def p_expression_at_function(p):
   'expression : expression AT CLASS_TYPE PERIOD ID LPAREN RPAREN'
   rule.append(75)
+
+  if( p[5] in ClassTable[p[3].datatype].privateFunctions):
+    sys.exit("Call to private function......ERROR")
+
 
   t=newtemp()
   code = p[1].code
@@ -1276,7 +1292,6 @@ def p_for(p):
   for i in range(len(code)):
     if(code[i]=='BREAK'):
       code[i]='GOTO,'+_pool
-      # sys.exit(_pool)
     elif(code[i]=='CONTINUE'):
       code[i]='GOTO,'+_loop
 
@@ -1296,7 +1311,7 @@ def p_formaldehyde_with_assign_many(p):
   else:
     sys.exit('No object found named ' + p[3].place)
 
-  p[0]=TREE.Formal(code=code)
+  p[0]=TREE.Formal(code=code, name = None)
 
 
 
@@ -1304,7 +1319,7 @@ def p_formaldehyde_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type'
   # rule.append(32)
   code = p[1].code
-  p[0]=TREE.Formal(code=code)
+  p[0]=TREE.Formal(code=code,name = None)
   # quit()
   if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
@@ -1322,7 +1337,7 @@ def p_formaldehyde_arr_many(p):
   code = p[1].code
   code.extend(p[7].code)
   code.append('ALLOCATE,' + current_symbol_table[0].scope_name + '.' + p[3] + ',' + get_expression_place(p[7].place))
-  p[0]=TREE.Formal(code=code)
+  p[0]=TREE.Formal(code=code,name = None)
   if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
   else:
@@ -1338,7 +1353,7 @@ def p_formaldehyde_with_assign(p):
   code = p[5].code
   code.append('ASSIGN,%s,%s'%(current_symbol_table[0].scope_name + '.'+p[1], get_expression_place(p[5].place)))
   # p[0] = TREE.SymTabEntry(id=p[1], datatype=p[3].datatype, code=code)
-  p[0]=TREE.Formal(code=code)
+  p[0]=TREE.Formal(code=code,name = None)
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
   else:
@@ -1348,7 +1363,7 @@ def p_formaldehyde_with_assign(p):
 def p_formaldehyde(p):
   'formaldehyde : ID COLON type'
   # rule.append(32)
-  p[0]=TREE.Formal(code=[])
+  p[0]=TREE.Formal(code=[],name = None)
   current_symbol_table[0].enter(name=p[1], changed_name=current_symbol_table[0].scope_name +'.' +p[1] ,datatype=p[3].place, size=4, isArray =False)
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
@@ -1361,7 +1376,7 @@ def p_formaldehyde_arr(p):
   # rule.append(33)
   code=p[5].code
   code.append('ALLOCATE,' + current_symbol_table[0].scope_name + '.' + p[1] + ',' + p[5].place)
-  p[0]=TREE.Formal(code=code)
+  p[0]=TREE.Formal(code=code,name = None)
 
 
   if p[3].place in ClassDict or p[3].place in basicDataType:
@@ -1370,7 +1385,6 @@ def p_formaldehyde_arr(p):
     sys.exit('No object found named ' + p[3].place)
 
 
-  # print(p[1])
   current_symbol_table[0].enter(name=p[1],changed_name=current_symbol_table[0].scope_name +'.' +p[1],datatype=p[3].place,size=4, isArray =True)
 
 
@@ -1382,8 +1396,23 @@ def p_expression_objid(p):
 
   code=p[1].code
 
-  datatype = ClassDict[p[1].datatype].getVariable(p[3]).datatype
+  if p[3] in ClassTable[p[1].datatype].private and currentClass[0] <> p[1].datatype:
+    sys.exit("Accessing private variable" + p[3] + " of class "+p[1].datatype)
+
+  if p[3] in ClassTable[p[1].datatype].parentprivatevariables:
+    sys.exit("Accessing ancestor's private variable" + p[3] + " in class "+p[1].datatype)
+
+
+  var = ClassDict[p[1].datatype].getVariable(p[3])
+
+  if(var.name not in ClassTable[ p[1].datatype ].variables):
+    sys.exit("Accessing Unknown variable " + p[3] + " of class "+p[1].datatype)
+
+
+  datatype = var.datatype
   offset = ClassTable[ p[1].datatype ].variables[p[3]]
+
+
   t = newtemp(datatype)
   code.append('INDEX_ASSIGN_R,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + str(offset))
 
@@ -1395,6 +1424,18 @@ def p_expression_objid_expression(p):
 
   code = p[1].code
   code.extend(p[5].code)
+  if p[3] in ClassTable[p[1].datatype].private and currentClass[0] <> p[1].datatype:
+    sys.exit("Accessing private variable" + p[3] + " of class "+p[1].datatype)
+
+  if p[3] in ClassTable[p[1].datatype].parentprivatevariables:
+    sys.exit("Accessing ancestor's private variable" + p[3] + " in class "+p[1].datatype)
+
+
+  var = ClassDict[p[1].datatype].getVariable(p[3])
+
+  if(var.name not in ClassTable[ p[1].datatype ].variables):
+    sys.exit("Accessing Unknown variable " + p[3] + " of class "+p[1].datatype)
+
   offset = ClassTable[ p[1].datatype ].variables[p[3]]
   code.append('INDEX_ASSIGN_L,'+ get_expression_place(p[1].place) +','+str(offset)+','+get_expression_place(p[5].place))
   
