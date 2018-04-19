@@ -36,6 +36,13 @@ def is_int(row):
 	except Exception as e:
 		return False
 
+def is_string(row):
+	if is_int(row):
+		return False
+	elif (row[0] == '"' and row[len(row)-1] == '"') or (row[0] == "'" and row[len(row)-1] == "'"):
+		return True
+	return False
+
 class InstrType(Enum):
 	'''Any Instruction in three Address code can be of one of these types'''
 	ASSIGN = 1
@@ -125,15 +132,16 @@ def set_inputs(row, curr_statement):
 			curr_statement.out = row[2]
 			curr_statement.out_type = EntryType.VARIABLE
 
-			try:
-				temp = int(row[3])
-				curr_statement.in1 = temp
+			if(is_int(row[3])):
+				curr_statement.in1 = int(row[3])
 				curr_statement.in1_type = EntryType.INTEGER
-			except Exception as e:
-				temp = row[3]
-				curr_statement.in1 = temp
+			elif(is_string(row[3])):
+				curr_statement.in1 = (row[3])
+				curr_statement.in1_type = EntryType.STRING
+				# print "-------11111111111-------------111111111----------1111"
+			else:
+				curr_statement.in1 = (row[3])
 				curr_statement.in1_type = EntryType.VARIABLE
-
 			try:
 				temp = int(row[4])
 				curr_statement.in2 = temp
@@ -145,13 +153,15 @@ def set_inputs(row, curr_statement):
 		elif(curr_statement.operator <> Operator.READ_STACK):
 			curr_statement.out = row[2]
 			curr_statement.out_type = EntryType.VARIABLE
-			try:
-				temp = int(row[3])
-				curr_statement.in1 = temp
+			if(is_int(row[3])):
+				curr_statement.in1 = int(row[3])
 				curr_statement.in1_type = EntryType.INTEGER
-			except Exception as e:
-				temp = row[3]
-				curr_statement.in1 = temp
+			elif(is_string(row[3])):
+				curr_statement.in1 = (row[3])
+				curr_statement.in1_type = EntryType.STRING
+				# print "-------11111111111-------------111111111----------1111"
+			else:
+				curr_statement.in1 = (row[3])
 				curr_statement.in1_type = EntryType.VARIABLE
 
 	elif(curr_statement.instr_typ == InstrType.IFGOTO):
@@ -251,18 +261,24 @@ def set_inputs(row, curr_statement):
 
 	elif(curr_statement.instr_typ == InstrType.FUNC_PARAM):
 		if(is_int(row[2])):
-			curr_statement.in1 = int(row[2])
-			curr_statement.in1_type = EntryType.INTEGER
+				curr_statement.in1 = int(row[2])
+				curr_statement.in1_type = EntryType.INTEGER
+		elif(is_string(row[2])):
+			curr_statement.in1 = (row[2])
+			curr_statement.in1_type = EntryType.STRING
 		else:
-			curr_statement.in1 = row[2]
+			curr_statement.in1 = (row[2])
 			curr_statement.in1_type = EntryType.VARIABLE
 
 	elif(curr_statement.instr_typ == InstrType.RETURN):
 		if(is_int(row[2])):
-			curr_statement.out = int(row[2])
-			curr_statement.out_type = EntryType.INTEGER
+				curr_statement.out = int(row[2])
+				curr_statement.out_type = EntryType.INTEGER
+		elif(is_string(row[2])):
+			curr_statement.out = (row[2])
+			curr_statement.out_type = EntryType.STRING
 		else:
-			curr_statement.out = row[2]
+			curr_statement.out = (row[2])
 			curr_statement.out_type = EntryType.VARIABLE
 
 	elif(curr_statement.instr_typ == InstrType.SCAN_INT or curr_statement.instr_typ == InstrType.PRINT_INT):
@@ -283,6 +299,14 @@ def set_inputs(row, curr_statement):
 				temp = row[3]
 				curr_statement.in2 = temp
 				curr_statement.in2_type = EntryType.VARIABLE
+
+	elif(curr_statement.instr_typ == InstrType.SCAN_STRING or curr_statement.instr_typ == InstrType.PRINT_STRING):
+		if is_string(row[2]):
+			curr_statement.in1 = row[2]
+			curr_statement.in1_type = EntryType.STRING
+		else:
+			curr_statement.in1 = row[2]
+			curr_statement.in1_type = EntryType.VARIABLE
 
 	elif(curr_statement.instr_typ == InstrType.ALLOCATE):
 		curr_statement.out = row[2]
@@ -462,6 +486,11 @@ def FindEmptyReg():
 		if (UsableRegisters[reg] == 0):
 			return reg
 
+def searchString(StringDict, string):
+	for strs in StringDict:
+		if StringDict[strs] == string:
+			return strs
+
 def GetReg(stmt, block):
 	
 	nue = NextUse[stmt.linenum]
@@ -514,15 +543,17 @@ def UpdateVariableData(statement,block):
 			# if(statement.instr_typ==InstrType.INDEX_ASSIGN_R or (l.dataType=="Array" and (statement.instr_typ==InstrType.SCAN_INT or statement.instr_typ==InstrType.PRINT_INT))):
 
 			if(l.scope == Scope.LOCAL):
-				if(l.isArray==True):
-					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
-				else:
-					statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
+				# if(l.isArray==True):
+				# 	statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
+				# else:
+				statement.code_statement = statement.code_statement + "lw $%s, -%d($fp)\n"%(VariableData[statement.in1][1], VariableData[statement.in1][0])
 			else:
-				if(l.dataType=="Array"):
-					statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
-				else:
-					statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
+				# if(l.dataType=="Array"):
+				# 	statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
+				# else:
+				statement.code_statement = statement.code_statement + "lw $%s, %s\n"%(VariableData[statement.in1][1], statement.in1)
+
+
 
 	if(statement.in2_type == EntryType.VARIABLE):
 		if(statement.in2 not in VariableData or VariableData[statement.in2][1] == 0):
@@ -538,9 +569,11 @@ def UpdateVariableData(statement,block):
 
 	if(statement.out_type == EntryType.VARIABLE):
 		if(statement.out not in VariableData or VariableData[statement.out][1] == 0):
+			# print statement.out,"PPPPPPPPPPPOOOOOOOOOOOOOOOPPPPPPPPPPPPOOOOOOOOOOOOOOOO"
 			# print(statement.out)
 			register = GetReg(statement,block)
 			VariableData[statement.out][1] = register
+			print statement.out,register
 			UsableRegisters[register] = statement.out
 			l=lookup_LocalSymbolTable(statement.out)
 
@@ -559,7 +592,9 @@ def UpdateVariableData(statement,block):
 				else:
 					statement.code_statement = statement.code_statement + "lw $%s,%s\n" % (register, UsableRegisters[register])
 
-def main(SymbolTables):
+def main(SymbolTables, StringDict):
+	# print StringDict
+	# quit()
 
 	code = []
 	leaders = [1]
@@ -568,6 +603,9 @@ def main(SymbolTables):
 	data_code = ".data\n"
 	machine_code = ".text\n"
 	data_code = data_code + 'space: .asciiz " "\n'
+	for string in StringDict:
+		print (StringDict[string].replace("'", "\"")).replace("\n","\\%c"%("n")),"@@@@"
+		data_code += "%s: .asciiz %s\n"%(string, (StringDict[string].replace("'", "\"")).replace("\n","\\%c"%("n")))
 
 
 
@@ -684,6 +722,10 @@ def main(SymbolTables):
 
 	print_int_func = "print_int:\nli $v0,1\nsyscall\njr $ra\n"
 	scan_int_func = "scan_int:\nli $v0,5\nsyscall\njr $ra\n"
+
+	print_string_func = "print_string:\nli $v0,4\nsyscall\njr $ra\n"
+	scan_string_func = "scan_string:\nli $v0,8\nsyscall\njr $ra\n"
+
 	exit_func="exit_func:\nli $v0,10\nsyscall\n"
 	space_func="space_func:\nla $a0, space\nli $v0, 4\nsyscall\njr $ra\n"
 
@@ -705,7 +747,12 @@ def main(SymbolTables):
 					st.code_statement = st.code_statement + "move $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1])
 				elif(st.in1_type == EntryType.INTEGER):
 					st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1)
-
+				elif(st.in1_type == EntryType.STRING):
+					print "#######",st.in1
+					for k in StringDict:
+						print StringDict[k]
+				 	st.code_statement += "la $%s, %s\n"%(VariableData[st.out][1], searchString(StringDict,st.in1))
+				 	# print VariableData[st.out][1],"@@@@@@@@@@@@"
 			elif(st.instr_typ == InstrType.ASSIGN):
 				if(st.operator == Operator.ADD):
 					if(st.in1_type == EntryType.VARIABLE and st.in2_type == EntryType.VARIABLE):
@@ -872,6 +919,10 @@ def main(SymbolTables):
 					st.code_statement = st.code_statement + "addiu $sp, $sp, -4\n"
 					st.code_statement += "li $t7, %d\n"%(st.in1)
 					st.code_statement += "sw $t7, ($sp)\n"
+				elif(st.in1_type == EntryType.STRING):
+					st.code_statement = st.code_statement + "addiu $sp, $sp, -4\n"
+					st.code_statement += "la $t7, %s\n"%(searchString(StringDict, st.in1))
+					st.code_statement += "sw $t7, ($sp)\n"
 				else:
 					st.code_statement = st.code_statement + "addiu $sp, $sp, -4\n"
 					st.code_statement += "sw $%s, ($sp)\n"%(VariableData[st.in1][1])
@@ -891,6 +942,8 @@ def main(SymbolTables):
 			elif(st.instr_typ == InstrType.RETURN):
 				if(st.out_type == EntryType.INTEGER):
 					st.code_statement += "li $v0, %d\n"%(st.out)
+				elif(st.out_type == EntryType.STRING):
+					st.code_statement += "la $v0, %s\n"%(searchString(StringDict, st.out))
 				else:
 					st.code_statement += "move $v0, $%s\n"%(VariableData[st.out][1])
 
@@ -1017,6 +1070,21 @@ def main(SymbolTables):
 							st.code_statement = st.code_statement + "jal print_int\n"
 				st.code_statement += "move $ra, $t9\n"
 
+			elif(st.instr_typ == InstrType.PRINT_STRING):
+				st.code_statement += "move $t9, $ra\n"
+
+
+				if(st.in1_type == EntryType.VARIABLE):
+					st.code_statement = st.code_statement + "move $a0,$%s\n" % (VariableData[st.in1][1])
+					st.code_statement = st.code_statement + "jal print_string\n"
+
+				elif(st.in1_type == EntryType.STRING):
+					st.code_statement = st.code_statement + "la $a0,%s\n" % searchString(StringDict, st.in1)
+					st.code_statement = st.code_statement + "jal print_string\n"
+
+
+				st.code_statement += "move $ra, $t9\n"
+
 
 			elif(st.instr_typ == InstrType.SCAN_INT):
 				st.code_statement += "move $t9, $ra\n"
@@ -1113,6 +1181,8 @@ def main(SymbolTables):
 	assemblyfile.write(print_int_func)
 	assemblyfile.write(scan_int_func)
 	assemblyfile.write(space_func)
+	assemblyfile.write(print_string_func)
+	assemblyfile.write(scan_string_func)
 
 	
 

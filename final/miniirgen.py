@@ -7,6 +7,7 @@ import tree as TREE
 from symtab import *
 from codegen import main
 from copy import deepcopy
+import string
 
 precedence = (
         ('right', 'GETS'),
@@ -31,6 +32,8 @@ ClassDict = {}
 ClassTable = {}
 currentClass=['Main']
 basicDataType = ['Int','String','Bool']
+
+String_Dict = {}
 '''
      TO BE DONE
 '''
@@ -47,6 +50,22 @@ def get_expression_place(name):
 
 flag=[0]
 tempCount=[0]
+
+stringcount = [0]
+
+
+
+def newstring( input_str, datatype='String'):
+  stringcount[0] += 1
+  str_name = 'str.' + str(stringcount[0])
+  output_str = input_str.replace("\n", "%c%c"%("\\","n"))
+  output_str = output_str.replace("\t", "%c%c"%("\\","t"))
+  # print input_str
+  # output_str = input_str.replace('\n', '*nl*')
+  # output_str = output_str.replace("\t", "*tb*")
+  String_Dict[str_name] = "'" + output_str + "'"
+  # print output_str,"!!!!"
+  return str_name
 
 
 def newtemp(datatype='Int'):
@@ -404,11 +423,14 @@ def p_formal_parameter_arr(p):
 def p_formal_with_assign(p):
   'formal : ID COLON type GETS expression'
   rule.append(31)
-
-  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name + '.' + p[1], datatype=p[3].place, size=4, isArray =False)
-
-
   code = p[5].code
+  if(p[3].place == 'String'):
+    code.append('ALLOCATE,' +current_symbol_table[0].scope_name + '.' + p[1] + ',100')
+    current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=100, isArray =False)
+
+  else:
+    current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
+
   code.append('ASSIGN,%s,%s'%(get_expression_place(p[1]), get_expression_place(p[5].place)))
   p[0]=TREE.Formal(code=code)
 
@@ -416,6 +438,8 @@ def p_formal_with_assign(p):
     pass
   else:
     sys.exit('No object found named ' + p[3].place)
+
+
 
   if(current_symbol_table[0].scope_name in ClassTable):
     ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size/4
@@ -425,18 +449,29 @@ def p_formal_with_assign(p):
 def p_formal(p):
   'formal : ID COLON type'
   rule.append(32)
-  p[0]=TREE.Formal(code=[])
+
+  code = []
+
+  if(p[3].place == 'String'):
+    code.append('ALLOCATE,' +current_symbol_table[0].scope_name + '.' + p[1] + ',100')
+    current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=100, isArray =False)
+
+  else:
+    current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
+
+  p[0]=TREE.Formal(code=code)
 
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
   else:
     sys.exit('No object found named ' + p[3].place)
   
-  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
+  # current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[3].place, size=4, isArray =False)
 
   if(current_symbol_table[0].scope_name in ClassTable):
     ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size/4
     ClassTable[current_symbol_table[0].scope_name].size += 4
+
 
 
 
@@ -545,8 +580,8 @@ def p_expression_outstring(p):
   code = p[3].code
   if p[3].datatype <> 'String':
     sys.exit("Type Check Error : out_string takes string")
-  code.append('SPACE')
-  # code.append('PRINT_STRING,'+get_expression_place(p[3].place))
+  # code.append('SPACE')
+  code.append('PRINT_STRING,'+get_expression_place(p[3].place))
   p[0]=TREE.FunctionCall(code=code)
 
 def p_expression_scanint(p):
@@ -969,7 +1004,9 @@ def p_expression_integer(p):
 def p_expression_string(p):
   'expression : STRING'
   rule.append(63)
-  p[0] = TREE.Expression(place=p[1], datatype='String', code=[],isArray=False)
+
+  newstring(input_str = p[1])
+  p[0] = TREE.Expression(place = "'" + p[1].replace("\n", "\\%c"%'n') + "'", datatype='String', code=[],isArray=False)
 
 def p_expression_true(p):
   'expression : TRUE'
@@ -1409,4 +1446,5 @@ for t in ClassTable:
   print ClassTable[t].printClass()
 
 print(".... Parsing .... done ....")
-main(SymbolTables)
+main(SymbolTables, String_Dict)
+print String_Dict
