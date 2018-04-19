@@ -11,7 +11,6 @@ class Node{
 
 	def set_next : Int(next_node : Node, self : Node){
 		{
-			self.next <- new Node;
 			self.next <- next_node;
 			return 1;;
 		}
@@ -60,12 +59,12 @@ class Main{
 			}
 			pool;
 
-			out_string("121");
+			out_string("\n");
 			while (not isvoid(head)) loop
 
 			{
 				head.print_data();
-				out_string("121");
+				out_string(" ");
 
 				head <- head.next;
 			}

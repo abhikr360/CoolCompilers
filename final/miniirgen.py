@@ -231,8 +231,15 @@ def p_feature_header_body(p):
   'feature : feature_header feature_body'
   code = p[1].code
   code.extend(p[2].code)
-  p[0] = TREE.FeatureHeader(code=code,datatype=p[1].datatype)
+  p[0] = TREE.FeatureHeader(code=code,datatype=p[1].datatype,name = p[1].name)
 
+  met = current_symbol_table[0].getMethod(p[1].name)
+  met.nargs = p[2].nargs
+
+  # ClassTable[current_symbol_table[0].parent.scope_name].function_parameters[p[1].name] = p[2].nargs
+
+  # print current_symbol_table[0].parent.scope_name,p[1].name,p[2].nargs
+  # raw_input()
 
   current_symbol_table[0]=current_symbol_table[0].parent
 
@@ -249,7 +256,7 @@ def p_feature_header_with_modifier(p):
       code.append('EXIT')
       flag[0]=1
   code.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[3])
-  p[0] = TREE.FeatureHeader(code=code, datatype=p[5].place)
+  p[0] = TREE.FeatureHeader(code=code, datatype=p[5].place,name = p[3])
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[3])
   # current_symbol_table[0].methods.append(new_sym_tab)
@@ -272,7 +279,7 @@ def p_feature_header(p):
   if(p[2] in ClassTable[currentClass[0]].privateFunctions ):
     ClassTable[currentClass[0]].privateFunctions.remove(p[2])
   code.append('FUNC_LABEL,'+current_symbol_table[0].scope_name+'.'+p[2])
-  p[0] = TREE.FeatureHeader(code=code, datatype=p[4].place)
+  p[0] = TREE.FeatureHeader(code=code, datatype=p[4].place,name = p[2])
 
   new_sym_tab = Symtab(parent=current_symbol_table[0], symtab_type='METHOD', scope_name=current_symbol_table[0].scope_name+'.'+p[2])
 
@@ -293,7 +300,7 @@ def p_feature_body_with_formal_parameter_list(p):
   	code.append('POP_STACK')
 
   code.append('FUNC_RETURN')
-  p[0]=TREE.FeatureBody(code=code)
+  p[0]=TREE.FeatureBody(code=code,nargs = p[2].nargs)
 
 
 
@@ -306,7 +313,7 @@ def p_feature_body(p):
   else:
     code.append('FUNC_RETURN')
 
-  p[0]=TREE.FeatureBody(code=code)
+  p[0]=TREE.FeatureBody(code=code, nargs = 0)
 
 
 
@@ -384,6 +391,8 @@ def p_formal_parameter_list_many(p):
   code = p[1].code
   # changed_name = p[3].place
 
+  _,class_name = current_symbol_table[0].scope_name.split('.')
+  ClassTable[current_symbol_table[0].parent.scope_name].function_parameters[class_name] = p[1].nargs+1
 
   # if p[3].datatype.place == 'Int':
   #   changed_name = current_symbol_table[0].getVariable(p[3].place).parent_scope_name + '.' + p[3].place
@@ -395,6 +404,13 @@ def p_formal_parameter_list_many(p):
 def p_formal_parameter_list(p):
   'formal_parameter_list : formal_parameter'
   rule.append(28)
+
+  _,class_name = current_symbol_table[0].scope_name.split('.')
+  # print  current_symbol_table[0].scope_name, class_name
+  ClassTable[current_symbol_table[0].parent.scope_name].function_parameters[class_name] = 1
+  # print ClassTable[current_symbol_table[0].parent.scope_name].function_parameters
+
+  # raw_input()
   
   # changed_name = p[1].place
   # if p[1].datatype.place == 'Int':
@@ -632,6 +648,9 @@ def p_expression_function_call_with_arguments_2(p):
   t = newtemp()
 
   code = p[3].code
+  function_args = ClassTable[met.parent_class].function_parameters[p[1]]
+  if function_args <> p[3].nargs:
+    sys.exit(met.name + " function takes %d"%met.nargs + " argument : Given %d"%p[3].nargs)
   code.append('FUNC_CALL,'+met.parent_class + '.' + p[1])
   code.append('READ_STACK,' + get_expression_place(t))
   datatype = met.datatype
@@ -644,6 +663,10 @@ def p_expression_function_call_2(p):
   met = current_symbol_table[0].getMethod(p[1])
 
   t=newtemp()
+
+  function_args = ClassTable[met.parent_class].function_parameters[p[1]]
+  if function_args <> 0:
+    sys.exit(met.name + " function takes %d"%met.nargs + " argument : Given 0")
 
   code = ['FUNC_START']
   code.append('FUNC_CALL,'+met.parent_class +'.'+p[1])
@@ -666,19 +689,20 @@ def p_argument_list(p):
 
   code.append('FUNC_START')
   code.append('FUNC_PARAM,{}'.format(get_expression_place(p[1].place)))
-  p[0]=TREE.ArgumentList(code=code, place=p[1].place)
+  p[0]=TREE.ArgumentList(code=code, place=p[1].place,nargs = 1)
 
 def p_argument_list_many(p):
   'argument_list : argument_list COMMA expression'
   rule.append(43)
  
 
+
   code = p[1].code
   # code.append('FUNC_START')
   code.extend(p[3].code)
   code.append('FUNC_PARAM,{}'.format(get_expression_place(p[3].place)))
 
-  p[0]=TREE.ArgumentList(code=code,place = p[3].place)
+  p[0]=TREE.ArgumentList(code=code,place = p[3].place,nargs = p[1].nargs+1)
 
 def p_expression_plus(p):
   'expression : expression PLUS expression'
@@ -1055,6 +1079,11 @@ def p_expression_function_call_with_arguments(p):
 
   # if(p[3] == 'printdataSecure'):
   # exit()
+  num = ClassTable[p[1].datatype].function_parameters[p[3]]
+  if p[5].nargs + 1 <> num:
+    sys.exit(p[3] + " takes %d"%(num) + " argument, Given %d"%p[5].nargs)
+  if p[1].datatype not in ClassDict:
+    sys.exit(p[1].datatype + " is not an class object ") 
   if( p[3] in ClassTable[p[1].datatype].privateFunctions and (currentClass[0] != p[1].datatype)):
     sys.exit("Call to private function......ERROR")
 
@@ -1078,6 +1107,9 @@ def p_expression_function_call(p):
   'expression : expression PERIOD ID LPAREN RPAREN'
   rule.append(69)
   t=newtemp()
+  num = ClassTable[p[1].datatype].function_parameters[p[3]]
+  if 1 <> num:
+    sys.exit(p[3] + " takes %d"%(num) + " argument, Given 1")
   
   if( p[3] in ClassTable[p[1].datatype].privateFunctions and (currentClass[0] != p[1].datatype)):
     sys.exit("Call to private function......ERROR")
@@ -1260,9 +1292,9 @@ def p_while(p):
   code.append('LABEL,'+_pool)
   for i in range(len(code)):
     if(code[i]=='BREAK'):
-      code[i]=_pool
+      code[i]='GOTO,'+_pool
     elif(code[i]=='CONTINUE'):
-      code[i]=_loop
+      code[i]='GOTO,'+_loop
 
   p[0] = TREE.While(code=code, datatype=p[4].datatype)
 
@@ -1279,12 +1311,14 @@ def p_for(p):
 
   _loop = newjump()
   _pool = newjump()
+  _update = newjump()
 
   code = p[3].code
   code.append('LABEL,' + _loop)
   code.extend(p[5].code)
   code.append('IFGOTO,EQUALS,'+get_expression_place(p[5].place)+',0,' + _pool)
   code.extend(p[10].code)
+  code.append('LABEL,' + _update)
   code.extend(p[7].code)
   code.append('GOTO,'+ _loop)
   code.append('LABEL,' + _pool)
@@ -1293,7 +1327,7 @@ def p_for(p):
     if(code[i]=='BREAK'):
       code[i]='GOTO,'+_pool
     elif(code[i]=='CONTINUE'):
-      code[i]='GOTO,'+_loop
+      code[i]='GOTO,'+_update
 
   p[0] = TREE.For(code=code, datatype=p[10].datatype)
 

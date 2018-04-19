@@ -15,6 +15,7 @@ class ClassObject:
 		self.private = []
 		self.parentprivatevariables=[]
 		self.functions = {}
+		self.function_parameters = {}
 		self.privateFunctions=[]
 		self.parent = None
 		self.size = 0
@@ -24,6 +25,7 @@ class ClassObject:
 		print ('private variables', self.private)
 		print ('parentprivatevariables', self.parentprivatevariables)
 		print ('functions', self.functions)
+		print ('function_parameters', self.function_parameters)
 		print ('private funtions', self.privateFunctions)
 		print ('parent', self.parent)
 		print ( 'size =' ,self.size)
@@ -50,9 +52,10 @@ class Variable:
 
 
 class Method:
-	def __init__(self, name, datatype='Int',parent_class = None):
+	def __init__(self, name, nargs, datatype='Int',parent_class = None):
 		self.name = name
 		self.datatype = datatype
+		self.nargs = nargs
 		self.parent_class = parent_class
 
 		
@@ -78,7 +81,7 @@ class Symtab:
 		if(self.search_method(name)):
 			sys.exit("Method %s already present in symbol table"%name)
 		else:
-			newmethod = Method(name,datatype,parent_class)
+			newmethod = Method(name,0,datatype,parent_class)
 			self.methods.append(newmethod)
 
 	def getVariable(self,name):

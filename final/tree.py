@@ -9,9 +9,10 @@ class Expression:
 
 class ArgumentList:
 	"""docstring for ArgumentList"""
-	def __init__(self, code, place):
+	def __init__(self, code, place, nargs):
 		self.code = code
 		self.place = place
+		self.nargs = nargs
 
 class FunctionCall:
 	"""docstring for FunctionCall"""
@@ -29,15 +30,17 @@ class Feature:
 
 class FeatureHeader:
 	"""docstring for FeatureHeader"""
-	def __init__(self, code, datatype='Int'):
+	def __init__(self, code, name, datatype='Int'):
 		self.code = code
+		self.name = name
 		self.datatype = datatype
 
 
 class FeatureBody:
 	"""docstring for FeatureBody"""
-	def __init__(self, code):
+	def __init__(self, code, nargs = 0):
 		self.code = code
+		self.nargs = nargs
 		
 
 class FeatureList:
