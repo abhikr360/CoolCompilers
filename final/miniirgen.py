@@ -13,6 +13,8 @@ precedence = (
         ('right', 'GETS'),
         ('left', 'OR'),
         ('left', 'AND'),
+        ('left', 'BITWISEAND'),
+        ('left', 'BITWISEOR'),
         ('right', 'NOT'),
         ('nonassoc', 'LTEQ', 'GTEQ', 'LT', 'GT', 'EQUAL'),
         ('left', 'PLUS', 'MINUS'),
@@ -663,7 +665,9 @@ def p_expression_function_call_2(p):
   met = current_symbol_table[0].getMethod(p[1])
 
   t=newtemp()
-
+  print('@@', met)
+  print(met.parent_class)
+  print(ClassTable[met.parent_class].function_parameters)
   function_args = ClassTable[met.parent_class].function_parameters[p[1]]
   if function_args <> 0:
     sys.exit(met.name + " function takes %d"%met.nargs + " argument : Given 0")
@@ -783,6 +787,42 @@ def p_expression_mod(p):
   code.append('MOD,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
+
+
+def p_expression_bitwise_and(p):
+  'expression : expression BITWISEAND expression'
+
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Int Type")
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
+
+
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.append('BITWISEAND,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
+
+
+def p_expression_bitwise_or(p):
+  'expression : expression BITWISEOR expression'
+
+  if(p[1].datatype <> p[3].datatype or p[1].datatype <> 'Int'):
+    sys.exit("TYPE Check Error : Both "+p[1].place + " and "+p[3].place+" are NOT Int Type")
+  if(p[1].isArray or p[3].isArray):
+    sys.exit("Type Check Error : "+p[1].place +" or "+p[3].place +" is array")
+
+
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.append('BITWISEOR,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
+
+  p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
+
+
 
 def p_expression_lt(p):
   'expression : expression LT expression'
@@ -960,6 +1000,9 @@ def p_expression_and(p):
   code.append('LABEL,' + l2)
 
   p[0] = TREE.Expression(place = t, code = code, datatype = p[1].datatype)
+
+
+
 
 def p_expression_not(p):
   'expression : NOT expression'

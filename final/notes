@@ -1,0 +1,7 @@
++ check that variables are not initialized at beginning of class
++ bit wise or and 
++ bug in line 395/396 and related ??
++ Not handling the case when there are no parameters in function(line 308). 
+	Will give key error in line 667
++ 
+
