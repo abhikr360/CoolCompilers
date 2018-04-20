@@ -1,7 +1,7 @@
 class A
 {
 	a : Int;
-	b : Int;
+	b : Int ;
 
 	def sum : Int(a : Int, b : Int, self : A)
 	{
