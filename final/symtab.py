@@ -51,13 +51,15 @@ class ClassObject:
 
 class Variable:
 	"""docstring for Variable"""
-	def __init__(self,name,changed_name ,datatype='Int', size=4,isArray=False,parent_scope_name = None):
+	def __init__(self,name,changed_name ,datatype='Int', size=4,isArray=False,parent_scope_name = None, is2dArray=False, rowsize=0):
 		self.name = name
 		self.changed_name = changed_name
 		self.datatype = datatype
 		self.isArray = isArray
 		self.size = size
 		self.parent_scope_name = parent_scope_name
+		self.is2dArray = is2dArray
+		self.rowsize =rowsize
 
 
 class Method:
@@ -78,12 +80,12 @@ class Symtab:
 		self.scope_name = scope_name 	# name of class or method or let id
 		self.lets = []
 
-	def enter(self, name, changed_name, datatype='Int',size=4,isArray=False):
+	def enter(self, name, changed_name, datatype='Int',size=4,isArray=False, is2dArray=False, rowsize=0):
 		# name = self.scope_name + '.' + name 
 		if(self.local_search(name)):
 			sys.exit("Variable %s already present in symbol table"%name)
 		else:
-			newvar = Variable(name,changed_name,datatype,size,isArray,self.scope_name)
+			newvar = Variable(name,changed_name,datatype,size,isArray,self.scope_name, is2dArray, rowsize)
 			self.variables.append(newvar)
 
 	def enter_method(self, name,datatype='Int',parent_class=None):

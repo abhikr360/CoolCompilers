@@ -1,6 +1,6 @@
 class Main
 {
-	arr : Int[7];
+	arr : Int[7][7];
 
 	def sort : Int (arr[] : Int,l :Int)
 	{

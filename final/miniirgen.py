@@ -446,10 +446,25 @@ def p_formal_parameter_arr(p):
   if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
   else:
-    sys.exit('No object found named ' + p[3].place)
+    sys.exit('No object found named ' + p[5].place)
 
 
   current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[5].place, size=4, isArray=True)
+
+
+
+def p_formal_parameter_arr2d(p):
+  'formal_parameter : ID LSQRBRACKET RSQRBRACKET LSQRBRACKET expression RSQRBRACKET COLON type'
+  rule.append(30)
+
+  p[0] = TREE.FormalParameter(code=[], place=p[1], datatype='Array')
+  if p[8].place in ClassDict or p[8].place in basicDataType:
+    pass
+  else:
+    sys.exit('No object found named ' + p[8].place)
+
+
+  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name +'.' + p[1], datatype=p[8].place, size=4, is2dArray=True, rowsize=p[5].place)
 
 
 def p_formal_with_assign(p):
@@ -536,6 +551,33 @@ def p_formal_arr(p):
       ClassTable[current_symbol_table[0].scope_name].size += 4
 
 
+def p_formal_arr2d(p):
+  'formal : ID COLON type LSQRBRACKET expression RSQRBRACKET LSQRBRACKET expression RSQRBRACKET'
+  rule.append(33)
+
+
+  t = newtemp()
+  code = p[5].code
+  code.extend(p[8].code)
+  code.append('MUL,' + get_expression_place(t) + ',' + get_expression_place(p[5].place) + ',' + get_expression_place(p[8].place))
+  code.append('ALLOCATE,' +current_symbol_table[0].scope_name + '.' + p[1] + ',' + get_expression_place(t))
+
+
+  p[0]=TREE.Formal(code=code,name = p[1])
+  if p[3].place in ClassDict or p[3].place in basicDataType:
+    pass
+  else:
+    sys.exit('No object found named ' + p[3].place)
+  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name + '.' + p[1],datatype=p[3].place,size=4, is2dArray =True, rowsize=int(p[8].place))
+
+  if(current_symbol_table[0].scope_name in ClassTable):
+    if(p[1] in ClassTable[current_symbol_table[0].scope_name].variables):
+      sys.exit("Variable already present in ancestor")
+    else:
+      ClassTable[current_symbol_table[0].scope_name].variables[p[1]] = ClassTable[current_symbol_table[0].scope_name].size/4
+      ClassTable[current_symbol_table[0].scope_name].size += 4
+
+
 
 def p_expression_block_expression(p):
   'expression : block_expression'
@@ -605,6 +647,35 @@ def p_expression_assign_arr(p):
   code.append('INDEX_ASSIGN_L,'+ get_expression_place(p[1].place) +','+get_expression_place(p[3].place)+','+get_expression_place(p[6].place))
   
   p[0] = TREE.Expression(code=code,place=p[6].place, datatype=p[6].datatype)
+
+
+def p_expression_assign_arr2d(p):
+  'expression : expression LSQRBRACKET expression RSQRBRACKET LSQRBRACKET expression RSQRBRACKET GETS expression'
+  rule.append(39)
+  var = current_symbol_table[0].getVariable(p[1].place)
+ 
+
+
+  if(p[3].datatype <> 'Int'):
+    sys.exit('Array index should be ineteger not '+p[3].datatype)
+
+  if(p[6].datatype <> 'Int'):
+    sys.exit('Array index should be ineteger not '+p[3].datatype)
+
+  if(var.datatype <> p[9].datatype and var.isArray):
+    sys.exit("Type Check Error "+var.name+" is assigned "+p[3].datatype)
+
+
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[9].code)
+  code.extend(p[3].code)
+  code.extend(p[6].code)
+  code.append('MUL,' + get_expression_place(t) + ',' + get_expression_place(p[3].place) + ',' + str(var.rowsize))
+  code.append('ADD,' + get_expression_place(t) + ',' + get_expression_place(t) + ',' + get_expression_place(p[6].place))
+  code.append('INDEX_ASSIGN_L,'+ get_expression_place(p[1].place) +','+get_expression_place(t)+','+get_expression_place(p[9].place))
+  
+  p[0] = TREE.Expression(code=code,place=p[9].place, datatype=p[9].datatype)
 
 
 def p_expression_outint(p):
@@ -958,10 +1029,7 @@ def p_expression_or(p):
   
 
 
-  # t = newtemp()
-  # code = p[1].code
-  # code.extend(p[3].code)
-  # code.append('ADD,' + t + ',' + p[1].place + ',' + p[3].place)
+  
 
   t = newtemp()
   l1 = newjump()
@@ -1065,6 +1133,23 @@ def p_expression_arr(p):
   code.extend(p[3].code)
   code.append('INDEX_ASSIGN_R,' + get_expression_place(t) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(p[3].place))
   p[0] = TREE.Expression(place = t, code = code, datatype=var.datatype,isArray=False)
+
+
+def p_expression_arr2d(p):
+  'expression : expression LSQRBRACKET expression RSQRBRACKET LSQRBRACKET expression RSQRBRACKET'
+  rule.append(61)
+  var = current_symbol_table[0].getVariable(p[1].place)
+
+
+  t1 = newtemp(p[1].datatype)
+  t2 = newtemp()
+  code = p[1].code
+  code.extend(p[3].code)
+  code.extend(p[6].code)
+  code.append('MUL,' + get_expression_place(t2) + ',' + str(var.rowsize) + ',' + get_expression_place(p[3].place))
+  code.append('ADD,' + get_expression_place(t2) + ',' + get_expression_place(t2) + ',' + get_expression_place(p[6].place))
+  code.append('INDEX_ASSIGN_R,' + get_expression_place(t1) + ',' + get_expression_place(p[1].place) + ',' + get_expression_place(t2))
+  p[0] = TREE.Expression(place = t1, code = code, datatype=var.datatype,isArray=False)
 
 
 def p_expression_integer(p):
@@ -1390,7 +1475,7 @@ def p_formaldehyde_with_assign_many(p):
   # rule.append(31)
   current_symbol_table[0].enter(name=p[3],changed_name=current_symbol_table[0].scope_name +'.'+p[3], datatype=p[5].place,size=4, isArray =False)
   code = p[7].code
-  code.append(p[1].code)
+  code.extend(p[1].code)
   code.append('ASSIGN,%s,%s'%(current_symbol_table[0].scope_name + '.' + p[3], get_expression_place(p[7].place)))
 
   if p[5].place in ClassDict or p[5].place in basicDataType:
@@ -1419,11 +1504,29 @@ def p_formaldehyde_many(p):
 def p_formaldehyde_arr_many(p):
   'formaldehyde : formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET'
   # rule.append(33)
-  current_symbol_table[0].enter(name= p[3],changed_name=current_symbol_table[0].scope_name +'.' +p[3],datatype=p[5].place, size=4*int(p[7].place), isArray =True)
+  current_symbol_table[0].enter(name= p[3],changed_name=current_symbol_table[0].scope_name +'.' +p[3],datatype=p[5].place, size=4, isArray =True)
 
   code = p[1].code
   code.extend(p[7].code)
   code.append('ALLOCATE,' + current_symbol_table[0].scope_name + '.' + p[3] + ',' + get_expression_place(p[7].place))
+  p[0]=TREE.Formal(code=code,name = None)
+  if p[5].place in ClassDict or p[5].place in basicDataType:
+    pass
+  else:
+    sys.exit('No object found named ' + p[3].place)
+
+
+def p_formaldehyde_arr2d_many(p):
+  'formaldehyde : formaldehyde COMMA ID COLON type LSQRBRACKET expression RSQRBRACKET LSQRBRACKET expression RSQRBRACKET'
+  # rule.append(33)
+  current_symbol_table[0].enter(name= p[3],changed_name=current_symbol_table[0].scope_name +'.' +p[3],datatype=p[5].place, size=4, is2dArray =True, rowsize = int(p[10].place))
+
+  t = newtemp()
+  code = p[1].code
+  code.extend(p[7].code)
+  code.extend(p[10].code)
+  code.append('MUL,' + get_expression_place(t) + ',' + get_expression_place(p[7].place) + ',' + get_expression_place(p[10].place))
+  code.append('ALLOCATE,' + current_symbol_table[0].scope_name + '.' + p[3] + ',' + get_expression_place(t))
   p[0]=TREE.Formal(code=code,name = None)
   if p[5].place in ClassDict or p[5].place in basicDataType:
     pass
@@ -1473,6 +1576,27 @@ def p_formaldehyde_arr(p):
 
 
   current_symbol_table[0].enter(name=p[1],changed_name=current_symbol_table[0].scope_name +'.' +p[1],datatype=p[3].place,size=4, isArray =True)
+
+
+def p_formaldehyde_arr2d(p):
+  'formaldehyde : ID COLON type LSQRBRACKET expression RSQRBRACKET LSQRBRACKET expression RSQRBRACKET'
+  # rule.append(33)
+
+  t = newtemp()
+  code=p[5].code
+  code.extend(p[8].code)
+  code.append('MUL,' + get_expression_place(t) + ',' + get_expression_place(p[5].place) + ',' +  get_expression_place(p[8].place))
+  code.append('ALLOCATE,' + current_symbol_table[0].scope_name + '.' + p[1] + ',' + get_expression_place(t))
+  p[0]=TREE.Formal(code=code,name = None)
+
+
+  if p[3].place in ClassDict or p[3].place in basicDataType:
+    pass
+  else:
+    sys.exit('No object found named ' + p[3].place)
+
+
+  current_symbol_table[0].enter(name=p[1],changed_name=current_symbol_table[0].scope_name +'.' +p[1],datatype=p[3].place,size=4, is2dArray =True, rowsize = int(p[8].place))
 
 
 
