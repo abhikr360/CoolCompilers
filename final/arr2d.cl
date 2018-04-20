@@ -86,6 +86,7 @@ class Main
 			obj <- new Test;
 			obj.print2darray(arr, 3);*)
 			(*out_int(arr[2][2]);*)
+			let arr : Int [n] in {
 			for (j<-0;j<n ;j<-j+1 ) loop{
 					arr2[j]<-m;
 					m<-m+1;
@@ -94,6 +95,7 @@ class Main
 			pool;
 			obj <- new Test;
 			obj.print1darray(arr2, 4);
+		}tel;
 		}
 	};
 };
