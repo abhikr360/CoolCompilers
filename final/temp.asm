@@ -1,139 +1,78 @@
 .data
 space: .asciiz " "
-Main.e : .word 0
-Main.bar : .word 0
-Main.c : .word 0
-Main.d : .word 0
+str.2: .asciiz "popo"
+str.3: .asciiz "niggs\n"
+str.1: .asciiz "Goodbye\n"
+Main.a : .word 0
+Main.b : .word 0
 .text
 main:
 
 j CLASS.Main
 
-#-----------------------------------block id: 140635593638976
+#-----------------------------------block id: 139916126056392
 
 jal exit_func
 
-#-----------------------------------block id: 140635593639048
+#-----------------------------------block id: 139916126056248
 CLASS.Main:
 
+lw $t5,Main.a
+li $v0, 9
+li $a0, 100
+sll $a0, $a0, 2
+syscall
+move $t5, $v0
+
+lw $s6,Main.b
+li $v0, 9
+li $a0, 100
+sll $a0, $a0, 2
+syscall
+move $s6, $v0
+
+sw $s6, Main.b
+sw $t5, Main.a
 
 move $fp, $sp
-addiu $sp, $sp, -28
+addiu $sp, $sp, -0
 jal Main.main
 
-#-----------------------------------block id: 140635593639120
+#-----------------------------------block id: 139916126077008
 
 jal exit_func
 
-#-----------------------------------block id: 140635593639192
+#-----------------------------------block id: 139916126077080
 Main.main:
 
-lw $t5, Main.c
-lw $s6, -4($fp)
-li $t7,0
-sgt $s6, $t5, $t7
+lw $t5,Main.a
+la $t5, str.1
 
-li $t7,0
-ble $s6,$t7,label.5
+lw $s6,Main.b
+la $s6, str.2
 
-lw $s5, Main.d
-lw $t1, -8($fp)
-li $t7,0
-sgt $t1, $s5, $t7
+move $t6, $ra
+move $a0,$t5
+la $a1, str.3
+jal strcat
+move $ra, $t6
 
-li $t7,0
-ble $t1,$t7,label.5
+move $t9, $ra
+move $a0,$t5
+jal print_string
+move $ra, $t9
 
-lw $s3, -12($fp)
-li $s3, 1
+move $t9, $ra
+move $a0,$s6
+jal print_string
+move $ra, $t9
 
-sw $s6, -4($fp)
-sw $s3, -12($fp)
-sw $t1, -8($fp)
-sw $s5, Main.d
-sw $t5, Main.c
-
-j label.6
-
-#-----------------------------------block id: 140635593641136
-label.5:
-
-lw $t5, -12($fp)
-li $t5, 0
-
-sw $t5, -12($fp)
-
-#-----------------------------------block id: 140635593641208
-label.6:
-
-lw $t5, -12($fp)
-li $t7,0
-sw $t5, -12($fp)
-
-bgt $t5,$t7,label.9
-
-#-----------------------------------block id: 140635593639264
-lw $t5, Main.d
-lw $s6, Main.e
-lw $s5, -20($fp)
-and $s5, $t5, $s6
-
-li $t7,0
-sw $s5, -20($fp)
-sw $s6, Main.e
-sw $t5, Main.d
-
-bgt $s5,$t7,label.7
-
-#-----------------------------------block id: 140635593639336
-lw $t5, Main.d
-lw $s6, -28($fp)
-addi $s6, $t5, -1
-
-move $t5, $s6
-
-sw $s6, -28($fp)
-sw $t5, Main.d
-
-j label.8
-
-#-----------------------------------block id: 140635593639408
-label.7:
-
-lw $t5, Main.e
-lw $s6, -24($fp)
-addi $s6, $t5, 1
-
-move $t5, $s6
-
-sw $s6, -24($fp)
-sw $t5, Main.e
-
-#-----------------------------------block id: 140635593639480
-label.8:
-
-
-j label.10
-
-#-----------------------------------block id: 140635593639552
-label.9:
-
-lw $t5, Main.d
-lw $s6, -16($fp)
-addi $s6, $t5, 1
-
-move $t5, $s6
-
-sw $s6, -16($fp)
-sw $t5, Main.d
-
-#-----------------------------------block id: 140635593639624
-label.10:
-
+sw $s6, Main.b
+sw $t5, Main.a
 
 jal exit_func
 
-#-----------------------------------block id: 140635593635888
+#-----------------------------------block id: 139916126077152
 exit_func:
 li $v0,10
 syscall
@@ -193,4 +132,36 @@ addi $a2, $a2, 1
 strlen.test:
 lb $t7, 0($a3)
 bnez $t7, strlen.loop
+jr $ra
+strcpy:
+move $t9, $a0
+move $t8, $a1
+strcpy.loop:
+lb $t7, 0($t9)
+beq $t7, $zero, strcpy.end
+addiu $t9, $t9, 1
+sb $t7, 0($t8)
+addiu $t8, $t8, 1
+b strcpy.loop
+strcpy.end:
+sb $zero, 0($t8)
+move $v0, $t9
+jr $ra
+strcat:
+move $t9, $a0
+move $t8, $a1
+strcat.first:
+lb $t7, 0($t9)
+beqz $t7, strcat.second
+addiu $t9, $t9 ,1
+j strcat.first
+strcat.second:
+lb $t7, 0($t8)
+sb $t7, 0($t9)
+beqz $t7, strcat.end
+addiu $t8, $t8, 1
+addiu $t9, $t9, 1
+j strcat.second
+strcat.end:
+sb $zero, 0($t9)
 jr $ra
