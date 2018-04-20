@@ -49,7 +49,7 @@ class Symtab:
 
 			current_sym_tab = current_sym_tab.parent
 
-		sys.exit('Error no entry in Symbol table for : '+name)
+		# sys.exit('Error no entry in Symbol table for : '+name)
 		return None
 
 	def getMethod(self,name):
@@ -62,7 +62,7 @@ class Symtab:
 
 			current_sym_tab = current_sym_tab.parent
 
-		sys.exit('Error no entry in Symbol table for : '+name)
+		# sys.exit('Error no entry in Symbol table for : '+name)
 		return None	
 
 	def search(self,name):

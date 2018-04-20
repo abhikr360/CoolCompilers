@@ -549,8 +549,8 @@ def p_expression_function_call_2(p):
 
   t=newtemp()
   code = ['FUNC_CALL,'+p[1]+','+t]
-  datatype = met.datatype
-  p[0] = TREE.Expression(code=code,place=t, datatype=datatype)
+  # datatype = met.datatype
+  p[0] = TREE.Expression(code=code,place=t)
 
 
 def p_argument_list(p):
