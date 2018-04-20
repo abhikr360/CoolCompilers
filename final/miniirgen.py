@@ -542,14 +542,14 @@ def p_formal_arr(p):
 
 
   code = p[5].code
-  code.append('ALLOCATE,' +current_symbol_table[0].scope_name + '.' + p[1] + ',' + p[5].place)
+  code.append('ALLOCATE,' +current_symbol_table[0].scope_name + '.' + p[1] + ',' + get_expression_place(p[5].place))
 
   p[0]=TREE.Formal(code=code,name = p[1])
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
   else:
     sys.exit('No object found named ' + p[3].place)
-  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name + '.' + p[1],datatype=p[3].place,size=4*int(p[5].place), isArray =True)
+  current_symbol_table[0].enter(name = p[1], changed_name=current_symbol_table[0].scope_name + '.' + p[1],datatype=p[3].place,size=4, isArray =True)
 
   if(current_symbol_table[0].scope_name in ClassTable):
     if(p[1] in ClassTable[current_symbol_table[0].scope_name].variables):
@@ -1571,7 +1571,7 @@ def p_formaldehyde_arr(p):
   'formaldehyde : ID COLON type LSQRBRACKET expression RSQRBRACKET'
   # rule.append(33)
   code=p[5].code
-  code.append('ALLOCATE,' + current_symbol_table[0].scope_name + '.' + p[1] + ',' + p[5].place)
+  code.append('ALLOCATE,' + current_symbol_table[0].scope_name + '.' + p[1] + ',' + get_expression_place(p[5].place))
   p[0]=TREE.Formal(code=code,name = None)
 
 

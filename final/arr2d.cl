@@ -6,16 +6,7 @@ class Test{
 	def print2darray : Int (arr[][3]: Int , n :Int, self : Test){
 	{	
 
-		(*out_int(n);
-		out_int(arr[0][0]);
-		out_int(arr[0][1]);
-		out_int(arr[0][2]);
-		out_int(arr[1][0]);
-		out_int(arr[1][1]);
-		out_int(arr[1][2]);
-		out_int(arr[2][0]);
-		out_int(arr[2][1]);
-		out_int(arr[2][2]); *)
+		
 
 		for (self.i<-0; self.i<3;self.i<-self.i+1 ) loop
 		{	out_string("h ");
@@ -28,13 +19,20 @@ class Test{
 	}
 	};
 
+	def print1darray : Int (arr[] : Int, n : Int, self : Test){
+		for (self.j<-0;self.j<n ;self.j<-self.j+1 ) loop
+					out_int(arr[self.j])
+			pool
+	};
+
 
 };
 (**)
 
 class Main
-{	n : Int<-3;
+{	n : Int<-4;
 	arr : Int[n][3];
+	arr2 : Int[n];
 	obj : Test;
 	i : Int;
 	m : Int <- 0;
@@ -77,7 +75,7 @@ class Main
 			out_int(n*m);
 			}tel; *)
 
-			for (i<-0; i<n;i<-i+1 ) loop
+			(*for (i<-0; i<n;i<-i+1 ) loop
 				for (j<-0;j<3 ;j<-j+1 ) loop{
 					arr[i][j]<-m;
 					m<-m+1;
@@ -86,8 +84,27 @@ class Main
 				pool
 			pool;
 			obj <- new Test;
-			obj.print2darray(arr, 3);
+			obj.print2darray(arr, 3);*)
 			(*out_int(arr[2][2]);*)
+			for (j<-0;j<n ;j<-j+1 ) loop{
+					arr2[j]<-m;
+					m<-m+1;
+					out_int(arr2[j]);
+				}
+			pool;
+			obj <- new Test;
+			obj.print1darray(arr2, 4);
 		}
 	};
 };
+
+(*out_int(n);
+		out_int(arr[0][0]);
+		out_int(arr[0][1]);
+		out_int(arr[0][2]);
+		out_int(arr[1][0]);
+		out_int(arr[1][1]);
+		out_int(arr[1][2]);
+		out_int(arr[2][0]);
+		out_int(arr[2][1]);
+		out_int(arr[2][2]); *)
