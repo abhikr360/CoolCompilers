@@ -87,6 +87,7 @@ tokens = (
    'COPY_STRING',
    'READ_FILE',
    'WRITE_FILE',
+   'APPEND_FILE',
 
    )
 # reserved Keyword
@@ -133,6 +134,7 @@ reserved = {
   'copy_string' : 'COPY_STRING',
   'read_file' : 'READ_FILE',
   'write_file' : 'WRITE_FILE',
+  'append_file' : 'APPEND_FILE',
 
 }
 

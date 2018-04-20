@@ -1,78 +1,132 @@
 .data
 space: .asciiz " "
-str.2: .asciiz "popo"
-str.3: .asciiz "niggs\n"
-str.1: .asciiz "Goodbye\n"
-Main.a : .word 0
-Main.b : .word 0
+str.2: .asciiz "extra"
+str.1: .asciiz "file.txt"
+Main.file_name : .word 0
+Main.input_str : .word 0
+Main.temp : .word 0
 .text
 main:
 
 j CLASS.Main
 
-#-----------------------------------block id: 139916126056392
+#-----------------------------------block id: 140632559981344
 
 jal exit_func
 
-#-----------------------------------block id: 139916126056248
+#-----------------------------------block id: 140632559981416
 CLASS.Main:
 
-lw $t5,Main.a
+lw $t5,Main.file_name
 li $v0, 9
 li $a0, 100
 sll $a0, $a0, 2
 syscall
 move $t5, $v0
 
-lw $s6,Main.b
+la $t5, str.1
+
+lw $s6,Main.input_str
 li $v0, 9
 li $a0, 100
 sll $a0, $a0, 2
 syscall
 move $s6, $v0
 
-sw $s6, Main.b
-sw $t5, Main.a
+la $s6, str.2
+
+lw $s5,Main.temp
+li $v0, 9
+li $a0, 100
+sll $a0, $a0, 2
+syscall
+move $s5, $v0
+
+sw $s5, Main.temp
+sw $s6, Main.input_str
+sw $t5, Main.file_name
 
 move $fp, $sp
-addiu $sp, $sp, -0
+addiu $sp, $sp, -4
 jal Main.main
 
-#-----------------------------------block id: 139916126077008
+#-----------------------------------block id: 140632559981488
 
 jal exit_func
 
-#-----------------------------------block id: 139916126077080
+#-----------------------------------block id: 140632559981632
 Main.main:
 
-lw $t5,Main.a
-la $t5, str.1
-
-lw $s6,Main.b
-la $s6, str.2
-
-move $t6, $ra
+lw $t5, Main.file_name
+lw $s6,Main.temp
+move $t9, $ra
+li $a1, 0
 move $a0,$t5
-la $a1, str.3
+jal file_open
+move $a0, $t8
+move $a1, $s6
+jal file_read
+jal file_close
+move $ra, $t9
+
+lw $s5, Main.input_str
+move $t6, $ra
+move $a0,$s6
+move $a1, $s5
 jal strcat
 move $ra, $t6
 
 move $t9, $ra
+li $a1, 1
 move $a0,$t5
-jal print_string
+jal file_open
+move $a0, $t8
+move $a1, $s6
+jal file_write
+jal file_close
 move $ra, $t9
+
+lw $t1, -4($fp)
+li $v0, 9
+li $a0, 100
+sll $a0, $a0, 2
+syscall
+move $t1, $v0
 
 move $t9, $ra
-move $a0,$s6
-jal print_string
+li $a1, 0
+move $a0,$t5
+jal file_open
+move $a0, $t8
+move $a1, $t1
+jal file_read
+jal file_close
 move $ra, $t9
 
-sw $s6, Main.b
-sw $t5, Main.a
+move $t6, $ra
+move $a0,$t1
+move $a1, $s5
+jal strcat
+move $ra, $t6
+
+move $t9, $ra
+li $a1, 1
+move $a0,$t5
+jal file_open
+move $a0, $t8
+move $a1, $t1
+jal file_write
+jal file_close
+move $ra, $t9
+
+sw $s6, Main.temp
+sw $s5, Main.input_str
+sw $t1, -4($fp)
+sw $t5, Main.file_name
 
 jal exit_func
 
-#-----------------------------------block id: 139916126077152
+#-----------------------------------block id: 140632559981560
 exit_func:
 li $v0,10
 syscall

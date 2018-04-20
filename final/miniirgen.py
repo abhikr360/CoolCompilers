@@ -1554,6 +1554,25 @@ def p_write_file(p):
   code.append('WRITE_FILE,' + get_expression_place(p[3].place) + ',' + get_expression_place(p[5].place))
   p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
 
+def p_append_file(p):
+  'expression : APPEND_FILE LPAREN expression COMMA expression RPAREN'
+
+  file_content = newtemp('String')
+
+
+  if(p[3].datatype != 'String'):
+    sys.exit('Invalid File name')
+
+  if(p[5].datatype != 'String'):
+    sys.exit('Can only write strings in file')
+  code = []
+  code.append(p[5].code)
+  code.append(p[3].code)
+  code.append('ALLOCATE,' + get_expression_place(file_content) + ',100')
+  code.append('READ_FILE,' + get_expression_place(file_content) + ',' + get_expression_place(p[3].place))
+  code.append('CONCAT_STRING,' + get_expression_place(file_content) + ',' + get_expression_place(p[5].place))
+  code.append('WRITE_FILE,' + get_expression_place(p[3].place) + ',' + get_expression_place(file_content))
+  p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
 
 def p_concat_string(p):
   'expression : CONCAT_STRING LPAREN expression COMMA expression RPAREN'
