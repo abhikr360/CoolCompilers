@@ -1561,6 +1561,31 @@ def p_write_file(p):
   p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
 
 
+def p_concat_string(p):
+  'expression : CONCAT_STRING LPAREN expression COMMA expression RPAREN'
+
+  if(p[5].datatype != 'String'):
+    sys.exit('Invalid Destination String')
+
+  if(p[3].datatype != 'String'):
+    sys.exit('Invalid Latter String')
+
+  code = p[5].code
+  code.append('CONCAT_STRING,' + get_expression_place(p[3].place) + ',' + get_expression_place(p[5].place))
+  p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
+
+def p_copy_string(p):
+  'expression : COPY_STRING LPAREN ID COMMA expression RPAREN'
+
+  if(p[5].datatype != 'String'):
+    sys.exit('Invalid Destination String')
+
+  # if(p[3].datatype != 'String'):
+  #   sys.exit('Invalid Latter String')
+
+  code = p[5].code
+  code.append('COPY_STRING,' + get_expression_place(p[3]) + ',' + get_expression_place(p[5].place))
+  p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
 
 # def p_expression_self(p):
 #   'expression : SELF'

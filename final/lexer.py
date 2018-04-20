@@ -83,6 +83,8 @@ tokens = (
    'OUT_STRING',
    'SCAN_INT',
    'SCAN_STRING',
+   'CONCAT_STRING',
+   'COPY_STRING',
    'READ_FILE',
    'WRITE_FILE',
 
@@ -127,6 +129,8 @@ reserved = {
   'out_string' : 'OUT_STRING',
   'scan_int' : 'SCAN_INT',
   'scan_string' : 'SCAN_STRING',
+  'concat_string' : 'CONCAT_STRING',
+  'copy_string' : 'COPY_STRING',
   'read_file' : 'READ_FILE',
   'write_file' : 'WRITE_FILE',
 
