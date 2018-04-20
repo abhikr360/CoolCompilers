@@ -1,7 +1,7 @@
 
 class Main {
    n : Int <- 4;
-   m : Int <- ;
+   m : Int <- 1;
    def fact : Int (n: Int, m: Int){
       if n+m<3 then
          return n+m;

@@ -1,4 +1,4 @@
-class Do {
+(*class Do {
 	def hello : Int (a : String, self : Do){
 		out_string(a)
 	};
@@ -10,35 +10,26 @@ class Do {
 			return "\ndude\n";;
 		}
 	};
-};
+};*)
 class Main
 {
-	a : String <- "Hello W\n";
+	a : String;
 	b : String;
-	c : Do <- new Do;
-
-	def len : Int(s : String)
-	{
-		{
-			let i : Int <- 0, temp : String <- s in
-			{
-				while (s > )
-			}tel;
-		}
-	};
+	c : Int <- 5;
+	(*c : Do <- new Do;*)
 
 	def main : Int ()
 	{
 		{
 			a <- "Goodbye\n";
 			b <- "popo";
+			(*copy_string(a,b);
+			out_string(a);
+			out_string(b);*)
+
+			concat_string(a,b);
 			out_string(a);
 			out_string(b);
-
-
-			c.hello(b);
-			a <- c.greet("Tushar");
-			out_string(a);
 
 		}
 	};

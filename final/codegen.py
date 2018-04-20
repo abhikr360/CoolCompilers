@@ -68,6 +68,8 @@ class InstrType(Enum):
 	ALLOCATE=21
 	READ_FILE=22
 	WRITE_FILE=23
+	COPY_STRING=24
+	CONCAT_STRING=25
 
 
 class EntryType(Enum):
@@ -350,6 +352,29 @@ def set_inputs(row, curr_statement):
 			curr_statement.in2 = row[3]
 			curr_statement.in2_type = EntryType.VARIABLE
 
+	elif(curr_statement.instr_typ == InstrType.COPY_STRING):
+
+		curr_statement.in1 = row[2]
+		curr_statement.in1_type = EntryType.VARIABLE
+
+		if(is_string(row[3])):
+			curr_statement.in2 = row[3]
+			curr_statement.in2_type = EntryType.STRING
+		else:
+			curr_statement.in2 = row[3]
+			curr_statement.in2_type = EntryType.VARIABLE
+
+	elif(curr_statement.instr_typ == InstrType.CONCAT_STRING):
+
+		curr_statement.in1 = row[2]
+		curr_statement.in1_type = EntryType.VARIABLE
+
+		if(is_string(row[3])):
+			curr_statement.in2 = row[3]
+			curr_statement.in2_type = EntryType.STRING
+		else:
+			curr_statement.in2 = row[3]
+			curr_statement.in2_type = EntryType.VARIABLE
 
 	#-------------------row 2 end -------------------
 	##print(curr_statement.linenum, curr_statement.instr_typ, curr_statement.operator,curr_statement.out,curr_statement.in1,curr_statement.in2)
@@ -765,6 +790,8 @@ def main(SymbolTables, StringDict):
 	file_write_func="file_write:\nli $v0, 15\nmove $a0, $t8\nmove $t6, $ra\njal strlen\nmove $ra, $t6\nsyscall\njr $ra\n"
 
 	strlen_func="strlen:\nmove $a3, $a1\nli $a2, 0\nj strlen.test\nstrlen.loop:\naddi $a3, $a3, 1\naddi $a2, $a2, 1\nstrlen.test:\nlb $t7, 0($a3)\nbnez $t7, strlen.loop\njr $ra\n"
+	strcat_func="strcat:\nmove $t9, $a0\nmove $t8, $a1\nstrcat.first:\nlb $t7, 0($t9)\nbeqz $t7, strcat.second\naddiu $t9, $t9 ,1\nj strcat.first\nstrcat.second:\nlb $t7, 0($t8)\nsb $t7, 0($t9)\nbeqz $t7, strcat.end\naddiu $t8, $t8, 1\naddiu $t9, $t9, 1\nj strcat.second\nstrcat.end:\nsb $zero, 0($t9)\njr $ra\n"
+	strcpy_func="strcpy:\nmove $t9, $a0\nmove $t8, $a1\nstrcpy.loop:\nlb $t7, 0($t9)\nbeq $t7, $zero, strcpy.end\naddiu $t9, $t9, 1\nsb $t7, 0($t8)\naddiu $t8, $t8, 1\nb strcpy.loop\nstrcpy.end:\nsb $zero, 0($t8)\nmove $v0, $t9\njr $ra\n"
 
 # ---------------------------------------------------------------Translation -----------------------------
 	prevst = None
@@ -897,9 +924,11 @@ def main(SymbolTables, StringDict):
 					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "slt $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "sgei $%s, $%s, %d\n"%(VariableData[st.out][1],VariableData[st.in2][1],st.in1)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in1
+						st.code_statement = st.code_statement + "sge $%s, $%s, $t7\n"%(VariableData[st.out][1],VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "slti $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in2
+						st.code_statement = st.code_statement + "slt $%s, $%s, $t7\n"%(VariableData[st.out][1], VariableData[st.in1][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 < st.in2 else 0)
 
@@ -910,7 +939,8 @@ def main(SymbolTables, StringDict):
 						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in1
 						st.code_statement = st.code_statement + "sle $%s, $t7, %d\n"%(VariableData[st.out][1],VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "slei $%s, $%s, %d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in2
+						st.code_statement = st.code_statement + "sle $%s, $%s, $t7\n"%(VariableData[st.out][1],VariableData[st.in1][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 <= st.in2 else 0)
 					# st.code_statement += "addi, $%s, $%s, 1\n"%(VariableData[st.out][1])
@@ -920,7 +950,8 @@ def main(SymbolTables, StringDict):
 					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "sgt $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "slei $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in1
+						st.code_statement = st.code_statement + "sle $%s, $%s, $t7\n"%(VariableData[st.out][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in2
 						st.code_statement = st.code_statement + "sgt $%s, $%s, $t7\n"%(VariableData[st.out][1],VariableData[st.in1][1])
@@ -931,9 +962,11 @@ def main(SymbolTables, StringDict):
 					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "sge $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "slti $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in1
+						st.code_statement = st.code_statement + "slt $%s, $%s, $t7\n"%(VariableData[st.out][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sgei $%s, $%s, %d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in2
+						st.code_statement = st.code_statement + "sge $%s, $%s, $t7\n"%(VariableData[st.out][1],VariableData[st.in1][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 >= st.in2 else 0)
 					
@@ -1143,12 +1176,41 @@ def main(SymbolTables, StringDict):
 					st.code_statement += "jal file_write\n"
 					st.code_statement += "jal file_close\n"
 
-				if(st.in2_type == EntryType.STRING):
+				elif(st.in2_type == EntryType.STRING):
 					st.code_statement += "la $a1, %s\n"%searchString(StringDict,st.in2)
 					st.code_statement += "jal file_write\n"
 					st.code_statement += "jal file_close\n"
 
 				st.code_statement += "move $ra, $t9\n"
+
+			elif(st.instr_typ == InstrType.COPY_STRING):
+				st.code_statement += "move $t6, $ra\n"
+				st.code_statement += "move $a1,$%s\n" % (VariableData[st.in1][1])
+
+				if(st.in2_type == EntryType.VARIABLE):
+					st.code_statement += "move $a0, $%s\n"%(VariableData[st.in2][1])
+					
+				elif(st.in2_type == EntryType.STRING):
+					st.code_statement += "la $a0, %s\n"%searchString(StringDict,st.in2)
+				
+				st.code_statement += "jal strcpy\n"
+
+				st.code_statement += "move $ra, $t6\n"
+
+			elif(st.instr_typ == InstrType.CONCAT_STRING):
+				st.code_statement += "move $t6, $ra\n"
+				st.code_statement += "move $a0,$%s\n" % (VariableData[st.in1][1])
+
+				if(st.in2_type == EntryType.VARIABLE):
+					st.code_statement += "move $a1, $%s\n"%(VariableData[st.in2][1])
+					
+				elif(st.in2_type == EntryType.STRING):
+					st.code_statement += "la $a1, %s\n"%searchString(StringDict,st.in2)
+				
+				st.code_statement += "jal strcat\n"
+
+				st.code_statement += "move $ra, $t6\n"
+
 
 			elif(st.instr_typ == InstrType.PRINT_INT):
 				st.code_statement += "move $t9, $ra\n"
@@ -1297,8 +1359,8 @@ def main(SymbolTables, StringDict):
 	assemblyfile.write(file_close_func)
 	assemblyfile.write(file_write_func)
 	assemblyfile.write(strlen_func)
-
-	
+	assemblyfile.write(strcpy_func)
+	assemblyfile.write(strcat_func)
 
 	assemblyfile.close()
 

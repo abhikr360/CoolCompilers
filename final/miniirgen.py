@@ -103,8 +103,8 @@ def p_start(p):
   f.write("2,EXIT\n")
   for a in p[0].code:
     if(len(a)):
-      print(str(i) + ',' + a)
-      f.write(str(i) + ',' + a + '\n')
+      print(str(i) + ',' + str(a))
+      f.write(str(i) + ',' + str(a) + '\n')
       i+=1
   f.close()
 
@@ -238,7 +238,8 @@ def p_feature_header_body(p):
   met = current_symbol_table[0].getMethod(p[1].name)
   met.nargs = p[2].nargs
 
-  # ClassTable[current_symbol_table[0].parent.scope_name].function_parameters[p[1].name] = p[2].nargs
+  if p[2].nargs == 0:
+    ClassTable[current_symbol_table[0].parent.scope_name].function_parameters[p[1].name] = p[2].nargs
 
   # print current_symbol_table[0].parent.scope_name,p[1].name,p[2].nargs
   # raw_input()
@@ -265,6 +266,8 @@ def p_feature_header_with_modifier(p):
   current_symbol_table[0].enter_method(p[3],p[5].place,current_symbol_table[0].scope_name)
 
   ClassTable[current_symbol_table[0].scope_name].functions[p[3]] = current_symbol_table[0].scope_name+'.'+p[3]
+  
+  ClassTable[current_symbol_table[0].scope_name].function_parameters[p[3]] = 0
 
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
@@ -288,6 +291,8 @@ def p_feature_header(p):
   current_symbol_table[0].enter_method(p[2],p[4].place,current_symbol_table[0].scope_name)
 
   ClassTable[current_symbol_table[0].scope_name].functions[p[2]] = current_symbol_table[0].scope_name+'.'+p[2]
+
+  ClassTable[current_symbol_table[0].scope_name].function_parameters[p[3]] = 0
 
   current_symbol_table[0] = new_sym_tab
   SymbolTables.append(new_sym_tab)
@@ -480,6 +485,9 @@ def p_formal_with_assign(p):
 
   code.append('ASSIGN,%s,%s'%(get_expression_place(p[1]), get_expression_place(p[5].place)))
   p[0]=TREE.Formal(code=code,name = p[1])
+
+  if current_symbol_table[0].scope_name <> 'Main':
+    sys.exit("Variable iniialised in "+current_symbol_table[0].scope_name+" Variable cannot be initialised in classes other than Main.")
 
   if p[3].place in ClassDict or p[3].place in basicDataType:
     pass
@@ -736,9 +744,7 @@ def p_expression_function_call_2(p):
   met = current_symbol_table[0].getMethod(p[1])
 
   t=newtemp()
-  print('@@', met)
-  print(met.parent_class)
-  print(ClassTable[met.parent_class].function_parameters)
+
   function_args = ClassTable[met.parent_class].function_parameters[p[1]]
   if function_args <> 0:
     sys.exit(met.name + " function takes %d"%function_args + " argument : Given 0")
@@ -1678,7 +1684,51 @@ def p_write_file(p):
   code.append('WRITE_FILE,' + get_expression_place(p[3].place) + ',' + get_expression_place(p[5].place))
   p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
 
+def p_append_file(p):
+  'expression : APPEND_FILE LPAREN expression COMMA expression RPAREN'
 
+  file_content = newtemp('String')
+
+
+  if(p[3].datatype != 'String'):
+    sys.exit('Invalid File name')
+
+  if(p[5].datatype != 'String'):
+    sys.exit('Can only write strings in file')
+  code = []
+  code.append(p[5].code)
+  code.append(p[3].code)
+  code.append('ALLOCATE,' + get_expression_place(file_content) + ',100')
+  code.append('READ_FILE,' + get_expression_place(file_content) + ',' + get_expression_place(p[3].place))
+  code.append('CONCAT_STRING,' + get_expression_place(file_content) + ',' + get_expression_place(p[5].place))
+  code.append('WRITE_FILE,' + get_expression_place(p[3].place) + ',' + get_expression_place(file_content))
+  p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
+
+def p_concat_string(p):
+  'expression : CONCAT_STRING LPAREN expression COMMA expression RPAREN'
+
+  if(p[5].datatype != 'String'):
+    sys.exit('Invalid Destination String')
+
+  if(p[3].datatype != 'String'):
+    sys.exit('Invalid Latter String')
+
+  code = p[5].code
+  code.append('CONCAT_STRING,' + get_expression_place(p[3].place) + ',' + get_expression_place(p[5].place))
+  p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
+
+def p_copy_string(p):
+  'expression : COPY_STRING LPAREN ID COMMA expression RPAREN'
+
+  if(p[5].datatype != 'String'):
+    sys.exit('Invalid Destination String')
+
+  # if(p[3].datatype != 'String'):
+  #   sys.exit('Invalid Latter String')
+
+  code = p[5].code
+  code.append('COPY_STRING,' + get_expression_place(p[3]) + ',' + get_expression_place(p[5].place))
+  p[0]=TREE.Expression(code=code, datatype=p[5].datatype)
 
 # def p_expression_self(p):
 #   'expression : SELF'
