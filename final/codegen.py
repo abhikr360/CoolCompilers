@@ -897,9 +897,11 @@ def main(SymbolTables, StringDict):
 					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "slt $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "sgei $%s, $%s, %d\n"%(VariableData[st.out][1],VariableData[st.in2][1],st.in1)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in1
+						st.code_statement = st.code_statement + "sge $%s, $%s, $t7\n"%(VariableData[st.out][1],VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "slti $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in1][1], st.in2)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in2
+						st.code_statement = st.code_statement + "slt $%s, $%s, $t7\n"%(VariableData[st.out][1], VariableData[st.in1][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 < st.in2 else 0)
 
@@ -910,7 +912,8 @@ def main(SymbolTables, StringDict):
 						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in1
 						st.code_statement = st.code_statement + "sle $%s, $t7, %d\n"%(VariableData[st.out][1],VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "slei $%s, $%s, %d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in2
+						st.code_statement = st.code_statement + "sle $%s, $%s, $t7\n"%(VariableData[st.out][1],VariableData[st.in1][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 <= st.in2 else 0)
 					# st.code_statement += "addi, $%s, $%s, 1\n"%(VariableData[st.out][1])
@@ -920,7 +923,8 @@ def main(SymbolTables, StringDict):
 					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "sgt $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "slei $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in1
+						st.code_statement = st.code_statement + "sle $%s, $%s, $t7\n"%(VariableData[st.out][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in2
 						st.code_statement = st.code_statement + "sgt $%s, $%s, $t7\n"%(VariableData[st.out][1],VariableData[st.in1][1])
@@ -931,9 +935,11 @@ def main(SymbolTables, StringDict):
 					if(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.VARIABLE):
 						st.code_statement = st.code_statement + "sge $%s, $%s, $%s\n"%(VariableData[st.out][1], VariableData[st.in1][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.VARIABLE and st.in1_type == EntryType.INTEGER):
-						st.code_statement = st.code_statement + "slti $%s, $%s, %d\n"%(VariableData[st.out][1], VariableData[st.in2][1], st.in1)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in1
+						st.code_statement = st.code_statement + "slt $%s, $%s, $t7\n"%(VariableData[st.out][1], VariableData[st.in2][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.VARIABLE):
-						st.code_statement = st.code_statement + "sgei $%s, $%s, %d\n"%(VariableData[st.out][1],VariableData[st.in1][1],st.in2)
+						st.code_statement = st.code_statement + "li $t7,%d\n"%st.in2
+						st.code_statement = st.code_statement + "sge $%s, $%s, $t7\n"%(VariableData[st.out][1],VariableData[st.in1][1])
 					elif(st.in2_type == EntryType.INTEGER and st.in1_type == EntryType.INTEGER):
 						st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], 1 if st.in1 >= st.in2 else 0)
 					

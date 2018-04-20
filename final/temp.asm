@@ -1,139 +1,194 @@
 .data
 space: .asciiz " "
-Main.e : .word 0
-Main.bar : .word 0
-Main.c : .word 0
-Main.d : .word 0
+Main.n : .word 0
+Main.m : .word 0
 .text
 main:
 
 j CLASS.Main
 
-#-----------------------------------block id: 140635593638976
+#-----------------------------------block id: 140399007904328
 
 jal exit_func
 
-#-----------------------------------block id: 140635593639048
+#-----------------------------------block id: 140399007904400
 CLASS.Main:
 
+lw $t5,Main.n
+li $t5, 4
+
+lw $s6,Main.m
+li $s6, 1
+
+sw $t5, Main.n
+sw $s6, Main.m
 
 move $fp, $sp
-addiu $sp, $sp, -28
+addiu $sp, $sp, -8
 jal Main.main
 
-#-----------------------------------block id: 140635593639120
+#-----------------------------------block id: 140399007904472
 
 jal exit_func
 
-#-----------------------------------block id: 140635593639192
-Main.main:
+#-----------------------------------block id: 140399007904544
+Main.fact:
 
-lw $t5, Main.c
+lw $t5, -8($fp)
+lw $t7, 0($fp)
+sw $t7, -4($fp)
+move $t5, $t7
+
 lw $s6, -4($fp)
-li $t7,0
-sgt $s6, $t5, $t7
+lw $t7, 4($fp)
+sw $t7, -8($fp)
+move $s6, $t7
+
+lw $s5, -12($fp)
+add $s5, $s6, $t5
+
+lw $t1, -16($fp)
+li $t7,3
+slt $t1, $s5, $t7
 
 li $t7,0
-ble $s6,$t7,label.5
+sw $t5, -4($fp)
+sw $s5, -12($fp)
+sw $t1, -16($fp)
+sw $s6, -8($fp)
 
-lw $s5, Main.d
-lw $t1, -8($fp)
-li $t7,0
-sgt $t1, $s5, $t7
+bgt $t1,$t7,label.1
 
-li $t7,0
-ble $t1,$t7,label.5
+#-----------------------------------block id: 140399007904616
+lw $t5, -8($fp)
+lw $s6, -4($fp)
+lw $s5, -24($fp)
+add $s5, $t5, $s6
 
-lw $s3, -12($fp)
-li $s3, 1
+lw $t1, -28($fp)
+addi $t1, $t5, -1
+
+addiu $sp, $sp, -4
+sw $ra, ($sp)
+addiu $sp, $sp, -4
+sw $fp, ($sp)
+
+addiu $sp, $sp, -4
+sw $t1, ($sp)
+
+addiu $sp, $sp, -4
+sw $s6, ($sp)
 
 sw $s6, -4($fp)
-sw $s3, -12($fp)
-sw $t1, -8($fp)
-sw $s5, Main.d
-sw $t5, Main.c
+sw $s5, -24($fp)
+sw $t5, -8($fp)
+sw $t1, -28($fp)
 
-j label.6
+move $fp, $sp
+addiu $sp, $sp, -36
+jal Main.fact
 
-#-----------------------------------block id: 140635593641136
-label.5:
+#-----------------------------------block id: 140399007892688
+lw $t5, -32($fp)
+lw $fp, ($sp)
+addiu $sp, $sp, 4
+lw $ra, ($sp)
+addiu $sp, $sp, 4
+move $t5, $v0
 
-lw $t5, -12($fp)
-li $t5, 0
-
-sw $t5, -12($fp)
-
-#-----------------------------------block id: 140635593641208
-label.6:
-
-lw $t5, -12($fp)
-li $t7,0
-sw $t5, -12($fp)
-
-bgt $t5,$t7,label.9
-
-#-----------------------------------block id: 140635593639264
-lw $t5, Main.d
-lw $s6, Main.e
-lw $s5, -20($fp)
-and $s5, $t5, $s6
-
-li $t7,0
-sw $s5, -20($fp)
-sw $s6, Main.e
-sw $t5, Main.d
-
-bgt $s5,$t7,label.7
-
-#-----------------------------------block id: 140635593639336
-lw $t5, Main.d
-lw $s6, -28($fp)
-addi $s6, $t5, -1
-
-move $t5, $s6
-
-sw $s6, -28($fp)
-sw $t5, Main.d
-
-j label.8
-
-#-----------------------------------block id: 140635593639408
-label.7:
-
-lw $t5, Main.e
 lw $s6, -24($fp)
-addi $s6, $t5, 1
-
-move $t5, $s6
+lw $s5, -36($fp)
+mult $s6, $t5
+mflo $s5
 
 sw $s6, -24($fp)
-sw $t5, Main.e
+sw $t5, -32($fp)
+sw $s5, -36($fp)
 
-#-----------------------------------block id: 140635593639480
-label.8:
+move $v0, $s5
+
+#-----------------------------------block id: 140399007892760
+
+j label.2
+
+#-----------------------------------block id: 140399007904832
+label.1:
+
+lw $t5, -8($fp)
+lw $s6, -4($fp)
+lw $s5, -20($fp)
+add $s5, $t5, $s6
+
+sw $s6, -4($fp)
+sw $s5, -20($fp)
+sw $t5, -8($fp)
+
+move $v0, $s5
+
+#-----------------------------------block id: 140399007904904
+label.2:
+
+addiu $sp, $sp, 4
+
+addiu $sp, $sp, 4
+
+addiu $sp, $sp, 36
+
+jr $ra
+
+#-----------------------------------block id: 140399007904976
+Main.main:
 
 
-j label.10
+#-----------------------------------block id: 140399007905048
+LET_BEGIN_Main.main.LET_1:
 
-#-----------------------------------block id: 140635593639552
-label.9:
+addiu $sp, $sp, -4
+sw $ra, ($sp)
+addiu $sp, $sp, -4
+sw $fp, ($sp)
 
-lw $t5, Main.d
-lw $s6, -16($fp)
-addi $s6, $t5, 1
+lw $t5, Main.n
+addiu $sp, $sp, -4
+sw $t5, ($sp)
 
-move $t5, $s6
+lw $s6, Main.m
+addiu $sp, $sp, -4
+sw $s6, ($sp)
 
-sw $s6, -16($fp)
-sw $t5, Main.d
+sw $t5, Main.n
+sw $s6, Main.m
 
-#-----------------------------------block id: 140635593639624
-label.10:
+move $fp, $sp
+addiu $sp, $sp, -36
+jal Main.fact
+
+#-----------------------------------block id: 140399007905408
+lw $t5, -4($fp)
+lw $fp, ($sp)
+addiu $sp, $sp, 4
+lw $ra, ($sp)
+addiu $sp, $sp, 4
+move $t5, $v0
+
+lw $s6, -8($fp)
+move $s6, $t5
+
+move $t9, $ra
+move $a0,$s6
+jal print_int
+move $ra, $t9
+
+sw $s6, -8($fp)
+sw $t5, -4($fp)
+
+#-----------------------------------block id: 140399007905480
+LET_OVER_LET_1:
 
 
 jal exit_func
 
-#-----------------------------------block id: 140635593635888
+#-----------------------------------block id: 140399007905264
 exit_func:
 li $v0,10
 syscall
