@@ -1,0 +1,15 @@
+#!/bin/bash
+
+
+code=""
+for arg; do
+	current_file=$(cat $arg)
+	code=$code$current_file
+done
+echo $code > t.cl
+
+python -B miniirgen.py t.cl tac  > /dev/null
+spim -f temp.asm
+rm tac
+rm temp.asm
+rm t.cl
