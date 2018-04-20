@@ -3,7 +3,8 @@ class Main
 	(*a : String;
 	b : String <- "file.txt";*)
 	file_name : String <- "file.txt";
-	input_str : String <- "Now I am complete";
+	input_str : String <- "extra";
+	temp : String;
 	def main : Int()
 	{
 		{
@@ -14,7 +15,13 @@ class Main
 			out_string(b);
 			out_string(a);*)
 
-			write_file(file_name, input_str);
+			read_file(temp, file_name);
+
+			concat_string(temp, input_str);
+			
+			write_file(file_name, temp);
+
+			append_file(file_name, input_str);
 		}
 
 	};
