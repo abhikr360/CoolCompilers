@@ -27,7 +27,7 @@ class Main
 			out_string(a);
 			out_string(b);*)
 
-			concat_string(a,c);
+			concat_string(a,b);
 			out_string(a);
 			out_string(b);
 
