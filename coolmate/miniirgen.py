@@ -95,15 +95,12 @@ def p_start(p):
 
   p[0]=TREE.Start(code=p[1].code)
   # t = newtemp()
-  print "1,GOTO,CLASS.Main"
-  print "2,EXIT"
   i=3
   f=open(sys.argv[2], 'wb')
   f.write("1,GOTO,CLASS.Main,"+'\n')
   f.write("2,EXIT\n")
   for a in p[0].code:
     if(len(a)):
-      print(str(i) + ',' + str(a))
       f.write(str(i) + ',' + str(a) + '\n')
       i+=1
   f.close()
@@ -1349,7 +1346,6 @@ def p_expression_at_function_with_arguments(p):
   if p[7].nargs + 1 <> num:
     sys.exit(p[5] + " takes %d"%num + " arguments Given %d"%p[7].nargs)
 
-  print p[3]
   if( p[5] in ClassTable[p[3]].privateFunctions):
     sys.exit("Call to private function......ERROR")
 
@@ -1760,17 +1756,17 @@ with open(input_file) as file:
 parser.parse(data)
 
 
-for s in SymbolTables:
-  print("===========")
-  s.printsymtab()
-print("===========")
+# for s in SymbolTables:
+#   print("===========")
+#   s.printsymtab()
+# print("===========")
 
 
 
-print(len(SymbolTables))
-for t in ClassTable:
-  print ClassTable[t].printClass()
+# print(len(SymbolTables))
+# for t in ClassTable:
+#   print ClassTable[t].printClass()
 
-print(".... Parsing .... done ....")
+print(".... Parsing .... done ....\n")
 main(SymbolTables, String_Dict)
-print String_Dict
+# print String_Dict

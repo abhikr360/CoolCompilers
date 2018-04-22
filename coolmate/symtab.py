@@ -101,9 +101,6 @@ class Symtab:
 
 
 		while current_sym_tab <> None:
-			if(name == 'b'):
-				current_sym_tab.printsymtab()
-				print (current_sym_tab.variables)
 			for variable_entry in current_sym_tab.variables:
 				if(variable_entry.name == name):
 					return variable_entry
