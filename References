@@ -3,3 +3,6 @@ https://github.com/aalhour/PyCOOLC/blob/master/docs/Grammar.md
 
 Official COOL Manual - 
 https://theory.stanford.edu/~aiken/software/cool/cool-manual.pdf
+
+Lexer and parser tutorial were seen from - 
+http://www.dabeaz.com/ply/ply.html
