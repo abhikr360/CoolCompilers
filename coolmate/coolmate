@@ -2,14 +2,33 @@
 
 
 code=""
+# for arg; do
+# 	if [ ! -f $arg ]; then
+# 		echo "file not found"
+# 		exit
+# 	fi
+# 	current_file=$(cat $arg)
+# 	code=$code$current_file
+# done
+# echo $code > t.cl
+rm t.cl 2>/dev/null
+touch t.cl
 for arg; do
-	current_file=$(cat $arg)
+	if [ ! -f $arg ]; then
+		echo "file not found"
+		exit
+	fi
+	cat $arg >> t.cl
 	code=$code$current_file
 done
-echo $code > t.cl
 
-python -B miniirgen.py t.cl tac  > /dev/null
-spim -f temp.asm
-rm tac
-rm temp.asm
-rm t.cl
+python -B miniirgen.py t.cl tac
+if [ -f temp.asm ]; then
+	spim -f temp.asm
+	rm tac
+	rm temp.asm
+	rm t.cl
+else
+	echo "temp.asm not created"
+	exit
+fi

@@ -1,4 +1,4 @@
-(*class Do {
+class Do {
 	def hello : Int (a : String, self : Do){
 		out_string(a)
 	};
@@ -25,20 +25,20 @@ class Lo {
 			return "\ndude\n";;
 		}
 	};
-};*)
+};
 class Main
 {
-	(*a : String <- "Hello W\n";
+	a : String <- "Hello W\n";
 	b : String;
 	n : Int <- 6;
 	c : Do <- new Do;
 	l : Lo <- new Lo;
-	d : Int[6]*)
+	d : Int[6];
 	i : Int;
 	def main : Int ()
 	{
 		{
-			(*for (i<- 0; i<10;i<-i+1)loop
+			for (i<- 0; i<10;i<-i+1)loop
 			{
 				
 				if (i<3) then
@@ -56,7 +56,7 @@ class Main
 
 
 			pool;
-			*)
+			
 			i<- 0;
 
 			while(i<10)loop{

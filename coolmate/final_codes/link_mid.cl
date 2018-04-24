@@ -48,12 +48,11 @@ class Main{
 			}
 			pool;
 
-			out_string("121");
+			out_string(" ");
 
 			fast <- head;
 			slow <- head;
 
-			((fast.next).next).print_data();
 
 			while ( (not isvoid(fast)) and (not isvoid(fast.next)) )(*and (not isvoid((fast.next).next)) )  *)
 			loop
@@ -64,7 +63,7 @@ class Main{
 				slow <- slow.next;
 			}
 			pool;
-
+			out_string("Mid of linked list is \n");
 			slow.print_data();
 
 		}

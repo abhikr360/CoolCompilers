@@ -627,7 +627,6 @@ def UpdateVariableData(statement,block):
 			# print(statement.out)
 			register = GetReg(statement,block)
 			VariableData[statement.out][1] = register
-			print statement.out,register
 			UsableRegisters[register] = statement.out
 			l=lookup_LocalSymbolTable(statement.out)
 
@@ -658,7 +657,6 @@ def main(SymbolTables, StringDict):
 	machine_code = ".text\n"
 	data_code = data_code + 'space: .asciiz " "\n'
 	for string in StringDict:
-		print (StringDict[string].replace("'", "\"")).replace("\n","\\%c"%("n")),"@@@@"
 		data_code += "%s: .asciiz %s\n"%(string, (StringDict[string].replace("'", "\"")).replace("\n","\\%c"%("n")))
 
 
@@ -701,20 +699,20 @@ def main(SymbolTables, StringDict):
 
 
 #----------------------------------------Local Symbol Table Loaded----------------------------------
-	print("----------LOCAL SYMBOL TABLE START----------")
-	for s in LocalSymbolTable:
-		print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
-	print("----------LOCAL SYMBOL TABLE END----------")
+	# print("----------LOCAL SYMBOL TABLE START----------")
+	# for s in LocalSymbolTable:
+	# 	print (s, LocalSymbolTable[s].size, LocalSymbolTable[s].dataType, LocalSymbolTable[s].scope)
+	# print("----------LOCAL SYMBOL TABLE END----------")
 
-	print("---------- VariableData START--------")
-	for k in VariableData.keys():
-		print(k, VariableData[k][0], VariableData[k][1])
-	print("---------- VariableData END--------")
+	# print("---------- VariableData START--------")
+	# for k in VariableData.keys():
+	# 	print(k, VariableData[k][0], VariableData[k][1])
+	# print("---------- VariableData END--------")
 
-	print("--------- MethodSize START------")
-	for k in MethodSize.keys():
-		print(k , MethodSize[k])
-	print("--------- MethodSize END ------")
+	# print("--------- MethodSize START------")
+	# for k in MethodSize.keys():
+	# 	print(k , MethodSize[k])
+	# print("--------- MethodSize END ------")
 
 
 	os.system('rm -f temp.asm')
@@ -812,9 +810,7 @@ def main(SymbolTables, StringDict):
 				elif(st.in1_type == EntryType.INTEGER):
 					st.code_statement = st.code_statement + "li $%s, %d\n"%(VariableData[st.out][1], st.in1)
 				elif(st.in1_type == EntryType.STRING):
-					print "#######",st.in1
-					for k in StringDict:
-						print StringDict[k]
+					
 				 	st.code_statement += "la $%s, %s\n"%(VariableData[st.out][1], searchString(StringDict,st.in1))
 				 	# print VariableData[st.out][1],"@@@@@@@@@@@@"
 			elif(st.instr_typ == InstrType.ASSIGN):
