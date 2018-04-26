@@ -1,0 +1,6 @@
+<snippet>
+	<content><![CDATA[out_int($1);]]></content>
+	<tabTrigger>out</tabTrigger>
+	<scope>source.cool</scope>
+	<description>out_int</description>
+</snippet>

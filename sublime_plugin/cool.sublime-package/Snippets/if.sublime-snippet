@@ -1,0 +1,10 @@
+<snippet>
+	<content><![CDATA[if ($1) then{
+	$0
+}else{
+	$2
+}fi;]]></content>
+	<tabTrigger>if</tabTrigger>
+	<scope>source.cool</scope>
+	<description>if</description>
+</snippet>

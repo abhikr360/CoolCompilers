@@ -1,0 +1,8 @@
+<snippet>
+	<content><![CDATA[let $1 : Int in  {
+	$0
+}tel;]]></content>
+	<tabTrigger>let</tabTrigger>
+	<scope>source.cool</scope>
+	<description>let expression</description>
+</snippet>

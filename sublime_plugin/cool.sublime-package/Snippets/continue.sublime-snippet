@@ -1,0 +1,7 @@
+<snippet>
+	<content><![CDATA[continue;
+]]></content>
+	<tabTrigger>con</tabTrigger>
+	<scope>source.cool</scope>
+	<description>continue</description>
+</snippet>

@@ -1,0 +1,8 @@
+<snippet>
+	<content><![CDATA[while ($1) loop{
+	$0
+}pool;]]></content>
+	<tabTrigger>wh</tabTrigger>
+	<scope>source.cool</scope>
+	<description>while</description>
+</snippet>

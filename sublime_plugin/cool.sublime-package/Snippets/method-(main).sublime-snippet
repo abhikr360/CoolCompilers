@@ -1,0 +1,10 @@
+<snippet>
+	<content><![CDATA[class Main {
+	def main : SELF_TYPE() {
+		$0
+	};
+};]]></content>
+	<tabTrigger>Main</tabTrigger>
+	<scope>source.cool</scope>
+	<description>Main Class</description>
+</snippet>
