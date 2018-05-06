@@ -22,7 +22,7 @@ Reference :
 	It has been completely derived from java plugin of sublime-text editor. We have used base of 
 	java plugin and added 
 	+ Color coding for COOL constructs
-	+ Nested line commenting on comment shortcut (Ctrl-/) 
-	+ Auto-Complete with COOL program constructs
+	+ Nested line commenting on comment shortcut (Ctrl-/ or Ctrl-Shift-/) 
+	+ Auto-Complete of COOL program constructs
 
 
